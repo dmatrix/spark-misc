@@ -1,3 +1,6 @@
+#
+# simple example
+#
 from pyspark.sql import SparkSession
 from IPython.display import display
 
