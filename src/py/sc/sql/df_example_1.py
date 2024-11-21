@@ -1,5 +1,5 @@
 #
-# Example used from Learning Spark v3 
+# Example used from Learning Spark v2 
 #
 from __future__ import print_function
 
@@ -19,7 +19,6 @@ if __name__ == "__main__":
              .appName("MnMCount")
              .getOrCreate())
     
-    # Ensure we are conneccted to the spark session
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
