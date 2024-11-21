@@ -5,10 +5,18 @@ from pyspark.sql import SparkSession
 README_FILE="/Users/jules/spark_homes/current/README.md"
 
 if __name__ == "__main__":
+    # let's stop any existing SparkSession if running at all
+    SparkSession.builder.master("local[*]").getOrCreate().stop()
+
+    # Use SparkConnect
     spark = (SparkSession.builder
-        #.remote("sc://localhost")
+        .remote("sc://localhost")
         .appName("SimpleApp")
         .getOrCreate())
+    
+    # Ensure we are conneccted to the spark session
+    assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
+    print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
     
     log_data = spark.read.text(README_FILE).cache()
 
