@@ -4,10 +4,7 @@
 from pyspark.sql import Row
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as sf
-
-def do_print_util(label:str) -> None:
-    print(f"{label}")
-    print("-" * len(label))
+from utils import do_print_util
 
 if __name__ == "__main__":
 
