@@ -1,3 +1,6 @@
+#
+# user the pandas 10 min tutorial guide
+# https://pandas.pydata.org/docs/user_guide/10min.html#selection
 import sys
 sys.path.append('.')
 
@@ -84,7 +87,38 @@ if __name__ == "__main__":
     print_seperator()
     print(df_1.transform(lambda x: x * -0.2))
 
-    # Groupby operations
-    operation_str
+    # Groupby operations:splitting, applying a function and combining results
+    operation_str = "GROUPING OPERATIONS"
+    print_header(operation_str)
+    df_4 = pd.DataFrame({
+                    "A": ["foo", "bar", "foo", "bar", "foo", "bar", "foo", "foo"],
+                    "B": ["one", "one", "two", "three", "two", "two", "one", "three"],
+                    "C": np.random.randn(8),
+                    "D": np.random.randn(8),
+            })
+    print(df_4.head())
+
+    df_5 = df_4.groupby("A")[["C", "D"]].sum()
+    print_seperator()
+    print(df_5.head())
+
+    # large data set
+    operation_str = "LARGE PANDAS SET"
+    print_header(operation_str)
+    num_rows = 10000
+    data = {
+        'A': np.random.randint(0, 100, num_rows),  # Integers between 0 and 100
+        'B': np.random.normal(0, 1, num_rows),  # Normally distributed floats with mean 0 and std deviation 1
+        'C': pd.date_range('2020-01-01', periods=num_rows, freq='D'),  # Daily dates starting from 2020-01-01
+        'D': np.random.choice(['Category 1', 'Category 2', 'Category 3'], num_rows),  # Categorical data
+        'E': np.random.uniform(0, 1, num_rows),  # Uniformly distributed floats between 0 and 1
+    }
+    df = pd.DataFrame(data)
+    print(df.head(n=50))
+    print(df.count())
+    print(df.A.agg(lambda x: np.mean(x) * 5.6))
+        
+
+
 
 
