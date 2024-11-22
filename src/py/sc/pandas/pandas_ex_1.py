@@ -12,7 +12,7 @@ if __name__ == "__main__":
     spark = (SparkSession
                 .builder
                 .remote("sc://localhost")
-                .appName('SqlExam[le') 
+                .appName('Pandas Example 1') 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session

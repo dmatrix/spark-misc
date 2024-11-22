@@ -9,7 +9,6 @@ from src.py.sc.utils.print_utils import print_header, print_seperator
 from pyspark.sql import SparkSession
 from IPython.display import display
 import pandas as pd
-from pyspark.sql import SparkSession
 import numpy as np
 
 if __name__ == "__main__":
@@ -20,7 +19,7 @@ if __name__ == "__main__":
     spark = (SparkSession
                 .builder
                 .remote("sc://localhost")
-                .appName('SqlExam[le') 
+                .appName("Pandas Example 2") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
