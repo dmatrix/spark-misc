@@ -38,7 +38,6 @@ if __name__ == "__main__":
     df = ps.DataFrame(df)
     print(f"++++Ensure it is PySpark Pandas datatype++++:{type(df)}")
     print("Generated Main DataFrame with 100,000 rows:")
-    print(df.head())
     # Display basic info
     print("DataFrame info:")
     print(df.head())
