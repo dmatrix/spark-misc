@@ -1,3 +1,10 @@
+"""
+PySpark Python app to test SparkConnect. This file tests include:
+
+1. Select specific columns
+2. Filter rows on ceratan column value 
+3. Group by Category and calculate average Value
+"""
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, avg
 from dateutil.relativedelta import relativedelta
@@ -15,7 +22,7 @@ if __name__ == "__main__":
     spark = (SparkSession
                 .builder
                 .remote("sc://localhost")
-                .appName("PySpark Dateutil Example 1") 
+                .appName("PySpark Dateutil Example 2") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session

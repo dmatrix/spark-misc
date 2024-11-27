@@ -1,8 +1,10 @@
-# This script, generaged by CodePilot, includes the following elements:
-# 	1.	A DataFrame with 100,000 rows and 5 date-related columns using python-dateutil.
-# 	2.	Random US state column.
-# 	3.	Transformations: select, filter, groupby, UDF, and sort.
-# 	4.	Pandas UDFs for applying custom transformations.
+"""
+This script, with certain parts generaged by CodePilot, includes the following tests:
+	1.	A DataFrame with 100,000 rows and 5 date-related columns using python-dateutil.
+	2.	Random US state column.
+	3.	Transformations: select, filter, groupby, and sort.
+"""
+
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col

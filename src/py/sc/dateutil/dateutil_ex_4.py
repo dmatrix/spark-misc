@@ -1,3 +1,12 @@
+"""
+This script, partially generaged by CodePilot, includes the following tests:
+	1.	A DataFrame with 100,000 rows and couple date-related columns using python-dateutil.
+	2.	Random US state column.
+	3.	Transformations: creation, select, filter, groupby, Aggregate, Pandas UDF, sort, 
+        join, and merge based on dateutil  APIs: days, years, past and present dates
+    4. Chaning from Pandas-on-spark DataFrames to PySpark DataFrames for using Pandas_UDF transformations
+    on datetime column types
+"""
 import sys
 sys.path.append('.')
 
@@ -37,7 +46,6 @@ if __name__ == "__main__":
         # return date.apply(lambda d: d + relativedelta(years=years))
         return date.apply(lambda x: x + relativedelta(years=1) if pd.notnull(x) else None)
 
-
     @pandas_udf(StringType())
     def extract_weekday(date):
         return date.apply(lambda d: d.strftime("%A"))
@@ -53,17 +61,18 @@ if __name__ == "__main__":
     # Create the first DataFrame
     start_date = datetime(2000, 1, 1)
     end_date = datetime(2030, 1, 1)
+    num_rows = 100_000
     data_1 = {
 
-        "id": [i for i in range(1, 10001)],
-        "start_date": [random_date(start_date, end_date) for _ in range(10000)],
-        "end_date": [random_date(start_date, end_date) for _ in range(10000)],
-        "value": [random.randint(1, 100) for _ in range(10000)],
-        "category": [random.choice(["A", "B", "C", "D"]) for _ in range(10000)],
+        "id": [i for i in range(1, num_rows + 1)],
+        "start_date": [random_date(start_date, end_date) for _ in range(num_rows)],
+        "end_date": [random_date(start_date, end_date) for _ in range(num_rows)],
+        "value": [random.randint(1, 100) for _ in range(num_rows)],
+        "category": [random.choice(["A", "B", "C", "D"]) for _ in range(num_rows)],
 
     }
 
-    # Use PySpark pandas
+    # Use PySpark pandas DataFrame and set some required options
     ps.set_option("compute.default_index_type", "distributed")
     ps.set_option('compute.ops_on_diff_frames', True)
     df_1 = ps.DataFrame(data_1)
@@ -72,7 +81,7 @@ if __name__ == "__main__":
     print("Transformation 1: Filter rows where value > 50:")
     d_f1 = df_1[df_1["value"] > 50]  
     print(df_1.head())
-    print(df_1.head())
+
     # Transformation 2: Extract year from date1
     print(" # Transformation 2: Extract year from date1:")    
     df_1["start_year"] = df_1["start_date"].dt.year 
@@ -85,46 +94,46 @@ if __name__ == "__main__":
     print(df_1.head())
     print_seperator()
 
-    # Apply lambda & UDFs to df_1
+    # Apply lambda to PySpark Pandas DataFrame: df_1
     # Transformation 5: Day difference
-    print("# Transformation 5: Day difference:")
+    print("# Transformation 5: Days difference:")
     df_1["days_difference"] = df_1.apply(lambda row: (row['end_date'] - row['start_date']).days, axis=1)
     print(df_1.head())
     print_seperator()
                                         
-    print("Applying Pandas `months_difference:`")
+    print("Applying Pandas apply(): `months_difference:`")
     df_1["months_diff"] = df_1.apply(lambda row: (row["end_date"] - row["start_date"]).days // 30, axis=1)
 
     print(df_1.head())
     print_seperator()
 
-    # Now convert Pandas Pyspark --> Pyspark DataFrame to apply 
-    # Pandas UDFs
+    # Now convert Pandas Pyspark --> Pyspark DataFrame to apply Pandas UDFs 
+    # a.ka. Vectorized UDFs
 
     spark_df_1 = df_1.to_spark()
 
-    print("Applying Pandas `add_years_to_date:`")
+    print("Applying Pandas UDF to PySpark DataFrame: `add_years_to_date:`")
     spark_df_1 = spark_df_1.withColumn("start_date_plus_2_years", add_years_to_date(spark_df_1["start_date"]))
     print(spark_df_1.show())
     print_seperator()
 
 
-    print("Applying Pandas `extract_weekday:`")
+    print("Applying Pandas UDF to PySpark DataFrame: `extract_weekday:`")
     spark_df_1 = spark_df_1.withColumn("weekday", extract_weekday(spark_df_1["start_date"]))
     print(spark_df_1.show())
     print_seperator()
 
-    print("Applying Pandas `is_date_in_past:`")
+    print("Applying Pandas UDF to PySpark DataFrame `is_date_in_past:`")
     spark_df_1 = spark_df_1.withColumn("date_in_past", is_date_in_past(spark_df_1["start_date"]))
     print(spark_df_1.show())
     print_seperator()
 
-    print("Applying Pandas `is_value_even_or_odd:`")
+    print("Applying Pandas UDF dto Pyspark DataFrame: `is_value_even_or_odd:`")
     spark_df_1 = spark_df_1.withColumn("value_even_or_odd", is_value_even_or_odd(spark_df_1["value"]))
     print(spark_df_1.show())
     print_seperator()
 
-    # Create the second DataFrame
+    # Create the second Pyspark Pandas DataFrame for joining and merging
     data_2 = {
         "id": [i for i in range(1, 10001)],
         "date2": [random_date(start_date, end_date) for _ in range(10000)],
@@ -132,6 +141,7 @@ if __name__ == "__main__":
         "group": [random.choice(["X", "Y", "Z"]) for _ in range(10000)],
     }
 
+    # Second PysSpark Pandas DataFrame
     df_2 = ps.DataFrame(data_2)
 
     # Merge and Join Operations on the original Pandas PySpark Dataframe

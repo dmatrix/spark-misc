@@ -1,3 +1,6 @@
+"""
+Python app to test relevant python-dateutil functinationality 
+"""
 from dateutil import parser, relativedelta, tz
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, rruleset, rrulestr, DAILY, MONTHLY
