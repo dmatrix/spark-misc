@@ -5,11 +5,11 @@
 # 	4.	Pandas UDFs for applying custom transformations.
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, pandas_udf
+from pyspark.sql.functions import col
+import pyspark.sql.functions as F
 from faker import Faker
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
-from dateutil.parser import parse
 
 import random
 import pandas as pd
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     spark = (SparkSession
                 .builder
                 .remote("sc://localhost")
-                .appName("PySpark Pandas UDF Dateutil Example 2") 
+                .appName("PySpark Pandas UDF Dateutil Example 3") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
@@ -75,25 +75,7 @@ if __name__ == "__main__":
     print("\nFiltered DataFrame (End_Date > Start_Date):")
     filtered_df.show(5)
 
-    # 3. Define a Pandas UDF to calculate the duration between Start_Date and End_Date
-    @pandas_udf("int")
-    def calculate_duration(start_date: pd.Series, end_date: pd.Series) -> pd.Series:
-        diff = end_date - start_date
-        # print(type(diff), diff)
-        return diff.dt.days
-
-    # Add a new column 'Duration' using the UDF
-    spark_df = spark_df.withColumn("Duration", calculate_duration(col("Start_Date"), col("End_Date")))
-
-    print("\nDataFrame with Duration Column:")
-    spark_df.show(5)
-
-    # 4. Groupby operation: Average duration by state
-    grouped_df = spark_df.groupBy("State").avg("Duration").alias("Avg_Duration").orderBy("avg(Duration)", ascending=False)
-    print("\nGrouped DataFrame (Average Duration by State):")
-    grouped_df.show(5)
-
-    # 5. Sort by Modified_At column
+    # 3. Sort by Modified_At column
     sorted_df = spark_df.orderBy("Modified_At")
     print("\nSorted DataFrame (by Modified_At):")
     sorted_df.show(5)
