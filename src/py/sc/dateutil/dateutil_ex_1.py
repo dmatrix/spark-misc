@@ -1,12 +1,12 @@
 """
-Python app to test relevant python-dateutil functinationality 
+Python app to test relevant python-dateutil functionality. 
 """
 from dateutil import parser, relativedelta, tz
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, rruleset, rrulestr, DAILY, MONTHLY
 from datetime import datetime, timedelta
 
-def main():
+def run_main():
     print("\n=== Python Dateutil Functional API Examples ===\n")
 
     # 1. Parsing Dates and Times
@@ -70,4 +70,4 @@ def main():
     print(f"Complex parsed date with custom timezone: {complex_date}")
 
 if __name__ == "__main__":
-    main()
+    run_main()
