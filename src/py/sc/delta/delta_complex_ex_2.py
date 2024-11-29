@@ -92,6 +92,31 @@ if __name__ == "__main__":
     sorted_websites = valid_websites.orderBy(col("content_length").desc())
     sorted_websites.limit(25).show(truncate=False)
 
+    # Save the DataFrame as a Delta table
+    print_header("CREATE A LOCAL DELTA TABLE OF THE SORTED WEBSITES BY CONTENT LENGTH:")
+    delta_table_path = "/tmp/delta/website_analysis"
+    sorted_websites.write.format("delta").mode("overwrite").save(delta_table_path)
+
+    # Register the Delta table in Spark SQL
+    spark.sql(f"CREATE TABLE IF NOT EXISTS website_analysis USING DELTA LOCATION '{delta_table_path}'")
+
+    print_header("USE SPARK SQL TO QUERY THE LOCAL DELTA TABLE OF THE SORTED WEBSITES BY CONTENT LENGTH:")
+    # Query the Delta table using Spark SQL
+    query_result = spark.sql("""
+        SELECT 
+            url, content_length, status_code, response_time, content_type
+        FROM 
+            website_analysis
+        WHERE 
+            status_code = 200
+        ORDER BY 
+            content_length DESC
+        LIMIT 25
+    """)
+
+    # Show the query result
+    query_result.show(truncate=False)
+
     # Stop the Spark session
     spark.stop()
 
