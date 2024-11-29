@@ -4,6 +4,7 @@ This PySpark Spark Connect application includes the following features:
 1. Generate a large number of websites URLs, and select a random number to process
 2. Download the content usuing Request Python package
 3. Use DataFrame API features for filtering and sorting
+4. Save as a parquet table and use SQL to query it
 """
 import sys
 sys.path.append('.')
@@ -12,6 +13,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, monotonically_increasing_id, pandas_udf
 from src.py.sc.utils.print_utils import print_seperator, print_header
 from src.py.sc.utils.web_utils import generate_valid_urls
+from delta.tables import DeltaTable
 
 import pandas as pd
 import random
@@ -91,6 +93,30 @@ if __name__ == "__main__":
     print_header("SORT WEBSITES BY CONTENT_LENGTH:")
     sorted_websites = valid_websites.orderBy(col("content_length").desc())
     sorted_websites.limit(25).show(truncate=False)
+
+    # Save the DataFrame as a Delta table
+    print_header("CREATE A PARQUET TABLE:")
+    sorted_websites.write.mode("overwrite").save("/tmp/tables/website_analysis")
+
+    # Register table in Spark SQL
+    spark.sql(f"CREATE TABLE IF NOT EXISTS website_analysis USING PARQUET LOCATION '/tmp/tables/website_analysis'")
+
+    print_header("USE SPARK SQL TO QUERY THE LOCAL PARQUETTABLE OF THE SORTED WEBSITES BY CONTENT LENGTH:")
+    # Query the Delta table using Spark SQL
+    query_result = spark.sql("""
+        SELECT 
+            url, content_length, status_code, response_time, content_type
+        FROM 
+            website_analysis
+        WHERE 
+            status_code = 200
+        ORDER BY 
+            content_length DESC
+        LIMIT 25
+    """)
+
+    # Show the query result
+    query_result.show(truncate=False)
 
     # Stop the Spark session
     spark.stop()

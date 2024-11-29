@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     # Create a new session with Spark Connect
     spark = (SparkSession.builder
-             .remote("sc://localhost:15002")
+             .remote("sc://localhost")
              .appName("MnMCount")
              .getOrCreate())
     
@@ -52,4 +52,4 @@ if __name__ == "__main__":
 
     # show the resulting aggregation for California
     ca_count_mnm_df.show(n=10, truncate=False)
-
+    ca_count_mnm_df.write.mode("overwrite").save("/tmp/tables/mnn_count_table")
