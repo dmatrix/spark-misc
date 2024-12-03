@@ -7,7 +7,7 @@ from pyspark.sql.functions import col
 
 if __name__ == "__main__":
     # Initialize Spark Session
-   # let's top any existing SparkSession if running at all
+    # let's top any existing SparkSession if running at all
     SparkSession.builder.master("local[*]").getOrCreate().stop()
 
     # Create SparkSession
