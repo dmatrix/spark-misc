@@ -3,6 +3,8 @@ This script, with certain parts generaged by CodePilot, includes the following t
 	1.	A DataFrame with 100,000 rows and 5 date-related columns using python-dateutil.
 	2.	Random US state column.
 	3.	Transformations: select, filter, groupby, and sort.
+
+Some code or partial code was generated from ChatGPT and CodePilot
 """
 
 

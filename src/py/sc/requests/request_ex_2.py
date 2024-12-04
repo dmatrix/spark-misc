@@ -5,6 +5,8 @@ This PySpark Spark Connect application includes the following features:
 2. Download the content usuing Request Python package
 3. Use DataFrame API features for filtering and sorting
 4. Save as a parquet table and use SQL to query it
+ChatGPT, CodePilot, and docs used to generate code sample for testing.
+
 """
 import sys
 sys.path.append('.')

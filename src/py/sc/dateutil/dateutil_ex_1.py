@@ -1,5 +1,6 @@
 """
-Python app to test relevant python-dateutil functionality. 
+Python app to test relevant python-dateutil functionality. Some code or partial code
+was generated from ChatGPT and CodePilot
 """
 from dateutil import parser, relativedelta, tz
 from dateutil.relativedelta import relativedelta

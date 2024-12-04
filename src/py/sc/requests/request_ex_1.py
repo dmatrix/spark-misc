@@ -4,6 +4,8 @@ This PySpark Spark Connect application includes the following features:
 1. Generate a large number of websites URLs, and select a random number to process
 2. Download the content usuing Request Python package
 3. Use DataFrame API features for filtering and sorting
+
+ChatGPT, CodePilot, and docs used to generate code sample for testing.
 """
 import sys
 sys.path.append('.')

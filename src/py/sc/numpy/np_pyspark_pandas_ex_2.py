@@ -1,3 +1,6 @@
+"""
+ChatGPT, CodePilot, and docs used to generate code sample for testing
+"""
 import sys
 sys.path.append('.')
 

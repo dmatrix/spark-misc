@@ -1,3 +1,6 @@
+"""
+ChatGPT, CodePilot, and docs used to generate code sample for testing
+"""
 from pyspark.sql import SparkSession
 import pandas as pd
 from sklearn.datasets import load_diabetes

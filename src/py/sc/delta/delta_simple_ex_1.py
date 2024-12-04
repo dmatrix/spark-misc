@@ -1,5 +1,6 @@
 """
-Test to create a simple Deltat Table
+Test to create a simple Deltat Table. Some code or partial code
+was generated from ChatGPT, CodePilot, and docs samples.
 """
 from pyspark.sql import SparkSession
 

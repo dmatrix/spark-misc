@@ -1,3 +1,6 @@
+"""
+ChatGPT, CodePilot, and docs used to generate code sample for testing
+"""
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt

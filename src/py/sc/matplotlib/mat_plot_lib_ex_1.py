@@ -1,3 +1,6 @@
+"""
+ChatGPT, CodePilot, and docs used to generate code sample for testing
+"""
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 import matplotlib.pyplot as plt

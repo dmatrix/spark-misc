@@ -4,6 +4,8 @@ PySpark Python app to test SparkConnect. This file tests include:
 1. Select specific columns
 2. Filter rows on ceratan column value 
 3. Group by Category and calculate average Value
+
+Some code or partial code was generated from ChatGPT and CodePilot
 """
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, avg
