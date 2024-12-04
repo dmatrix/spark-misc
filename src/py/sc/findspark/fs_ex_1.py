@@ -1,5 +1,5 @@
 """
-Test to create a simple Deltat Table
+Test to find spark home, after unsetting the SPARK_HOME environment variable
 """
 from pyspark.sql import SparkSession
 import os

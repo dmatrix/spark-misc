@@ -1,6 +1,9 @@
 #
 # user the pandas 10 min tutorial guide
 # https://pandas.pydata.org/docs/user_guide/10min.html#selection
+#
+# ChatGPT, CodePilot, and docs used to generate code sample for testing
+#
 import sys
 sys.path.append('.')
 

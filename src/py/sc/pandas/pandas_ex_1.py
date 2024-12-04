@@ -1,3 +1,6 @@
+"""
+ChatGPT, CodePilot, and docs used to generate code sample for testing
+"""
 from pyspark.sql import SparkSession
 from IPython.display import display
 import pandas as pd
