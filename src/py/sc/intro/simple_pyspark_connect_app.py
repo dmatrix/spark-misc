@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     # Use SparkConnect
     spark = (SparkSession.builder
-        .remote("sc://localhost")
+        .remote("local[*]")
         .appName("SimpleApp")
         .getOrCreate())
     
