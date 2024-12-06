@@ -13,7 +13,7 @@ if __name__ == "__main__":
     SparkSession.builder.master("local[*]").getOrCreate().stop()
 
     # Create a new session with Spark Connect
-    spark = SparkSession.builder.remote("sc://localhost:15002").getOrCreate()
+    spark = SparkSession.builder.remote("local[*]").getOrCreate()
 
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
