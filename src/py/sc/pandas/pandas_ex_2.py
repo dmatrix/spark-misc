@@ -2,8 +2,8 @@
 # user the pandas 10 min tutorial guide
 # https://pandas.pydata.org/docs/user_guide/10min.html#selection
 #
-# ChatGPT, CodePilot, and docs used to generate code sample for testing
-#
+# A combination ChatGPT, CodePilot, and docs used to generate code sample for testing
+##
 import sys
 sys.path.append('.')
 
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("Pandas Example 2") 
                 .getOrCreate())
     
@@ -35,6 +35,8 @@ if __name__ == "__main__":
     # Create a simple series
     s = pd.Series([1, 3, 5, np.nan, 6, 8])
     print(s)
+    print_seperator(size=10)
+
 
     # Create a pandas DataFrame
     operation_str = "BASIC OBJECT CREATION:DataFrames"
@@ -42,6 +44,8 @@ if __name__ == "__main__":
     dates = pd.date_range("20241121", periods=6)
     df_1 = pd.DataFrame(np.random.randn(6, 4), index=dates, columns=list("ABCD"))
     display(df_1)
+    print_seperator(size=10)
+
 
     # Creating a DataFrame from a dictionary, where keys are columns and values are 
     # key's values of various types.
@@ -70,13 +74,13 @@ if __name__ == "__main__":
     operation_str = "SELECTING DATA: GETITEM"
     print_header(operation_str)
     print(df_1.A)
-    print_seperator()
+    print_seperator(size=8)
     print(df_1["A"])
     # selecting all rows : with desired columns
     print_seperator()
     print(df_1.loc[:, ["A", "C"]])
     # boolean indexing; select rows where df_1 A > 0
-    print_seperator()
+    print_seperator(size=8)
     print(df_1[df_1["A"] > 0])
 
     # User defined functions
@@ -86,7 +90,7 @@ if __name__ == "__main__":
     print_header(operation_str)
     df_3 = df_1.agg(lambda x: np.mean(x) * 5.6)
     print(df_3.head())
-    print_seperator()
+    print_seperator(size=8)
     print(df_1.transform(lambda x: x * -0.2))
 
     # Groupby operations:splitting, applying a function and combining results
@@ -101,8 +105,9 @@ if __name__ == "__main__":
     print(df_4.head())
 
     df_5 = df_4.groupby("A")[["C", "D"]].sum()
-    print_seperator()
     print(df_5.head())
+    print_seperator(size=8)
+
 
     # large data set
     operation_str = "LARGE PANDAS SET"
@@ -119,6 +124,8 @@ if __name__ == "__main__":
     print(df.head(n=50))
     print(df.count())
     print(df.A.agg(lambda x: np.mean(x) * 5.6))
+    print_seperator(size=8)
+
         
 
 

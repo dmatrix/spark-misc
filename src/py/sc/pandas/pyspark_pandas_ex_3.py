@@ -1,5 +1,5 @@
 """
-ChatGPT, CodePilot, and docs used to generate code sample for testing
+A combination ChatGPT, CodePilot, and docs used to generate code sample for testing
 """
 
 import sys
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("Pyspark Pandas Example 3") 
                 .getOrCreate())
     
@@ -41,17 +41,19 @@ if __name__ == "__main__":
     # Convert to Spark PySpark Pandas DataFrame
     df = ps.DataFrame(df)
     print(f"++++Ensure it is PySpark Pandas datatype++++:{type(df)}")
-    print("Generated Main DataFrame with 100,000 rows:")
+    print_header("Generated Main DataFrame with 100,000 rows:")
     # Display basic info
     print("DataFrame info:")
     print(df.head())
+    print_seperator()
 
     # Select specific columns
     operation_str = "BASIC DATAFERAME OPERATION:SELECT"
     print_header(operation_str)
     selected_columns = df[["Col_1", "Col_5", "Group"]]
-    print("\nSelected columns:")
+    print_header("Selected columns:")
     print(selected_columns.head())
+    print_seperator()
 
     operation_str = "BASIC DATAFERAME OPERATION:GROUPBY"
     print_header(operation_str)
@@ -59,6 +61,7 @@ if __name__ == "__main__":
     grouped_mean = df.groupby("Group").mean()
     print("\nGroup-wise mean:")
     print(grouped_mean.head())
+    print_seperator()
 
     # Sort the DataFrame by 'Col_1' in descending order
     operation_str = "BASIC DATAFERAME OPERATION:SORT"
@@ -79,6 +82,7 @@ if __name__ == "__main__":
     )
     print("\nAggregated data:")
     print(aggregated_data)
+    print_seperator()
 
     # Filter rows where 'Col_1' > 0.9 and 'Col_2' < 0.1
     operation_str = "BASIC DATAFERAME OPERATION:FILTER"
@@ -86,3 +90,4 @@ if __name__ == "__main__":
     filtered_df = df[(df["Col_1"] > 0.9) & (df["Col_2"] < 0.1)]
     print("\nFiltered rows where 'Col_1' > 0.9 and 'Col_2' < 0.1:")
     print(filtered_df.head())
+    print_seperator()
