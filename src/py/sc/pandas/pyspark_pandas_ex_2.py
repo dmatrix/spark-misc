@@ -1,5 +1,5 @@
 """
-ChatGPT, CodePilot, and docs used to generate code sample for testing
+A combination ChatGPT, CodePilot, and docs used to generate code sample for testing
 """
 
 import sys
@@ -15,19 +15,20 @@ from pyspark.sql import SparkSession
 
 
 if __name__ == "__main__":
-    # let's top any existing SparkSession if running at all
+    # let's dtop any existing SparkSession if running at all
     SparkSession.builder.master("local[*]").getOrCreate().stop()
 
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("PySpark Pandas Example 2") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
+
     # Set default options for PySpark Pandas
     ps.set_option("compute.default_index_type", "distributed")
 
@@ -41,7 +42,7 @@ if __name__ == "__main__":
         return start_date + relativedelta(days=random_days)
 
     # Constants
-    NUM_ROWS = 100000
+    NUM_ROWS = 275_000
     START_DATE = datetime(2000, 1, 1)
     END_DATE = datetime(2023, 1, 1)
 
@@ -51,7 +52,7 @@ if __name__ == "__main__":
         "First_Name": [fake.first_name() for _ in range(NUM_ROWS)],
         "Last_Name": [fake.last_name() for _ in range(NUM_ROWS)],
         "Age": [random.randint(18, 65) for _ in range(NUM_ROWS)],
-        "Department": [random.choice(["HR", "IT", "Finance", "Marketing", "Sales"]) for _ in range(NUM_ROWS)],
+        "Department": [random.choice(["HR", "IT", "Finance", "Engineering", "R&D","Marketing", "Sales"]) for _ in range(NUM_ROWS)],
         "Salary": [random.randint(30000, 120000) for _ in range(NUM_ROWS)],
         "Join_Date": [random_date(START_DATE, END_DATE).strftime("%Y-%m-%d") for _ in range(NUM_ROWS)],
         "City": [fake.city() for _ in range(NUM_ROWS)],
@@ -59,46 +60,54 @@ if __name__ == "__main__":
         "Remote_Work": [random.choice([True, False]) for _ in range(NUM_ROWS)],
     }
 
-    # Convert to PySpark Pandas DataFrame
+    # Create a PySpark Pandas DataFrame
     df = ps.DataFrame(data)
     print(f"++++Ensure it is PySpark Pandas datatype++++:{type(df)}")
-    print("Generated Main DataFrame with 100,000 rows:")
+    print_header(f"Generated Main DataFrame with { NUM_ROWS} rows:")
     print(df.head())
+    print_seperator()
 
     # Create a department-location DataFrame for join
     departments_data = {
-        "Department": ["HR", "IT", "Finance", "Marketing", "Sales"],
-        "Location": ["New York", "San Francisco", "London", "Paris", "Sydney"],
-        "Department_Budget": [200000, 500000, 300000, 250000, 400000],
+        "Department": ["HR", "IT", "Finance", "Marketing", "Sales","Engineering","R&D"],
+        "Location": ["New York", "San Francisco", "London", "Paris", "Sydney", "San Francisco", "New York"],
+        "Department_Budget": [200000, 500000, 300000, 250000, 400000, 800000, 100000],
     }
+
+    # Create PySpark Pandas DataFrame
     departments_df = ps.DataFrame(departments_data)
 
-    print("\nDepartment DataFrame:")
+    print_header("Department DataFrame:")
     print(departments_df)
+    print_seperator()
 
     # Join operation: Merge the main dataset with department-location data
     joined_df = df.merge(departments_df, on="Department", how="left")
-    print("\nJoined DataFrame (with Department Locations and Budgets):")
+    print_header("Joined DataFrame (with Department Locations and Budgets):")
     print(joined_df.head())
+    print_seperator()
 
     # Perform operations
     # Select specific columns
     selected_df = joined_df[["First_Name", "Last_Name", "Department", "Salary", "Location"]]
-    print("\nSelected Columns (First_Name, Last_Name, Department, Salary, Location):")
+    print_header("Selected Columns (First_Name, Last_Name, Department, Salary, Location):")
     print(selected_df.head())
+    print_seperator()
 
     # Complex groupby: Average Salary and Employee Count by Department
     grouped_df = joined_df.groupby("Department").agg(
         Avg_Salary=("Salary", "mean"),
         Employee_Count=("Employee_ID", "count"),
     )
-    print("\nGroupby Operations (Avg Salary and Employee Count by Department):")
+    print_header("Groupby Operations (Avg Salary and Employee Count by Department):")
     print(grouped_df)
+    print_seperator()
 
     # Filter employees with Salary > 80000 and Age < 40
     filtered_df = joined_df[(joined_df["Salary"] > 80000) & (joined_df["Age"] < 40)]
-    print("\nFiltered DataFrame (Salary > 80000 and Age < 40):")
+    print_header("Filtered DataFrame (Salary > 80000 and Age < 40):")
     print(filtered_df.head())
+    print_seperator()
 
     # Add a UDF to categorize age
     def age_category(age):
@@ -110,8 +119,9 @@ if __name__ == "__main__":
             return "Senior"
 
     joined_df["Age_Category"] = joined_df["Age"].apply(age_category)
-    print("\nDataFrame with Age Category:")
+    print_header("DataFrame with Age Category:")
     print(joined_df[["Age", "Age_Category"]].head())
+    print_seperator()
 
     # Save the resulting DataFrame to a CSV
     output_path = "output/large_dataset_with_join.csv"
