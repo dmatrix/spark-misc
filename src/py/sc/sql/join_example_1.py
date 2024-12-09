@@ -1,9 +1,12 @@
 #
 # Examples from pyspark-cookbook guide
 #
+import sys
+sys.path.append('.')
+from src.py.sc.utils.print_utils import print_header, print_seperator
+
 from pyspark.sql import Row
 from pyspark.sql import SparkSession
-from utils import do_print_util
 
 if __name__ == "__main__":
 
@@ -13,17 +16,18 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
-                .appName('PysparkFunctionExample') 
+                .remote("local[*]")
+                .appName('PySpark DataFrame APIs Example 2') 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
+    print_header("ASSERTING SPARK CONNECT USAGE:")
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
 
     column_str = "THE ART OF JOINING....(DEFAULT:INNER JOIN)"
-    do_print_util(column_str)
-
+    print_header(column_str)
+    
     # Create a DataFrame using Rows
     df_1 = spark.createDataFrame([
         Row(age=10, height=80.0, name="alice"),
@@ -41,20 +45,23 @@ if __name__ == "__main__":
     ])
 
     # Join by name
+    print_header("JOIN BY COLUMN NAME:")
     df_3 = df_1.join(df_2, on="name")
     df_3.show(truncate=False)
+    print_seperator(size=10)
 
     # Let’s take LEFT join as another example. A left join includes all of the records 
     # from the first (left) of two tables, even if there are no matching values for records 
     # in the second (right) table.
     column_str = "THE ART OF JOINING....:LEFT JOIN)"
-    do_print_util(column_str)
+    print_header(column_str)
     df_4 = df_1.join(df_2, on="name", how="left")
     df_4.show(truncate=False)
+    print_seperator(size=10)
     
     # And a RIGHT join keeps all of the records from the right table.
     column_str = "THE ART OF JOINING....:RIGHT JOIN)"
-    do_print_util(column_str)
+    print_header(column_str)
     df_5 = df_1.join(df_2, on="name", how="right")
     df_5.show(truncate=False)
 
