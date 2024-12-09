@@ -1,5 +1,5 @@
 """
-ChatGPT, CodePilot, and docs used to generate code sample for testing
+ChatGPT, CodePilot, and docs used to generate partial code sample for testing
 """
 import sys
 sys.path.append('.')
@@ -20,8 +20,8 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
-                .appName("Pyspark Pandas/Numpy Example 3") 
+                .remote("local[*]")
+                .appName("Pyspark Pandas/Numpy Example 2") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
@@ -39,16 +39,16 @@ if __name__ == "__main__":
     }
 
     # df = pd.DataFrame(data)
+    # Create a PySpark Pandas DataFrame
     df = ps.DataFrame(data)
     ps.set_option('compute.ops_on_diff_frames', True)
 
-    print("Original DataFrame:")
+    print("Original Pyspark Pandas DataFrame:")
     print(f"++++Ensure it is PySpark Pandas datatype++++:{type(df)}")
     print("Generated Main DataFrame with 100,000 rows:")
     # Display basic info
     print("DataFrame info:")
     print(df.head())
-
 
     # NumPy-style operations on PySpark Pandas DataFrame
     # 1. Element-wise addition
@@ -59,35 +59,35 @@ if __name__ == "__main__":
     # 2. Element-wise multiplication
     df["B_times_C"] = df["B"] * df["C"]
     print("\nElement-wise multiplication (B * C):")
-    print(df)
+    print(df.head())
 
     # 3. Apply NumPy universal functions (e.g., sqrt)
     df["C_sqrt"] = np.sqrt(df["C"])
     print("\nSquare root of column C:")
-    print(df)
+    print(df.head())
 
     # 4. Row-wise sum
-    df["Row_Sum"] = df[["A", "B", "C"]].sum(axis=1)
     print("\nRow-wise sum (A + B + C):")
-    print(df)
+    df["Row_Sum"] = df[["A", "B", "C"]].sum(axis=1)
+    print(df.head())
 
     # 5. Aggregations using NumPy
     col_mean = df[["A", "B", "C"]].mean()
-    col_std = df[["A", "B", "C"]].std()
-
     print("\nColumn-wise mean:")
     print(col_mean)
     print("\nColumn-wise standard deviation:")
+    col_std = df[["A", "B", "C"]].std()
     print(col_std)
 
     # 6. Conditional selection with NumPy
-    df["A_gt_50"] = df["A"] > 50  # Check if values in A are greater than 50
     print("\nConditional column (A > 50):")
-    print(df)
+    df["A_gt_50"] = df["A"] > 50  # Check if values in A are greater than 50
+    print(df.head())
 
-    # # 7. NumPy `where` for conditional value assignment
-    # df["Category"] = np.where(df["A"] > 50, "High", "Low")
+    # 7. NumPy `where` for conditional value assignment (not working as
+    # PySpark API not yet implemented)
     # print("\nCategory based on A > 50 (using np.where):")
-    # print(df)
+    # df["Category"] = np.where(df["A"] > 50, "High", "Low")
+    # print(df.head())
 
     spark.stop()

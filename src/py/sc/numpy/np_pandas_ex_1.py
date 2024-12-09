@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("Pyspark Pandas/Numpy Example 1") 
                 .getOrCreate())
     
@@ -40,14 +40,12 @@ if __name__ == "__main__":
     }
 
     df = pd.DataFrame(data)
-
     print("Original DataFrame:")
     print(f"++++Ensure it is PySpark Pandas datatype++++:{type(df)}")
     print("Generated Main DataFrame with 100,000 rows:")
     # Display basic info
     print("DataFrame info:")
     print(df.head())
-
 
     # NumPy-style operations on PySpark Pandas DataFrame
     # 1. Element-wise addition
