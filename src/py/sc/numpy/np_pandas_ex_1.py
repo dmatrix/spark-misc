@@ -22,7 +22,7 @@ if __name__ == "__main__":
     spark = (SparkSession
                 .builder
                 .remote("sc://localhost")
-                .appName("Pyspark Pandas/Numpy Example 3") 
+                .appName("Pyspark Pandas/Numpy Example 1") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
