@@ -5,10 +5,13 @@ This PySpark Spark Connect application includes the following features:
 2. Download the content usuing Request Python package
 3. Use DataFrame API features for filtering and sorting
 
-ChatGPT, CodePilot, and docs used to generate code sample for testing.
+ChatGPT, CodePilot, and Python docs used to generate code sample for testing.
 """
 import sys
 sys.path.append('.')
+
+import warnings
+warnings.filterwarnings("ignore")
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, monotonically_increasing_id, pandas_udf
@@ -27,21 +30,21 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("Requests Example 1") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
-    print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
+    print(f"\n+++++Making sure it's using SparkConnect session:{spark}+++++")
 
     # Generate URLs and select 200 random URLs
-    number_of_urls = 3000
+    number_of_urls = 6000
     random_urls =  int(number_of_urls / 3) 
     all_urls = generate_valid_urls(number_of_urls)
     random_websites = random.sample(all_urls, random_urls)
 
-    # Create a DataFrame from the random sample of websites
+    # Create a PySpark DataFrame from the random sample of websites
     websites_df = spark.createDataFrame([(url,) for url in random_websites], ["url"])
 
     # Add a unique ID column
@@ -73,6 +76,8 @@ if __name__ == "__main__":
 
     # Apply the UDF to add the columns
     websites_with_details = websites_df.withColumn("details", fetch_website_details(col("url")))
+    print_header("\nApplied UDFs to add website details to the dataframe")
+
 
     # Extract individual columns from the struct column
     websites_with_details = websites_with_details.select(
@@ -84,15 +89,21 @@ if __name__ == "__main__":
         col("details.content_type").alias("content_type")
     )
     # Filter out invalid responses
-    print_header("FILTER OUT INVALID RESPONSES:")
+    print_header("\nFILTER OUT INVALID RESPONSES:")
     valid_websites = websites_with_details.filter(col("content_length") > 0)
     valid_websites.limit(10).show(truncate=False)
     print_seperator()
 
+    # Order by descending order of response time
+    print_header("\nSORT BY WEBSITES RESPONSE TIME: DESCENDING ORDER:")
+    response_times = valid_websites.orderBy(col("response_time").desc())
+    response_times.limit(10).show(truncate=False)
+    print_seperator()
+
     # Sort the DataFrame by content length
-    print_header("SORT WEBSITES BY CONTENT_LENGTH:")
+    print_header("\nSORT WEBSITES BY CONTENT_LENGTH:")
     sorted_websites = valid_websites.orderBy(col("content_length").desc())
-    sorted_websites.limit(25).show(truncate=False)
+    sorted_websites.limit(10).show(truncate=False)
 
     # Stop the Spark session
     spark.stop()

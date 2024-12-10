@@ -15,7 +15,6 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, monotonically_increasing_id, pandas_udf
 from src.py.sc.utils.print_utils import print_seperator, print_header
 from src.py.sc.utils.web_utils import generate_valid_urls
-from delta.tables import DeltaTable
 
 import pandas as pd
 import random
@@ -29,8 +28,8 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
-                .appName("Requests Example 1") 
+                .remote("local[*]")
+                .appName("Requests Example 2") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
@@ -38,7 +37,7 @@ if __name__ == "__main__":
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
 
     # Generate URLs and select 200 random URLs
-    number_of_urls = 3000
+    number_of_urls = 6000
     random_urls =  int(number_of_urls / 3) 
     all_urls = generate_valid_urls(number_of_urls)
     random_websites = random.sample(all_urls, random_urls)

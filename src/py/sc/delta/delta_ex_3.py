@@ -10,6 +10,9 @@ Some code or partial code was generated from ChatGPT, CodePilot, and docs sample
 import sys
 sys.path.append('.')
 
+import warnings
+warnings.filterwarnings("ignore")
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, monotonically_increasing_id, pandas_udf
 from src.py.sc.utils.print_utils import print_seperator, print_header
@@ -27,8 +30,8 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
-                .appName("Requests Example 1") 
+                .remote("local[*]")
+                .appName("Delta Table Example 2") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
