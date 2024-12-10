@@ -17,7 +17,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("PySpark Scikit-learn Example 1") 
                 .getOrCreate())
     
