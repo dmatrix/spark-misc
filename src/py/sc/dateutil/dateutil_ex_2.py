@@ -2,11 +2,21 @@
 PySpark Python app to test SparkConnect. This file tests include:
 
 1. Select specific columns
-2. Filter rows on ceratan column value 
+2. Filter rows on certain column value 
 3. Group by Category and calculate average Value
+4. Use dateutil for certain columns
 
 Some code or partial code was generated from ChatGPT and CodePilot
 """
+
+import sys
+sys.path.append('.')
+
+import warnings
+warnings.filterwarnings("ignore")
+
+from src.py.sc.utils.print_utils import print_seperator, print_header
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, avg
 from dateutil.relativedelta import relativedelta
@@ -23,7 +33,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("PySpark Dateutil Example 2") 
                 .getOrCreate())
     
@@ -59,25 +69,32 @@ if __name__ == "__main__":
     # Convert Pandas DataFrame to PySpark DataFrame
     spark_df = spark.createDataFrame(pandas_df)
 
-    print("Initial PySpark DataFrame:")
+    print_header("Initial PySpark DataFrame:")
     spark_df.show(5)
+    print_seperator(size=15)
 
     # DataFrame Transformations
 
     # 1. Select specific columns
     selected_df = spark_df.select("Start_Date", "Modified_Date", "Category", "Value")
-    print("\nSelected Columns:")
+    print_header("\nSelected Columns:")
     selected_df.show(5)
+    print_seperator(size=15)
+
 
     # 2. Filter rows where Value is greater than 500
     filtered_df = selected_df.filter(col("Value") > 500)
-    print("\nFiltered DataFrame (Value > 500):")
+    print_header("\nFiltered DataFrame (Value > 500):")
     filtered_df.show(5)
+    print_seperator(size=15)
+
 
     # 3. Group by Category and calculate average Value
     grouped_df = filtered_df.groupBy("Category").agg(avg("Value").alias("Average_Value"))
-    print("\nGrouped DataFrame (Average Value by Category):")
+    print_header("\nGrouped DataFrame (Average Value by Category):")
     grouped_df.show()
+    print_seperator(size=15)
+
 
     # Stop the Spark session
     spark.stop()

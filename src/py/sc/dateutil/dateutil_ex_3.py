@@ -7,7 +7,12 @@ This script, with certain parts generaged by CodePilot, includes the following t
 Some code or partial code was generated from ChatGPT and CodePilot
 """
 
+import sys
+sys.path.append('.')
+import warnings
+warnings.filterwarnings("ignore")
 
+from src.py.sc.utils.print_utils import print_seperator, print_header
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 import pyspark.sql.functions as F
@@ -49,7 +54,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("PySpark Pandas UDF Dateutil Example 3") 
                 .getOrCreate())
     
@@ -65,24 +70,29 @@ if __name__ == "__main__":
     pandas_df = generate_data(fake, num_rows)
     spark_df = spark.createDataFrame(pandas_df)
 
-    print("Initial Spark DataFrame:")
+    print_header("Initial Spark DataFrame:")
     spark_df.show(5)
+    print_seperator(size=15)
 
     # Transformation Operations
     # 1. Select specific columns
     selected_df = spark_df.select("ID", "Start_Date", "End_Date", "State")
-    print("\nSelected Columns:")
+    print_header("\nSelected Columns:")
     selected_df.show(5)
+    print_seperator(size=15)
 
     # 2. Filter rows where End_Date is greater than Start_Date
     filtered_df = spark_df.filter(col("End_Date") > col("Start_Date"))
-    print("\nFiltered DataFrame (End_Date > Start_Date):")
+    print_header("\nFiltered DataFrame (End_Date > Start_Date):")
     filtered_df.show(5)
+    print_seperator(size=15)
+
 
     # 3. Sort by Modified_At column
     sorted_df = spark_df.orderBy("Modified_At")
-    print("\nSorted DataFrame (by Modified_At):")
+    print_header("\nSorted DataFrame (by Modified_At):")
     sorted_df.show(5)
+    print_seperator(size=15)
 
     # Stop the Spark session
     spark.stop()
