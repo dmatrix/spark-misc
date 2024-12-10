@@ -95,6 +95,5 @@ if __name__ == "__main__":
     grouped_df.show()
     print_seperator(size=15)
 
-
     # Stop the Spark session
     spark.stop()

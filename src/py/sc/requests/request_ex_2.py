@@ -11,6 +11,9 @@ ChatGPT, CodePilot, and docs used to generate code sample for testing.
 import sys
 sys.path.append('.')
 
+import warnings
+warnings.filterwarnings("ignore")
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, monotonically_increasing_id, pandas_udf
 from src.py.sc.utils.print_utils import print_seperator, print_header
