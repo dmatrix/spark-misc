@@ -8,7 +8,7 @@ from dateutil.rrule import rrule, rruleset, rrulestr, DAILY, MONTHLY
 from datetime import datetime, timedelta
 
 def run_main():
-    print("\n=== Python Dateutil Functional API Examples ===\n")
+    print("\n=== Python Dateutil Functional API Examples without SparkSession ===\n")
 
     # 1. Parsing Dates and Times
     print("1. Parsing Dates and Times")
