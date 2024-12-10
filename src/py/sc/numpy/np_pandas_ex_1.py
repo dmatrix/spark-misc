@@ -4,6 +4,9 @@ ChatGPT, CodePilot, and docs used to generate code sample for testing
 
 import sys
 sys.path.append('.')
+import warnings
+warnings.filterwarnings("ignore")  # Ignore warnings coming from Arrow optimizations. 
+
 
 import pyspark.pandas as ps
 from src.py.sc.utils.print_utils import print_header, print_seperator
