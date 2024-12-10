@@ -7,6 +7,8 @@ import findspark
 
 if __name__ == "__main__":
     spark_home = os.getenv("SPARK_HOME")
+    os.environ["SPARK_HOME"] = "" if spark_home else spark_home
+    spark_home = os.getenv("SPARK_HOME")
     print(f"SPARK_HOME: {spark_home}")
     findspark.init()
     # let's top any existing SparkSession if running at all
@@ -15,7 +17,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("Find Spark Example 1") 
                 .getOrCreate())
     
