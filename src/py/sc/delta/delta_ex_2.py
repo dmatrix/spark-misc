@@ -1,8 +1,9 @@
 """
-Test to create a simple Deltat Table. Some code or partial code
+Test to create a simple Delta Table. Some code or partial code
 was generated from ChatGPT, CodePilot, and docs samples.
 """
 from pyspark.sql import SparkSession
+from delta import DeltaTable
 
 if __name__ == "__main__":
     # let's top any existing SparkSession if running at all
@@ -11,7 +12,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("Delta Example 1") 
                 .getOrCreate())
     

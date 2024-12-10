@@ -80,7 +80,6 @@ if __name__ == "__main__":
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session
-    
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
                         
