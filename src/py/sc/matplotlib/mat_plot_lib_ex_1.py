@@ -1,6 +1,13 @@
 """
-ChatGPT, CodePilot, and docs used to generate code sample for testing
+ChatGPT, CodePilot, and docs used to generate some or partial code sample for testing
 """
+import sys
+sys.path.append('.')
+import warnings
+warnings.filterwarnings("ignore")
+
+from src.py.sc.utils.print_utils import print_header, print_seperator
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 import matplotlib.pyplot as plt
@@ -13,7 +20,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("Matplotlib Example 1") 
                 .getOrCreate())
     
