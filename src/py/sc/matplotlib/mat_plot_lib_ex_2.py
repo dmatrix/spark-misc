@@ -1,7 +1,6 @@
 """
 ChatGPT, CodePilot, and docs used to generate code sample for testing
 """
-import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -16,7 +15,7 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("sc://localhost")
+                .remote("local[*]")
                 .appName("Matplotlib Example 2") 
                 .getOrCreate())
     
