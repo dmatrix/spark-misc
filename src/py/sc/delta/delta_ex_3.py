@@ -4,6 +4,8 @@ This PySpark Spark Connect application includes the following features:
 1. Generate a large number of websites URLs, and select a random number to process
 2. Download the content usuing Request Python package
 3. Use DataFrame API features for filtering and sorting
+4. Create a delta table from the final dataframe
+5. Use SQL to query the delta table
 
 Some code or partial code was generated from ChatGPT, CodePilot, and docs sample.
 """
@@ -30,8 +32,8 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("local[*]")
-                .appName("Delta Table Example 2") 
+                .remote("sc://localhost")
+                .appName("Delta Table Example 3") 
                 .getOrCreate())
     
     # Ensure we are conneccted to the spark session

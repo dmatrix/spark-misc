@@ -3,7 +3,14 @@ Test to create a simple Delta Table. Some code or partial code
 was generated from ChatGPT, CodePilot, and docs samples.
 """
 from pyspark.sql import SparkSession
-from delta import DeltaTable
+import os
+import sys
+sys.path.append('.')
+
+from src.py.sc.utils.print_utils import print_header, print_seperator
+
+import warnings
+warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     # let's top any existing SparkSession if running at all
@@ -12,10 +19,11 @@ if __name__ == "__main__":
     # Create SparkSession
     spark = (SparkSession
                 .builder
-                .remote("local[*]")
+                .remote("sc://localhost")
                 .appName("Delta Example 1") 
                 .getOrCreate())
     
+    DELTA_TABLE_PATH = "/tmp/delta/spark_authors_delta_table"
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
@@ -23,6 +31,18 @@ if __name__ == "__main__":
     columns = ["id", "name"]
     data = [(1, "jules"), (2, "denny"), (3, "brooke"), (4, "td")]
     df = spark.createDataFrame(data).toDF(*columns)
+    print_header("SPARK AUTHORS DATAFRAME:")
+    print(df.show())
+    print_seperator(size=15)
 
     # Write the DataFrame as a Delta table
-    df.write.format("delta").save("/tmp/delta/my_delta_table")
+    print_header("CREATING AUTHORS DELTA TABLE:")
+    df.write.format("delta").mode("overwrite").save(DELTA_TABLE_PATH)
+    print(os.listdir(DELTA_TABLE_PATH))
+    print_seperator(size=15)
+
+    # read back from the Author's Delta Table
+    # read the table back into a PySpark DataFrame
+    print_header("READ DATA FROM THE DELTA TABLE:")
+    df = spark.read.format("delta").load(DELTA_TABLE_PATH)
+    print(df.show())
