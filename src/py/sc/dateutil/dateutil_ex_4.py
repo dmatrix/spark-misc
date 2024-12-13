@@ -15,6 +15,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from src.py.sc.utils.print_utils import print_seperator, print_header
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
 
 from src.py.sc.utils.print_utils import print_seperator
 from pyspark.sql import SparkSession
@@ -31,11 +32,9 @@ if __name__ == "__main__":
     # Initialize Spark session
     # let's top any existing SparkSession if running at all
     SparkSession.builder.master("local[*]").getOrCreate().stop()
-    spark = (SparkSession
-                .builder
-                .remote("local[*]")
-                .appName("PySpark Dateutil Example 4") 
-                .getOrCreate())
+    
+    spark = SparkConnectSession(remote="local[*]",
+                                app_name="PySpark Dateutil Example 4").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
