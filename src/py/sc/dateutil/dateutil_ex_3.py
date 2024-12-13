@@ -13,6 +13,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from src.py.sc.utils.print_utils import print_seperator, print_header
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 import pyspark.sql.functions as F
@@ -52,11 +53,8 @@ if __name__ == "__main__":
     SparkSession.builder.master("local[*]").getOrCreate().stop()
 
     # Create SparkSession
-    spark = (SparkSession
-                .builder
-                .remote("local[*]")
-                .appName("PySpark Pandas UDF Dateutil Example 3") 
-                .getOrCreate())
+    spark = SparkConnectSession(remote="local[*]",
+                                app_name="PySpark Pandas UDF Dateutil Example 3").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
@@ -66,7 +64,7 @@ if __name__ == "__main__":
     fake = Faker()
 
     # Create DataFrame with 100,000 rows
-    num_rows = 100000
+    num_rows = 100_000
     pandas_df = generate_data(fake, num_rows)
     spark_df = spark.createDataFrame(pandas_df)
 
