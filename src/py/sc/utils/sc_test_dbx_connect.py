@@ -11,7 +11,6 @@ from src.py.sc.utils.spark_session_cls import SparkConnectSession
 if __name__ == "__main__":
     cluster_id = os.environ.get("clusterID")
     assert cluster_id
-
     spark = SparkConnectSession(remote=None, mode="dbconnect",
                                 app_name="PySpark DBConnect Test").get()
     
