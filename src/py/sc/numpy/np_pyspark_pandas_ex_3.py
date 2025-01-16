@@ -3,6 +3,7 @@ PySpark on Pandas notebook converted into Pyspark application
 Source: Spark 4.0.0preview-2 documentation: 
 https://mybinder.org/v2/gh/apache/spark/f0d465e09b8?filepath=python%2Fdocs%2Fsource%2Fgetting_started%2Fquickstart_ps.ipynb
 """
+import os
 import sys
 sys.path.append('.')
 
@@ -12,21 +13,31 @@ warnings.filterwarnings("ignore")  # Ignore warnings coming from Arrow optimizat
 import time
 import pyspark.pandas as ps
 from src.py.sc.utils.print_utils import print_header, print_seperator
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
 from pyspark.sql import SparkSession
 import numpy as np
 import pandas as pd
 
 if __name__ == "__main__":
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
 
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
-
-    # Create SparkSession
-    spark = (SparkSession
-                .builder
-                .remote("local[*]")
-                .appName("Pyspark Pandas/Numpy Example 2") 
-                .getOrCreate())
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="Pyspark Pandas/Numpy Example 3").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
