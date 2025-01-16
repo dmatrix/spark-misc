@@ -14,16 +14,19 @@ class SparkConnectSession():
                     .builder
                     .appName(app_name) 
                     .getOrCreate())
-            elif mode == "dbconnect":
-                  from databricks.connect.session import DatabricksSession as SparkSession
-                  from databricks.sdk.core import Config
-                  cluster_id = os.environ.get("clusterID")
-                  config = Config(profile="default", cluster_id=cluster_id)
-                  self.ss = SparkSession.builder.sdkConfig(config=config).getOrCreate()
             else:
                   raise Exception(f"Illegal mode: {mode} not supported")
     def get(self) ->SparkSession:
           return self.ss
 
+class DatabrckSparkSession():
+      def __init__(self, config: dict={}) -> None:
+            from databricks.connect.session import DatabricksSession as SparkSession
+            from databricks.sdk.core import Config
 
-
+            cluster_id = os.environ.get("clusterID")
+            config = Config(profile="default", cluster_id=cluster_id)
+            self.ss = SparkSession.builder.sdkConfig(config=config).getOrCreate()
+      
+      def get(self) ->SparkSession:
+          return self.ss

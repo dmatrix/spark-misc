@@ -1,11 +1,14 @@
 """
 ChatGPT, CodePilot, and docs used to generate partial code sample for testing
 """
+import os
 import sys
 sys.path.append('.')
 
 import warnings
 warnings.filterwarnings("ignore")  # Ignore warnings coming from Arrow optimizations. 
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
 
 import pyspark.pandas as ps
 from src.py.sc.utils.print_utils import print_header, print_seperator
@@ -17,15 +20,24 @@ import random
 
 if __name__ == "__main__":
 
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
 
-    # Create SparkSession
-    spark = (SparkSession
-                .builder
-                .remote("local[*]")
-                .appName("Pyspark Pandas/Numpy Example 2") 
-                .getOrCreate())
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="Pyspark Pandas/Numpy Example 2").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
