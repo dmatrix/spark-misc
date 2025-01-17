@@ -212,27 +212,28 @@ if __name__ == "__main__":
 
     # Getting data in/out
     # CSV is straightforward and easy to use. See here to write a CSV file and here to read a CSV file.
-    print_header("PANDAS-ON-SPARK I/O: CSV: WRITE-AND-READ BACK")
-    psdf.to_csv('foo.csv')
-    psdf_r = ps.read_csv('foo.csv').head(10)
-    print(psdf_r.head())
-    print_seperator(size=15)
+    if mode == "connect":
+        print_header("PANDAS-ON-SPARK I/O: CSV: WRITE-AND-READ BACK")
+        psdf.to_csv('foo.csv')
+        psdf_r = ps.read_csv('foo.csv').head(10)
+        print(psdf_r.head())
+        print_seperator(size=15)
 
-    # Parquet
-    # Parquet is an efficient and compact file format to read and write faster. 
-    # See here to write a Parquet file and here to read a Parquet file.
-    print_header("PANDAS-ON-SPARK I/O: PARQUET: WRITE-AND-READ BACK")
-    psdf.to_parquet('bar.parquet')
-    psdf_p = ps.read_parquet('bar.parquet').head(10)
-    print(psdf_p.head())
+        # Parquet
+        # Parquet is an efficient and compact file format to read and write faster. 
+        # See here to write a Parquet file and here to read a Parquet file.
+        print_header("PANDAS-ON-SPARK I/O: PARQUET: WRITE-AND-READ BACK")
+        psdf.to_parquet('bar.parquet')
+        psdf_p = ps.read_parquet('bar.parquet').head(10)
+        print(psdf_p.head())
 
-    # Spark IO
-    # In addition, pandas API on Spark fully supports Spark's various datasources such as 
-    # ORC and an external datasource. See here to write it to the specified datasource and here to read it from the datasource.
+        # Spark IO
+        # In addition, pandas API on Spark fully supports Spark's various datasources such as 
+        # ORC and an external datasource. See here to write it to the specified datasource and here to read it from the datasource.
 
-    print_header("PANDAS-ON-SPARK I/O: ORC: WRITE-AND-READ BACK")
-    psdf.spark.to_spark_io('zoo.orc', format="orc")
-    psdf_orc = ps.read_spark_io('zoo.orc', format="orc").head(10)
-    print(psdf_orc.head())
+        print_header("PANDAS-ON-SPARK I/O: ORC: WRITE-AND-READ BACK")
+        psdf.spark.to_spark_io('zoo.orc', format="orc")
+        psdf_orc = ps.read_spark_io('zoo.orc', format="orc").head(10)
+        print(psdf_orc.head())
     
     spark.stop()
