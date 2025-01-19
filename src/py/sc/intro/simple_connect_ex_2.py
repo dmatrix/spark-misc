@@ -26,11 +26,11 @@ if __name__ == "__main__":
         cluster_id = os.environ.get("clusterID")
         assert cluster_id
         spark = spark = DatabrckSparkSession().get()
-        README_FILE = "/Users/jules/spark_homes/current/README.md"
+        README_FILE = "dbfs:/databricks-datasets/SPARK_README.md"
     else:
         spark = SparkConnectSession(remote="local[*]", mode=mode,
                                 app_name="PySpark DataFrame Simple Example 2").get()
-        README_FILE = "/FileStore/tables/jsd/README.md"
+        README_FILE = "/Users/jules/spark_homes/current/README.md"
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
