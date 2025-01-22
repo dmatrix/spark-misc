@@ -45,6 +45,7 @@ if __name__ == "__main__":
     data = [(1, "jules"), (2, "denny"), (3, "brooke"), (4, "td")]
     df = spark.createDataFrame(data).toDF(*columns)
     print(df.show())
+    print(df.schema)
 
     # Convert to Pandas
     display(df.toPandas())

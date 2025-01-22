@@ -1,25 +1,35 @@
 #
 # Examples from pyspark-cookbook guide
 #
+import os
 import sys
 sys.path.append('.')
+
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
 from src.py.sc.utils.print_utils import print_header, print_seperator
 
 from pyspark.sql import Row
-from pyspark.sql import SparkSession
 from pyspark.sql import functions as sf
 
 if __name__ == "__main__":
-
-    # let's stop any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
-
-    # Create SparkSession
-    spark = (SparkSession
-                .builder
-                .remote("local[*]")
-                .appName('PysparkFunctionExample') 
-                .getOrCreate())
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="Pyspark Functions Example").get()
     
     # Ensure we are conneccted to the spark session
     print_header("ASSERTING SPARK CONNECT USAGE:")

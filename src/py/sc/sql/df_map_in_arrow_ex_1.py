@@ -1,38 +1,44 @@
+import os
 import sys
 sys.path.append('.')
 
-import warnings
-warnings.filterwarnings("ignore")
-
-from pyspark.sql import SparkSession
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
+from src.py.sc.utils.print_utils import print_header, print_seperator
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, FloatType
 from faker import Faker
 import pyarrow as pa
-from src.py.sc.utils.spark_session_cls import SparkConnectSession
-from src.py.sc.utils.print_utils import print_seperator, print_header
+
 from typing import Iterator
 
 if __name__ == "__main__":
-    # Step 1: Initialize Spark Session
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
     
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
-
-    # Create SparkSession
-    m_conf = {"spark.sql.execution.arrow.pyspark.enabled", "true"}
-    spark = SparkConnectSession(remote="local[*]", 
-                                app_name="PySpark MapInArrow Example",
-                                ).get()
-    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="PySpark MapInArrow Example").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
     print_seperator(size=20)
 
-    NUM_OF_ROWS = 1_000_000
+    NUM_OF_ROWS = 750_000
     NUM_OF_COLUMNS = 6
 
-    # Step 2: Generate a large DataFrame with 2M rows and six columns
+    # Step 2: Generate a large DataFrame with NUM_OF_ROWS rows and six columns
     print_header(f"Create an initial DataFrame of {NUM_OF_ROWS} rows:")
     fake = Faker()
     data = [(i, fake.name(), fake.job(), fake.random_int(20, 60), fake.pyfloat(positive=True, right_digits=2), fake.state()) 
