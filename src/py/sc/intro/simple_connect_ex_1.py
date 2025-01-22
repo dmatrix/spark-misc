@@ -5,6 +5,9 @@ import os
 import sys
 sys.path.append('.')
 
+import warnings
+warnings.filterwarnings("ignore")
+
 from src.py.sc.utils.spark_session_cls import SparkConnectSession
 from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
 from src.py.sc.utils.print_utils import print_seperator
