@@ -1,26 +1,39 @@
-from pyspark.sql import SparkSession
+import os
+import sys
+sys.path.append('.')
+
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
+from src.py.sc.utils.print_utils import print_header
 import pyspark.pandas as ps
-from pyspark.sql.functions import pandas_udf
+from pyspark.sql.functions import pandas_udf, count
 from pyspark.sql.types import TimestampType
 
 from dateutil.relativedelta import relativedelta
 import pandas as pd
-from datetime import datetime
 
 if __name__ == "__main__":
-    # Initialize Spark session
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
-    spark = (SparkSession
-                .builder
-                .remote("sc://localhost")
-                .appName("PySpark Dateutil Example 4") 
-                .getOrCreate())
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="PySpark Dateutil Test Example 2").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
-
 
     # Enable pandas-on-Spark
     ps.set_option("compute.default_index_type", "distributed")
@@ -39,7 +52,7 @@ if __name__ == "__main__":
     df = spark.createDataFrame(data, schema=columns)
     df = df.withColumn("Start_Date", df["Start_Date"].cast(TimestampType()))
 
-    print("Original DataFrame:")
+    print_header("ORIGINAL DATAFRAME:")
     df.show()
 
     # Define a pandas UDF with explicit decorator
@@ -54,7 +67,7 @@ if __name__ == "__main__":
     # Apply the UDF to create a new column
     df_with_end_date = df.withColumn("End_Date", add_one_year(df["Start_Date"]))
 
-    print("DataFrame with End Date (1 Year Added):")
+    print_header("DATAFRAME WITH END DATE (1 YEAR ADDED):")
     df_with_end_date.show()
 
     # Stop the Spark session

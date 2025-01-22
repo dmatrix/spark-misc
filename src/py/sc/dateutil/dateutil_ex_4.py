@@ -8,6 +8,7 @@ This script, partially generaged by CodePilot, includes the following tests:
         on datetime column types
 """
 
+import os 
 import sys
 sys.path.append('.')
 
@@ -16,9 +17,7 @@ warnings.filterwarnings("ignore")
 
 from src.py.sc.utils.print_utils import print_seperator, print_header
 from src.py.sc.utils.spark_session_cls import SparkConnectSession
-
-from src.py.sc.utils.print_utils import print_seperator
-from pyspark.sql import SparkSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
 from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import StringType, TimestampType
 
@@ -29,11 +28,22 @@ import pandas as pd
 import random
 
 if __name__ == "__main__":
-    # Initialize Spark session
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
     
-    spark = SparkConnectSession(remote="local[*]",
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
                                 app_name="PySpark Dateutil Example 4").get()
     
     # Ensure we are conneccted to the spark session

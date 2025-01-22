@@ -1,8 +1,10 @@
+import os
+
 import sys
 sys.path.append('.')
 
-from src.py.sc.utils.print_utils import print_header, print_seperator
-from pyspark.sql import SparkSession
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
 from pyspark.sql.functions import pandas_udf, col
 from pyspark.sql.types import DateType, IntegerType, StringType
 from datetime import datetime, timedelta
@@ -11,16 +13,23 @@ import pyspark.pandas as ps
 import random
 
 if __name__ == "__main__":
-    # Initialize Spark session
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
-
-    # Create SparkSession
-    spark = (SparkSession
-                .builder
-                .remote("sc://localhost")
-                .appName("PySpark Dateutil Example Debug") 
-                .getOrCreate())
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="PySpark Dateutil Test Example 3").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
@@ -50,11 +59,11 @@ if __name__ == "__main__":
     print(f"Difference: {rd.years} years, {rd.months} months, {rd.days} days")
 
     print("---" * 5)
-    #df_1["days_difference"] = df_1.apply(lambda row: (relativedelta(random_date(start_date, end_date), df_1["date1"]).days))
-    df_1["days_difference"] = df_1.apply(lambda row: row["date1"].days)
+    # df_1["days_difference"] = df_1.apply(lambda row: (relativedelta(random_date(start_date, end_date), df_1["date1"]).days))
+    # df_1["days_difference"] = df_1.apply(lambda row: df_1["date1"].days)
 
-  
     rd = relativedelta(random_date(start_date, end_date), df_1["date1"][0])
     print(f"Difference: {rd.years} years, {rd.months} months, {rd.days} days")
     print(df_1.head())
+
     spark.stop()

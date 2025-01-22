@@ -9,16 +9,18 @@ PySpark Python app to test SparkConnect. This file tests include:
 Some code or partial code was generated from ChatGPT and CodePilot
 """
 
+import os
+
 import sys
 sys.path.append('.')
 
 import warnings
 warnings.filterwarnings("ignore")
 
-from src.py.sc.utils.print_utils import print_seperator, print_header
 from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
+from src.py.sc.utils.print_utils import print_seperator, print_header
 
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, avg
 from dateutil.relativedelta import relativedelta
 from faker import Faker
@@ -27,12 +29,22 @@ import random
 import pandas as pd
 
 if __name__ == "__main__":
-    # Initialize Spark session
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
-
-    # Create SparkSession
-    spark = SparkConnectSession(remote="local[*]",
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
                                 app_name="PySpark Dateutil Example 2").get()
     
     # Ensure we are conneccted to the spark session
