@@ -1,4 +1,12 @@
-from pyspark.sql import SparkSession
+import os
+import sys
+sys.path.append('.')
+import warnings
+warnings.filterwarnings("ignore")
+
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
+
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import Ridge
@@ -8,22 +16,29 @@ from pyspark.sql.functions import pandas_udf, col
 
 
 if __name__ == "__main__":
-    # Step 1: Initialize Spark Session
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
-
-    # Create SparkSession
-    spark = (SparkSession
-                .builder
-                .remote("local[*]")
-                .appName("Pyspark Scikit-learn Example 2") 
-                .getOrCreate())
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="PySpark Scikit-learn Example 3").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
 
-    NUM_SAMPLES = 100_000
+    NUM_SAMPLES = 250_000
     # Step 2: Generate a large synthetic dataset with 10,000 rows and 10 features
     X, y = make_regression(n_samples=NUM_SAMPLES, n_features=10, noise=0.1, random_state=42)
 
