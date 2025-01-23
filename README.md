@@ -11,7 +11,7 @@ Spark Connect Documentation
 
 Spark Connect Technical Talks
  * [Python with Spark Connect](https://www.youtube.com/watch?v=QGUvjcrqj-U)
- * [Spark Connect: Apache Spark 3.4 & Beyong](https://www.youtube.com/watch?v=vTd3OqDzjuo)
+ * [Spark Connect: Apache Spark 3.4 & Beyond](https://www.youtube.com/watch?v=vTd3OqDzjuo)
  * [ Use Spark from anywhere - A Spark client in Python powered by Spark Connect](https://www.youtube.com/watch?v=PzgPcvFDD4I)
 
 
