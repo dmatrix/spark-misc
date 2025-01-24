@@ -8,14 +8,16 @@ This PySpark Spark Connect application includes the following features:
 ChatGPT, CodePilot, and docs used to generate code sample for testing.
 
 """
+import os
 import sys
 sys.path.append('.')
 
 import warnings
 warnings.filterwarnings("ignore")
 
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, monotonically_increasing_id, pandas_udf
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
 from src.py.sc.utils.print_utils import print_seperator, print_header
 from src.py.sc.utils.web_utils import generate_valid_urls
 
@@ -24,16 +26,25 @@ import random
 import requests
 import time
 
+STORAGE_LOCATION = "website_analysis"
 if __name__ == "__main__":
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
-
-    # Create SparkSession
-    spark = (SparkSession
-                .builder
-                .remote("local[*]")
-                .appName("Requests Example 2") 
-                .getOrCreate())
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="Requests Example 2").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
@@ -98,20 +109,17 @@ if __name__ == "__main__":
     sorted_websites = valid_websites.orderBy(col("content_length").desc())
     sorted_websites.limit(25).show(truncate=False)
 
-    # Save the DataFrame as a Delta table
-    print_header("CREATE A PARQUET TABLE:")
-    sorted_websites.write.mode("overwrite").save("/tmp/tables/website_analysis")
-
     # Register table in Spark SQL
-    spark.sql(f"CREATE TABLE IF NOT EXISTS website_analysis USING PARQUET LOCATION '/tmp/tables/website_analysis'")
-
+    print_header("CREATE A MANAGED TABLE:")
+    spark.sql(f"DROP TABLE IF EXISTS {STORAGE_LOCATION}")
+    sorted_websites.write.option("mode", "overwrite").saveAsTable("website_analysis")
     print_header("USE SPARK SQL TO QUERY THE LOCAL PARQUETTABLE OF THE SORTED WEBSITES BY CONTENT LENGTH:")
-    # Query the Delta table using Spark SQL
-    query_result = spark.sql("""
+    # Query the managed table using Spark SQL
+    query_result = spark.sql(f"""
         SELECT 
             url, content_length, status_code, response_time, content_type
         FROM 
-            website_analysis
+            {STORAGE_LOCATION}
         WHERE 
             status_code = 200
         ORDER BY 

@@ -7,14 +7,17 @@ This PySpark Spark Connect application includes the following features:
 
 ChatGPT, CodePilot, and Python docs used to generate code sample for testing.
 """
+
+import os
 import sys
 sys.path.append('.')
 
 import warnings
 warnings.filterwarnings("ignore")
 
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, monotonically_increasing_id, pandas_udf
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
 from src.py.sc.utils.print_utils import print_seperator, print_header
 from src.py.sc.utils.web_utils import generate_valid_urls
 
@@ -24,15 +27,23 @@ import requests
 import time
 
 if __name__ == "__main__":
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
-
-    # Create SparkSession
-    spark = (SparkSession
-                .builder
-                .remote("local[*]")
-                .appName("Requests Example 1") 
-                .getOrCreate())
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="Requests Example 1").get()
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
@@ -76,8 +87,7 @@ if __name__ == "__main__":
 
     # Apply the UDF to add the columns
     websites_with_details = websites_df.withColumn("details", fetch_website_details(col("url")))
-    print_header("\nApplied UDFs to add website details to the dataframe")
-
+    print_header("\nApplied UDFs to add website details to the dataframe:")
 
     # Extract individual columns from the struct column
     websites_with_details = websites_with_details.select(
