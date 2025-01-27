@@ -1,3 +1,12 @@
+import os
+import sys
+sys.path.append('.')
+
+import warnings
+warnings.filterwarnings("ignore")
+
+from src.py.sc.utils.print_utils import print_seperator, print_header
+
 import pandas as pd
 from deltalake.writer import write_deltalake
 from deltalake import DeltaTable
@@ -15,25 +24,41 @@ data = {
     "Join_Date": [datetime(2021, 1, 1), datetime(2022, 6, 15), datetime(2023, 3, 10)],
 }
 df = pd.DataFrame(data)
+df_read = df
+
+print_header("INITIAL PANDAS DATAFRAME:")
+print(df)
+print_seperator("---")
 
 # Write the Pandas DataFrame to a Delta table
+print_header("CREATE A DELTA TABLE & LIST FILES:")
 write_deltalake(delta_table_path, df, mode="overwrite")
-print("\nInitial Delta Table:")
 print(DeltaTable(delta_table_path).files())
+print_seperator("----")
 
 # Step 2: Read the Delta table
+print_header("\nREAD THE DELTA TABLE")
 delta_table = DeltaTable(delta_table_path)
-df_read = delta_table.to_pandas()
-print("\nRead Delta Table:")
+try:
+    df_read = delta_table.to_pandas()
+except OSError:
+    print("OSError: Repetition level histogram size mismatch: Need to update pyarrow to 19.0.1")
 print(df_read)
+print_seperator("----")
 
 # Step 3: Update the Delta table
 # Add two years to the Join_Date column
+print_header("DELTA TABLE AFTER UPDATEING JOIN_DATES:")
 df_read["Join_Date"] = df_read["Join_Date"].apply(lambda d: d + relativedelta(years=2))
 write_deltalake(delta_table_path, df_read, mode="overwrite")
 
-print("\nDelta Table After Updating Join_Date:")
-print(DeltaTable(delta_table_path).to_pandas())
+try:
+
+    print(DeltaTable(delta_table_path).to_pandas())
+except OSError:
+     print("OSError: Repetition level histogram size mismatch: Need to update pyarrow to 19.0.1")
+     print(df_read)
+     print_seperator("----")
 
 # Step 4: Append new rows to the Delta table
 new_data = {
@@ -45,11 +70,17 @@ new_data = {
 df_new = pd.DataFrame(new_data)
 write_deltalake(delta_table_path, df_new, mode="append")
 
-print("\nDelta Table After Appending Rows:")
-df_new = DeltaTable(delta_table_path).to_pandas()
-print(df_new)
+print_header("\nDelta Table After Appending Rows:")
+try:
+
+    df_new = DeltaTable(delta_table_path).to_pandas()
+except OSError:
+    print("OSError: Repetition level histogram size mismatch: Need to update pyarrow to 19.0.1")
+    print(df_new)
+    print_seperator("----")
 
 # Step 5: sort the table by Age
 df_age_sorted = df_new.sort_values(by="Age", ascending=False)
-print(f"sorted by age: {df_age_sorted}")
+print_header("sorted by age:")
+print(f"sorted dataframe: {df_age_sorted}")
 
