@@ -1,27 +1,39 @@
+import os
+import sys
+sys.path.append('.')
+from src.py.sc.utils.print_utils import print_header, print_seperator
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
+
 from delta import *
-from pyspark.sql import SparkSession
 from delta.tables import DeltaTable
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from faker import Faker
 
-import sys
-sys.path.append('.')
-from src.py.sc.utils.print_utils import print_header, print_seperator
-from src.py.sc.utils.spark_session_cls import SparkConnectSession
 import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # Step 1: create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="Delta Example CRUD 5").get()
 
-    # Create SparkSession
-    spark = SparkConnectSession(remote="sc://localhost",
-                                app_name="Delta Table Example (CRUD) 5").get()
-
-    # File path for the Delta table
-    delta_table_path = "/tmp/crud_delta_table"
+    DELTA_TABLE_NAME = "crud_operations_tbl_2"
 
     # Step 2: Generate a large dataset using Faker (100,000 rows, 6 columns)
     fake = Faker()
@@ -33,16 +45,18 @@ if __name__ == "__main__":
     df = spark.createDataFrame(data, columns)
 
     # Step 3: CREATE operation - Write the data as a Delta table
-    df.write.format("delta").mode("overwrite").save(delta_table_path)
+    print_header("CREATING CRUD DELTA TABLE:")
+    spark.sql(f"DROP TABLE IF EXISTS {DELTA_TABLE_NAME};")
+    df.write.format("delta").saveAsTable(DELTA_TABLE_NAME)
     print("Delta table created.")
 
     # Step 4: READ operation - Load and display the Delta table
-    delta_table = spark.read.format("delta").load(delta_table_path)
+    delta_table_df = spark.read.table(f"{DELTA_TABLE_NAME}")
     print("Initial Delta table:")
-    delta_table.show(10)
+    delta_table_df.show(10)
 
     # Step 5: UPDATE operation - Update salary for employees with age > 50
-    delta_table = DeltaTable.forPath(spark, delta_table_path)
+    delta_table = DeltaTable.forPath(spark, f"{DELTA_TABLE_NAME}")
     delta_table.update(
         condition=col("age") > 50,
         set={"salary": lit(2000)}  # Set salary to 2000

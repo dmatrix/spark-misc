@@ -9,14 +9,16 @@ This PySpark Spark Connect application includes the following features:
 
 Some code or partial code was generated from ChatGPT, CodePilot, and docs sample.
 """
+import os
 import sys
 sys.path.append('.')
 
 import warnings
 warnings.filterwarnings("ignore")
 
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, monotonically_increasing_id, pandas_udf
+from src.py.sc.utils.spark_session_cls import SparkConnectSession
+from src.py.sc.utils.spark_session_cls import DatabrckSparkSession
 from src.py.sc.utils.print_utils import print_seperator, print_header
 from src.py.sc.utils.web_utils import generate_valid_urls
 from src.py.sc.utils.spark_session_cls import SparkConnectSession
@@ -27,18 +29,32 @@ import requests
 import time
 
 if __name__ == "__main__":
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
+    spark = None
+    # Create a new session with Spark Connect mode={"dbconnect", "connect", "classic"}
+    if len(sys.argv) <= 1:
+        args = ["dbconnect", "classic", "connect"]
+        print(f"Command line must be one of these values: {args}")
+        sys.exit(1)  
+    mode = sys.argv[1]
+    print(f"++++ Using Spark Connect mode: {mode}")
+    
+    # create Spark Connect type based on type of SparkSession you want
+    if mode == "dbconnect":
+        cluster_id = os.environ.get("clusterID")
+        assert cluster_id
+        spark = spark = DatabrckSparkSession().get()
+    else:
+        spark = SparkConnectSession(remote="local[*]", mode=mode,
+                                app_name="Delta Example 2").get()
 
-    # Create SparkSession
-    spark = SparkConnectSession(remote="sc://localhost", 
-                                app_name="Delta Example 1").get()
+
+    DELTA_TABLE_NAME = "website_analysis"
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
 
-    # Generate URLs and select 200 random URLs
+    # Generate URLs and select random URLs
     number_of_urls = 3000
     random_urls =  int(number_of_urls / 3) 
     all_urls = generate_valid_urls(number_of_urls)
@@ -98,20 +114,21 @@ if __name__ == "__main__":
     sorted_websites.limit(25).show(truncate=False)
 
     # Save the DataFrame as a Delta table
-    print_header("CREATE A LOCAL DELTA TABLE OF THE SORTED WEBSITES BY CONTENT LENGTH:")
-    delta_table_path = "/tmp/delta/website_analysis"
-    sorted_websites.write.format("delta").mode("overwrite").save(delta_table_path)
+    print_header("CREATE A MANAGED DELTA TABLE OF THE SORTED WEBSITES BY CONTENT LENGTH:")
+    spark.sql(f"DROP TABLE IF EXISTS {DELTA_TABLE_NAME};")
+    sorted_websites.write.format("delta").saveAsTable(DELTA_TABLE_NAME)
 
-    # Register the Delta table in Spark SQL
-    spark.sql(f"CREATE TABLE IF NOT EXISTS website_analysis USING DELTA LOCATION '{delta_table_path}'")
+    # Get the Deltat table name properties
+    spark.sql(f"desc formatted {DELTA_TABLE_NAME}").show(truncate = False)
+    print_seperator("---")
 
-    print_header("USE SPARK SQL TO QUERY THE LOCAL DELTA TABLE OF THE SORTED WEBSITES BY CONTENT LENGTH:")
+    print_header("USE SPARK SQL TO QUERY THE MANGAGED DELTA TABLE OF THE SORTED WEBSITES BY CONTENT LENGTH:")
     # Query the Delta table using Spark SQL
-    query_result = spark.sql("""
+    query_result = spark.sql(f"""
         SELECT 
             url, content_length, status_code, response_time, content_type
         FROM 
-            website_analysis
+            {DELTA_TABLE_NAME}
         WHERE 
             status_code = 200
         ORDER BY 
