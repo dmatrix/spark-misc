@@ -90,11 +90,11 @@ if __name__ == "__main__":
 
     # Step 6: READ historical data using Time Travel
     print_header("Time travel example - Show the first version of the Delta table:")
-    historical_df = spark.read.format("delta").option("versionAsOf", 0).load(delta_table_path)
+    historical_df = spark.read.format("delta").option("versionAsOf", 0).load(f"{DELTA_TABLE_NAME}")
     historical_df.show()
 
     # Step 7: Clean up (optional) - Vacuum to remove old files
-    print_header("Vaccum the deltat table:")
+    print_header("Vaccum the delta table:")
     delta_table.vacuum(retentionHours=0)  # Retention period in hours
 
     # Stop Spark Session
