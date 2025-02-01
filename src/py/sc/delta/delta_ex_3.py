@@ -4,7 +4,8 @@ This PySpark Spark Connect application includes the following features:
 1. Read an exisitng delta table created from previous example
 2. Use SQL to queries the delta table
 
-Some code or partial code generated from Delta documentation.
+Some code or partial code generated from Delta documentation, extended with ChatGPT, and 
+borrowed from Delta documentation
 """
 import os
 import sys

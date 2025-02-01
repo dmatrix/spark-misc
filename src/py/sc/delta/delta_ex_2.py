@@ -7,7 +7,9 @@ This PySpark Spark Connect application includes the following features:
 4. Create a delta table from the final dataframe
 5. Use SQL to query the delta table
 
-Some code or partial code was generated from ChatGPT, CodePilot, and docs sample.
+Some code or partial code generated from Delta documentation, extended with ChatGPT, and 
+borrowed from Delta documentation.
+
 """
 import os
 import sys
@@ -55,7 +57,7 @@ if __name__ == "__main__":
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
 
     # Generate URLs and select random URLs
-    number_of_urls = 3000
+    number_of_urls = 6000
     random_urls =  int(number_of_urls / 3) 
     all_urls = generate_valid_urls(number_of_urls)
     random_websites = random.sample(all_urls, random_urls)

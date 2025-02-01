@@ -1,3 +1,16 @@
+"""
+This PySpark Spark Connect application includes the following features:
+
+1. Read an exisitng delta table created from previous example
+2. Use SQL to queries the delta table
+3. Excercise Delta Table CRUD functionality: update, merge, delete, upsert,etc
+
+Some code or partial code generated from Delta documentation, extended with ChatGPT, and 
+borrowed from Delta documentation
+
+Presently, some CRUD operation are not supported yet in 4.0.0rc1
+https://docs.delta.io/4.0.0-preview/delta-spark-connect.html#preview-limitations
+"""
 import os
 import sys
 sys.path.append('.')

@@ -1,6 +1,8 @@
 """
-Test to create a simple Delta Table. Some code or partial code
-was generated from ChatGPT, CoPilot, and docs samples.
+Test to create a simple Delta Table. 
+
+Some code or partial code generated from Delta documentation, extended with ChatGPT, and 
+borrowed from Delta documentation.
 """
 
 import os
