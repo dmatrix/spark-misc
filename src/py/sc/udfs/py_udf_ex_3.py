@@ -9,14 +9,11 @@ from src.py.sc.utils.print_utils import print_seperator, print_header
 from src.py.sc.utils.spark_session_cls import SparkConnectSession
 from pyspark.sql import SparkSession
 
-if __name__ == "__main__":
 
-    # Initialize Spark session
-    # let's top any existing SparkSession if running at all
-    SparkSession.builder.master("local[*]").getOrCreate().stop()
+if __name__ == "__main__":
     
-    spark = SparkConnectSession(remote="local[*]",
-                                app_name="PySpark UDF Debugging Example 1").get()
+    spark = (SparkConnectSession(remote="local[*]",
+                                 app_name="PySpark UDF Debugging Example 1").get())
     
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
