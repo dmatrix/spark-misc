@@ -1,6 +1,5 @@
 This is a public repository for Apache Spark 3.5.3, 4.0.0-preview[1,2], and Spark Connect examples 
-for testing common Python packages. Partial code snippets for testing was generated using a combination 
-of ChatGPT, CodePilot, _Learning Spark 2nd Ed_, and PySpark documentation and tutorial examples.
+for testing common Python packages. Partial code snippets for testing were generated using a combination of ChatGPT, CodePilot, _Learning Spark 2nd Ed_, and PySpark documentation and tutorial examples.
 
 <img src="images/spark_connect.png">
 

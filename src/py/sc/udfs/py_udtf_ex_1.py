@@ -5,7 +5,7 @@ warnings.filterwarnings("ignore")
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udtf
-from pyspark.sql.types import Row, Iterator, Any
+from pyspark.sql.types import Row, Any
 from pyspark.sql.connect.udtf import UserDefinedTableFunction, PythonEvalType, AnalyzeArgument,AnalyzeResult
 from pyspark.sql.types import Row, StructType, StructField, IntegerType, StringType
 
@@ -40,8 +40,8 @@ class ProcessPolymorphicSimpleData(UserDefinedTableFunction):
             info = row['info']
             yield (info, len(info))
 
-    def terminate(self) -> Iterator[Any]:
-      yield "done", None
+    # def terminate(self) -> Iterator[Any]:
+    #   yield "done", None
 
 
 if __name__ == "__main__":
