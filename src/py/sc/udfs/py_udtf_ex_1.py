@@ -5,7 +5,6 @@ warnings.filterwarnings("ignore")
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udtf
-from pyspark.sql.types import Row, Any
 from pyspark.sql.connect.udtf import UserDefinedTableFunction, PythonEvalType, AnalyzeArgument,AnalyzeResult
 from pyspark.sql.types import Row, StructType, StructField, IntegerType, StringType
 
