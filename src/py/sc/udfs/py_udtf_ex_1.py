@@ -5,63 +5,52 @@ warnings.filterwarnings("ignore")
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udtf
-from pyspark.sql.connect.udtf import UserDefinedTableFunction, PythonEvalType, AnalyzeArgument,AnalyzeResult
-from pyspark.sql.types import Row, StructType, StructField, IntegerType, StringType
+from pyspark.sql.functions import lit, col
 
-# Define a simple polymorphic UDTF class
+# Define the UDTF function
+@udtf(returnType="start_city: string, end_city: string, miles: int, hrs_by_car: float, hrs_by_plane: float, plane_fair_dollar: float")
+class TravelDuration:
+    def __init__(self):
+        self.car_speed = 65  # mph
+        self.plane_speed = 350  # mph
+        self.plane_fair_per_hour = 200
 
-@udtf()
-class ProcessPolymorphicSimpleData(UserDefinedTableFunction):
-    evalType = PythonEvalType.SQL_TABLE_UDF
-
-    @staticmethod
-    def analyze(input_schema: AnalyzeArgument):
-      if isinstance(input_schema, int):
-        return AnalyzeResult(StructType([
-            StructField("input_number", IntegerType(), True),
-            StructField("squared", IntegerType(), True)
-        ]))
-      elif isinstance(input_schema, str):
-        return AnalyzeResult(StructType([
-            StructField("info", StringType(), True),
-            StructField("length", IntegerType(), True)
-        ]))
-      else:
-        return AnalyzeResult(StructType([
-            StructField("words", StringType(), True),
-            StructField("length", IntegerType(), True)
-        ]))
-
-    def eval(self, row: Row):
-        if 'value' in row:
-            yield (row['value'], row['value'] ** 2)
-        else:
-            info = row['info']
-            yield (info, len(info))
-
-    # def terminate(self) -> Iterator[Any]:
-    #   yield "done", None
-
+    def eval(self, start_city: str, end_city: str, miles: float):
+        hrs_by_car = miles / self.car_speed
+        hrs_by_plane = miles / self.plane_speed
+        plane_fair_us_dollar = self.plane_fair_per_hour * hrs_by_plane
+        yield start_city, end_city, miles, hrs_by_car, hrs_by_plane, plane_fair_us_dollar
 
 if __name__ == "__main__":
     spark = (SparkSession.builder 
-            .remote("local[*]") 
-            .appName("PySpark UDTF Polymorphic Example 1")
-            .getOrCreate())
+                .remote("local[*]") 
+                .appName("PySpark UDTF Example 1")
+                .getOrCreate())
 
     # Ensure we are conneccted to the spark session
     assert("<class 'pyspark.sql.connect.session.SparkSession'>" == str(type((spark))))
     print(f"+++++Making sure it's using SparkConnect session:{spark}+++++")
 
-    df_1 = spark.createDataFrame([(1,), (2,), (3,),(4,), (5,)], ["input_number"])
-    df_2 = spark.createDataFrame([("Spark Connect"), ("with"), ("user defined table functions"), ("rocks!")], ["words"])
+    # Create a distance DataFrame
+    distances_df = spark.createDataFrame([
+        ("New York", "Boston", 190),
+        ("Los Angeles", "San Francisco", 2375),
+        ("Chicago", "Miami", 1197),
+        ("Houston", "Dallas", 239),
+        ("San Francisco", "Seattle", 810) ], 
+        ["start_city", "end_city", "miles"])
     
-    print(df_1.show(truncate=False))
-    print(df_2.show(truncate=False))
+    distances_df.show(truncate=False)
 
-    df_1.createOrReplaceTempView("table_int_values")
-    df_2.createOrReplaceTempView("table_string_values")
+    # Use our UDTF to test it; this should return a single line
+    TravelDuration(lit("New York"), lit("Boston"), lit(190)).show()
 
-    spark.udtf.register("process_polymorphic_simple_data", ProcessPolymorphicSimpleData)
-    print(spark.sql("SELECT * FROM process_polymorphic_simple_data(TABLE(table_int_values))").show())
-    
+    # Apply our UDTF with a lateral join for transformation
+    transfrom_df = distances_df.lateralJoin(TravelDuration(col("start_city").outer(), col("end_city").outer(), col("miles")))
+
+    spark.stop()
+
+
+
+
+
