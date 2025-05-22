@@ -29,6 +29,20 @@ class DataValidation:
     
         self.df = df
 
+    def filter_missing_values(self) -> DataFrame:
+        """
+        Filters the DataFrame to include only rows with missing values.
+        
+        Returns:
+            DataFrame: A DataFrame containing rows with missing values.
+        """
+        return self.df.filter(
+            col("ssn").isNull() | 
+            col("city").isNull() | 
+            col("state").isNull() | 
+            col("airline_of_choice").isNull()
+        )
+
     def _count_missing_values(self) -> int:
         """
         Counts the number of rows with missing values in the DataFrame.
@@ -36,12 +50,17 @@ class DataValidation:
         Returns:
             int: The count of rows with missing values.
         """
-        return self.df.filter(
-            col("ssn").isNull() | 
-            col("city").isNull() | 
-            col("state").isNull() | 
-            col("airline_of_choice").isNull()
-        ).count()
+        return self.filter_missing_values().count()
+    
+    def filter_negative_mileage(self) -> DataFrame:
+        """
+        Filters the DataFrame to include only rows with negative mileage.
+        
+        Returns:
+            DataFrame: A DataFrame containing rows with negative mileage.
+        """
+        return self.df.filter(col("mileage_flown") < 0)
+    
     
     def _count_negative_mileage(self) -> int:
         """
@@ -50,18 +69,45 @@ class DataValidation:
         Returns:
             DataFrame: A DataFrame containing rows with negative mileage.
         """
-        return self.df.filter(col("mileage_flown") < 0).count()
+        return self.filter_negative_mileage().count()
     
-    def _count_zero_mileage(self) -> int:
+    def filter_zero_mileage(self) -> DataFrame:
         """
         Filters the DataFrame to include only rows with zero mileage.
         
         Returns:
             DataFrame: A DataFrame containing rows with zero mileage.
         """
-        return self.df.filter(col("mileage_flown") == 0 ).count()
+        return self.df.filter(col("mileage_flown") == 0)
+    
+    def _count_zero_mileage(self) -> int:
+        """
+        Filters the DataFrame to include only rows with zero mileage.
+        
+        Returns:
+            int: The count of rows with zero mileage.
+        """
+        return self.filter_zero_mileage().count()
+    
+    def filter_zero_mileage(self) -> DataFrame:
+        """
+        Filters the DataFrame to include only rows with zero mileage.
+        
+        Returns:
+            DataFrame: A DataFrame containing rows with zero mileage.
+        """
+        return self.df.filter(col("mileage_flown") == 0)
     
     def _count_age_mismatch(self) -> int: 
+        """
+        Filters the DataFrame to include only rows with age and date of birth mismatch.
+        
+        Returns:
+            int: The count of rows with age and date of birth mismatch.
+        """
+        return self.filter_count_status_mismatch().count()
+    
+    def filter_age_mismatch(self) -> DataFrame:
         """
         Filters the DataFrame to include only rows with age and date of birth mismatch.
         
@@ -73,11 +119,14 @@ class DataValidation:
             datediff(current_date(), col("date_of_birth")) / 365
         ).filter(
             abs(col("calculated_age")) - abs(col("age")) > 1  # Allow 1 year difference due to day calculation
-        ).count()
+        )
     
-    def _count_status_mismatch(self) -> int:
+    def filter_count_status_mismatch(self) -> DataFrame:
         """
         Filters the DataFrame to include only rows with status and mileage mismatch.
+        
+        Returns:
+            DataFrame: A DataFrame containing rows with status and mileage mismatch.
         """
         return self.df.filter(
             ~(
@@ -86,7 +135,13 @@ class DataValidation:
                 ((col("mileage_flown") >= 25000) & (col("mileage_flown") < 50000)) & (col("status") == "BRONZE") |
                 (col("mileage_flown") < 25000) & (col("status") == "NONE")
             )
-        ).count()
+        )
+    
+    def _count_status_mismatch(self) -> int:
+        """
+        Filters the DataFrame to include only rows with status and mileage mismatch.
+        """
+        return self.filter_count_status_mismatch().count()
 
 
     def print_validation_report(self) -> None:
