@@ -143,10 +143,31 @@ class DataValidation:
         """
         return self.filter_count_status_mismatch().count()
 
+    def filter_duplicate_records(self) -> DataFrame:
+        """
+        Filters the DataFrame to include only duplicate records based on unique_id.
+        
+        Returns:
+            DataFrame: A DataFrame containing duplicate records.
+        """
+        return self.df.groupBy("unique_id").count().filter(col("count") > 1)
+    
+    def _count_duplicate_records(self) -> int:
+        """
+        Counts the number of duplicate records in the DataFrame based on unique_id.
+        
+        Returns:
+            int: The count of duplicate records.
+        """
+        return self.filter_duplicate_records().count()
 
-    def print_validation_report(self) -> None:
+
+    def print_validation_report(self) -> int:
         """
         Prints a validation report for the DataFrame.
+
+        Returns:
+            int: The count of rows with missing values or other issues.
         """
 
         # Count records with various issues
@@ -158,6 +179,7 @@ class DataValidation:
 
         age_mismatch = self._count_age_mismatch()
         status_mismatch = self._count_status_mismatch()
+        duplicate_records = self._count_duplicate_records()
 
         # Print the validation report
 
@@ -168,5 +190,10 @@ class DataValidation:
         print(f"- Records with zero mileage: {zero_mileage}")
         print(f"- Records with age/DOB mismatch: {age_mismatch}")
         print(f"- Records with status/mileage mismatch: {status_mismatch}")
-    
+        print(f"- Records with duplicate unique_id: {duplicate_records}")
+
+        if missing_fields | negative_mileage | zero_mileage | age_mismatch | status_mismatch | duplicate_records:
+            return 1
+        else:
+            return 0 
 
