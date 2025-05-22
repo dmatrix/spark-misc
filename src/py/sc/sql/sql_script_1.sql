@@ -1,0 +1,8 @@
+BEGIN
+  DECLARE c INT = 10;
+  WHILE c > 0 DO
+    INSERT INTO T VALUES (c);
+    SET c = c - 1;
+  END WHILE;
+  SELECT * FROM T;
+END
