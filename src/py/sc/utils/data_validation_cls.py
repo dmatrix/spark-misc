@@ -1,6 +1,6 @@
 import os
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, abs, datediff, current_date
+from pyspark.sql.functions import col, abs, datediff, current_date, count
 
 class DataValidation:
     """
@@ -9,12 +9,16 @@ class DataValidation:
     Attributes:
         df (DataFrame): The DataFrame to validate.
     Methods:
-        _count_missing_values(): Counts the number of rows with missing values.
-        _count_negative_mileage(): Counts the number of rows with negative mileage.
-        _count_zero_mileage(): Counts the number of rows with zero mileage.
-        _count_age_mismatch(): Counts the number of rows with age and date of birth mismatch.
-        _count_status_mismatch(): Counts the number of rows with status and mileage mismatch.
-        print_validation_report(): Prints a validation report for the DataFrame.
+        except_all(df: DataFrame) -> int:
+            Returns the rows in the DataFrame that are not present in the other DataFrame.
+        drop_missing_values() -> int:
+            Drops rows with missing values from the DataFrame.
+        drop_negative_or_zero_mileage() -> int:
+            Filters the DataFrame to include only rows with negative mileage.
+        drop_duplicate_records() -> int:
+            Filters the DataFrame to include only duplicate records based on unique_id.
+        print_validation_report() -> int:
+            Prints a validation report for the DataFrame.
     Usage:
         df = spark.read.json("path/to/json")
         validator = DataValidation(df)
@@ -28,172 +32,96 @@ class DataValidation:
         """
     
         self.df = df
+        self.missing_values = 0
+        self.zero_or_negative_mileage = 0
+        self.duplicate_records = 0
+        self.original_count = df.count()
 
-    def filter_missing_values(self) -> DataFrame:
+    def get_df(self) -> DataFrame:
         """
-        Filters the DataFrame to include only rows with missing values.
+        Returns the DataFrame.
         
         Returns:
-            DataFrame: A DataFrame containing rows with missing values.
+            DataFrame: The DataFrame.
         """
-        return self.df.filter(
-            col("ssn").isNull() | 
-            col("city").isNull() | 
-            col("state").isNull() | 
-            col("airline_of_choice").isNull()
-        )
-
-    def _count_missing_values(self) -> int:
-        """
-        Counts the number of rows with missing values in the DataFrame.
-        
-        Returns:
-            int: The count of rows with missing values.
-        """
-        return self.filter_missing_values().count()
+        return self.df
     
-    def filter_negative_mileage(self) -> DataFrame:
+
+    def except_all(self, df: DataFrame) -> int:
+        """
+        Returns the rows in the DataFrame that are not present in the other DataFrame.
+        
+        Args:
+            df (DataFrame): The DataFrame to compare against.
+        
+        Returns:
+            int: the new count of rows in the DataFrame after removing missing values
+        """
+        
+        self.df = self.df.exceptAll(df)
+       
+        return self.df.count()
+
+    def drop_missing_values(self, cleanup=False) -> int:
+        """
+        Drops rows with missing values from the DataFrame.
+        
+        Returns:
+            int: The count of rows dropped of missing values.
+        """
+        self.df = self.df.na.drop()
+        self.missing_values = self.original_count - self.df.count()
+        return self.missing_values 
+       
+    
+    def drop_negative_or_zero_mileage(self) -> DataFrame:
         """
         Filters the DataFrame to include only rows with negative mileage.
         
         Returns:
-            DataFrame: A DataFrame containing rows with negative mileage.
+            int: The count of rows with negative or zero mileage.
         """
-        return self.df.filter(col("mileage_flown") < 0)
-    
-    
-    def _count_negative_mileage(self) -> int:
-        """
-        Filters the DataFrame to include only rows with negative mileage.
-        
-        Returns:
-            DataFrame: A DataFrame containing rows with negative mileage.
-        """
-        return self.filter_negative_mileage().count()
-    
-    def filter_zero_mileage(self) -> DataFrame:
-        """
-        Filters the DataFrame to include only rows with zero mileage.
-        
-        Returns:
-            DataFrame: A DataFrame containing rows with zero mileage.
-        """
-        return self.df.filter(col("mileage_flown") == 0)
-    
-    def _count_zero_mileage(self) -> int:
-        """
-        Filters the DataFrame to include only rows with zero mileage.
-        
-        Returns:
-            int: The count of rows with zero mileage.
-        """
-        return self.filter_zero_mileage().count()
-    
-    def filter_zero_mileage(self) -> DataFrame:
-        """
-        Filters the DataFrame to include only rows with zero mileage.
-        
-        Returns:
-            DataFrame: A DataFrame containing rows with zero mileage.
-        """
-        return self.df.filter(col("mileage_flown") == 0)
-    
-    def _count_age_mismatch(self) -> int: 
-        """
-        Filters the DataFrame to include only rows with age and date of birth mismatch.
-        
-        Returns:
-            int: The count of rows with age and date of birth mismatch.
-        """
-        return self.filter_count_status_mismatch().count()
-    
-    def filter_age_mismatch(self) -> DataFrame:
-        """
-        Filters the DataFrame to include only rows with age and date of birth mismatch.
-        
-        Returns:
-            DataFrame: A DataFrame containing rows with age and date of birth mismatch.
-        """
-        return self.df.withColumn(
-            "calculated_age", 
-            datediff(current_date(), col("date_of_birth")) / 365
-        ).filter(
-            abs(col("calculated_age")) - abs(col("age")) > 1  # Allow 1 year difference due to day calculation
-        )
-    
-    def filter_count_status_mismatch(self) -> DataFrame:
-        """
-        Filters the DataFrame to include only rows with status and mileage mismatch.
-        
-        Returns:
-            DataFrame: A DataFrame containing rows with status and mileage mismatch.
-        """
-        return self.df.filter(
-            ~(
-                (col("mileage_flown") > 100000) & (col("status") == "GOLD") |
-                ((col("mileage_flown") >= 50000) & (col("mileage_flown") <= 100000)) & (col("status") == "SILVER") |
-                ((col("mileage_flown") >= 25000) & (col("mileage_flown") < 50000)) & (col("status") == "BRONZE") |
-                (col("mileage_flown") < 25000) & (col("status") == "NONE")
-            )
-        )
-    
-    def _count_status_mismatch(self) -> int:
-        """
-        Filters the DataFrame to include only rows with status and mileage mismatch.
-        """
-        return self.filter_count_status_mismatch().count()
+        self.zero_or_negative_mileage = self.df.filter(col("mileage_flown") <= 0).count()
+        self.df = self.df.filter(col("mileage_flown") > 0)
 
-    def filter_duplicate_records(self) -> DataFrame:
+        return self.zero_or_negative_mileage
+    
+   
+    def drop_duplicate_records(self) -> DataFrame:
         """
         Filters the DataFrame to include only duplicate records based on unique_id.
         
         Returns:
-            DataFrame: A DataFrame containing duplicate records.
-        """
-        return self.df.groupBy("unique_id").count().filter(col("count") > 1)
-    
-    def _count_duplicate_records(self) -> int:
-        """
-        Counts the number of duplicate records in the DataFrame based on unique_id.
-        
-        Returns:
             int: The count of duplicate records.
         """
-        return self.filter_duplicate_records().count()
+        duplicate_df = (self.df.groupBy("unique_id") 
+                        .agg(count("*").alias("count")) 
+                        .filter(col("count") > 1))
+        self.duplicate_records  = duplicate_df.count()
+        self.df = self.df.dropDuplicates(subset=["unique_id"])
+        return self.duplicate_records
 
 
-    def print_validation_report(self) -> int:
+    def print_validation_report(self) -> None:
         """
         Prints a validation report for the DataFrame.
 
-        Returns:
-            int: The count of rows with missing values or other issues.
+        Returns: 
+            None
         """
 
         # Count records with various issues
-        missing_fields = self._count_missing_values()
-        
-        negative_mileage = self._count_negative_mileage()
-        zero_mileage = self._count_zero_mileage()
-
-
-        age_mismatch = self._count_age_mismatch()
-        status_mismatch = self._count_status_mismatch()
-        duplicate_records = self._count_duplicate_records()
+        missing_fields = self.drop_missing_values()
+        negative_or_zero_mileage = self.drop_negative_or_zero_mileage()
+        duplicate_records = self.drop_duplicate_records()
 
         # Print the validation report
-
-        print(f"Data validation summary:")
-        print(f"- Total records: {self.df.count()}")
-        print(f"- Records with missing fields: {missing_fields}")
-        print(f"- Records with negative mileage: {negative_mileage}")
-        print(f"- Records with zero mileage: {zero_mileage}")
-        print(f"- Records with age/DOB mismatch: {age_mismatch}")
-        print(f"- Records with status/mileage mismatch: {status_mismatch}")
-        print(f"- Records with duplicate unique_id: {duplicate_records}")
-
-        if missing_fields | negative_mileage | zero_mileage | age_mismatch | status_mismatch | duplicate_records:
-            return 1
+        print(f"Data data validation summary:")
+        print (f"- Total records before cleanup: {self.original_count}")
+        print(f" - Total records after cleanup: {self.df.count()}")
+        print(f" - Records with missing fields: {missing_fields}")
+        print(f" - Records with negative or zero mileage: {negative_or_zero_mileage}")
+        if duplicate_records > 0:
+            print(f" - Records with duplicate unique_id: {duplicate_records}")
         else:
-            return 0 
-
+            print(f" - No records with duplicate unique_id")
