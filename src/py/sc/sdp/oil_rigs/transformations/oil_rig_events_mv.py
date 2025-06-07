@@ -94,5 +94,5 @@ def eagle_ford_rig_mv() -> DataFrame:
     ])
     
     start_date = datetime.now() - timedelta(days=2)
-    data = generate_sensor_data('eagle_ford_rig', start_date)
+    data = generate_sensor_data('eagle_ford_rig', start_date, num_events=10000)
     return spark.createDataFrame(data, schema) 
