@@ -45,7 +45,7 @@ def main():
     orders_df = query_orders_mv(db_name)
     
     # Show the DataFrame
-    print(orders_df.show(truncate=False))
+    print(orders_df.show(10, truncate=False))
 
 if __name__ == "__main__":
     main()
