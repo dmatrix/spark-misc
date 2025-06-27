@@ -7,4 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "httpx>=0.28.1",
     "mcp[cli]>=1.10.1",
+    "nodejs>=0.1.1",
+    "npm>=0.1.1",
+    "npx>=0.1.6",
 ]
