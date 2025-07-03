@@ -16,7 +16,7 @@ Spark Connect Technical Talks
 Spark Data Source Talks
  * [Breaking Barriers: Building Custom Spark 4.0 Data Connectors with Python](https://lnkd.in/gvMZFQ_g)
  * [Bridging Big Data and AI: Empowering PySpark With Lance Format for Multi-Modal AI Data Pipelines](https://lnkd.in/gdauyv8E)
- * [Apache Spark™ 4.0 for Data Engineering] (https://www.youtube.com/watch?v=odQ6mEUzGvQ)
+ * [Apache Spark™ 4.0 for Data Engineering](https://www.youtube.com/watch?v=odQ6mEUzGvQ)
 
 Cheers,
 
