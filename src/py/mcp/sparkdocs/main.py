@@ -1,13 +1,11 @@
 #
-# This is a simple mcp server that will search the web for the best answer
-# to a given query and return the text from the docs
+# This script implements an MCP server that answers queries by searching the web,
+# focusing on Spark-related documentation. It leverages the Serper API for web search
+# and BeautifulSoup for HTML parsing. The server is built using the FastMCP framework,
+# and environment variables are managed with dotenv.
 #
-# It uses the serper api to search the web and the beautifulsoup library to parse the html
-#
-# It uses the mcp.server.fastmcp library to run the server
-#
-# It uses the dotenv library to load the environment variables
-# source: modified and augmented from https://www.youtube.com/watch?v=Ek8JHgZtmcI
+# The code is adapted and extended from a YouTube tutorial to better serve Spark documentation needs.
+
 #
 import os
 import json
@@ -29,6 +27,7 @@ docs_urls = {
     "python-datasource": "https://spark.apache.org/docs/latest/api/python/tutorial/sql/python_data_source.html",
     "pyspark": "https://spark.apache.org/docs/latest/api/python/user_guide/index.html",
     "spark-sql": "https://spark.apache.org/docs/latest/sql-ref.html",
+    "python-datasoruce-examples": "https://github.com/allisonwang-db/pyspark-data-sources"
     # "spark-ml": "https://spark.apache.org/docs/latest/ml-guide.html",
     # "spark-streaming": "https://spark.apache.org/docs/latest/streaming-programming-guide.html",
     # "spark-mllib": "https://spark.apache.org/docs/latest/mllib-guide.html",
@@ -108,4 +107,27 @@ async def get_spark_docs(query: str, section: str):
 
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    import asyncio
+    import sys
+    
+    def print_header(msg):
+        print("\n" + "="*40)
+        print(msg)
+        print("="*40)
+
+    if len(sys.argv) > 1 and sys.argv[1] == "test":
+        # Run a couple of test queries
+        async def run_tests():
+            try:
+                print_header("Test 1: PySpark SQL Example")
+                result1 = await get_spark_docs("How to use Spark SQL?", "spark-sql")
+                print(result1[:1000] + ("..." if len(result1) > 1000 else ""))
+
+                print_header("Test 2: DataFrame from CSV")
+                result2 = await get_spark_docs("How to create a DataFrame from CSV?", "python-api")
+                print(result2[:1000] + ("..." if len(result2) > 1000 else ""))
+            except Exception as e:
+                print(f"Test failed: {e}")
+        asyncio.run(run_tests())
+    else:
+        mcp.run(transport="stdio")

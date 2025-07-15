@@ -85,6 +85,32 @@ Once configured, you can use the SparkDocs MCP server in Cursor by:
 - "How to use Spark Data Source API?"
 - "What are the best practices for Spark performance optimization?"
 
+## Testing
+
+You can verify that the MCP server and its documentation search tool are working by running a built-in test harness. This will execute a couple of example queries and print the results to your terminal.
+
+### Run the Test Harness
+
+From the project directory, run:
+
+```bash
+python3 main.py test
+```
+
+Or, if you are using the project's virtual environment:
+
+```bash
+.venv/bin/python main.py test
+```
+
+This will perform two example documentation queries:
+- "How to use Spark SQL?" (in the `spark-sql` section)
+- "How to create a DataFrame from CSV?" (in the `python-api` section)
+
+You should see output that includes the raw text of the relevant Spark documentation pages. If there are errors (such as missing dependencies or API keys), they will be printed to the terminal.
+
+**Note:** The test harness does not require MCP protocol clients (like Cursor) and is intended for quick verification and debugging.
+
 ## Project Structure
 
 ```
