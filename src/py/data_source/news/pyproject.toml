@@ -1,0 +1,11 @@
+[project]
+name = "news"
+version = "0.1.0"
+description = "Apache Spark News Data Source using Python Data Source API"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pyspark>=4.0.0",
+    "newsapi-python>=0.2.7",
+    "pyarrow>=20.0.0",
+]
