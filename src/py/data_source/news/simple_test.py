@@ -5,7 +5,7 @@ Simple test to verify the news data source is working.
 
 import os
 from pyspark.sql import SparkSession
-from main import NewsDataSource
+from news import NewsDataSource
 
 def simple_test():
     """Simple test of the news data source."""

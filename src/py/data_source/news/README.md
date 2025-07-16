@@ -43,7 +43,7 @@ export NEWSAPI_KEY="your_api_key_here"
 
 ```python
 from pyspark.sql import SparkSession
-from main import NewsDataSource
+from news import NewsDataSource
 
 # Create Spark session
 spark = SparkSession.builder \

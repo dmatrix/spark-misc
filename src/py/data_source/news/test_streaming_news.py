@@ -13,7 +13,7 @@ from datetime import datetime
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, window, count, desc, current_timestamp
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType
-from main import NewsDataSource
+from news import NewsDataSource
 
 
 def test_streaming_news_basic():
