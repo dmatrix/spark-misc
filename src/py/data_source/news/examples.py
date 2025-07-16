@@ -10,7 +10,7 @@ import os
 from datetime import datetime, timedelta
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, when, length, split, explode, lower, desc, count, avg
-from main import NewsDataSource
+from news import NewsDataSource
 
 
 def create_spark_session(app_name: str) -> SparkSession:

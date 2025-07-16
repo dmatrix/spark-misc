@@ -8,7 +8,7 @@ import os
 import time
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, current_timestamp
-from main import NewsDataSource
+from news import NewsDataSource
 
 
 def test_quick_streaming():

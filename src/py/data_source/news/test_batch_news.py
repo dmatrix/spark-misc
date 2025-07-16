@@ -10,7 +10,7 @@ import os
 import sys
 from datetime import datetime, timedelta
 from pyspark.sql import SparkSession
-from main import NewsDataSource
+from news import NewsDataSource
 
 
 def test_batch_news_basic():
