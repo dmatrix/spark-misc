@@ -474,7 +474,7 @@ When you modify the project (add files, change dependencies, update version), yo
 #### 1. Update `pyproject.toml`
 ```toml
 [project]
-name = "restapi"
+name = "pyspark-rest-datasource"
 version = "0.1.0"  # Update version as needed
 description = "Add your description here"
 readme = "README.md"
@@ -499,25 +499,25 @@ pip install --editable .
 #### 3. Verify Updates
 ```bash
 # Check updated metadata
-cat restapi.egg-info/PKG-INFO
+cat pyspark_rest_datasource.egg-info/PKG-INFO
 
 # Check updated dependencies
-cat restapi.egg-info/requires.txt
+cat pyspark_rest_datasource.egg-info/requires.txt
 
 # Check updated source files
-cat restapi.egg-info/SOURCES.txt
+cat pyspark_rest_datasource.egg-info/SOURCES.txt
 ```
 
 ### Understanding egg-info Files
 
-The `restapi.egg-info/` directory contains the following files:
+The `pyspark_rest_datasource.egg-info/` directory contains the following files:
 
 | File | Purpose | Example Content |
 |------|---------|----------------|
 | `PKG-INFO` | Package metadata | Name, version, dependencies, description |
 | `requires.txt` | Runtime dependencies | `pyarrow>=20.0.0\npyspark>=4.0.0\npytest>=8.4.1` |
 | `SOURCES.txt` | Source files list | `README.md\npyproject.toml\nrestapi.py\n...` |
-| `top_level.txt` | Top-level modules | `restapi` |
+| `top_level.txt` | Top-level modules | `pyspark_rest_datasource` |
 | `dependency_links.txt` | External links | Usually empty |
 
 ### Package Distribution
@@ -531,8 +531,8 @@ pip install build
 python -m build
 
 # This creates:
-# - dist/restapi-0.1.0-py3-none-any.whl
-# - dist/restapi-0.1.0.tar.gz
+# - dist/pyspark_rest_datasource-0.1.0-py3-none-any.whl
+# - dist/pyspark_rest_datasource-0.1.0.tar.gz
 ```
 
 #### Publishing to PyPI (Optional)
@@ -553,7 +553,7 @@ twine upload --repository testpypi dist/*
 2. **Update `pyproject.toml`** if needed
 3. **Reinstall package** with `uv pip install --editable .`
 4. **Run tests** with `python run_tests.py`
-5. **Verify metadata** in `restapi.egg-info/`
+5. **Verify metadata** in `pyspark_rest_datasource.egg-info/`
 6. **Commit changes** including updated egg-info files
 
 ## Contributing
