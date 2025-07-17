@@ -1,3 +1,13 @@
+Metadata-Version: 2.4
+Name: restapi
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: pyarrow>=20.0.0
+Requires-Dist: pyspark>=4.0.0
+Requires-Dist: pytest>=8.4.1
+
 # REST API Data Source for PySpark
 
 A production-ready REST API Data Source implementation for Apache Spark using the Python Data Source API (Spark 4.0+). This allows you to read from and write to REST APIs directly using Spark's DataFrame API.
@@ -22,103 +32,19 @@ A production-ready REST API Data Source implementation for Apache Spark using th
 ## Installation
 
 ### Prerequisites
-- Python 3.13+
+- Python 3.8+
 - Apache Spark 4.0+ (for Python Data Source API support)
-- Required packages (as specified in `pyproject.toml`):
-  - `pyarrow>=20.0.0`
-  - `pyspark>=4.0.0`
-  - `pytest>=8.4.1`
+- Required packages: `pyspark`, `requests`
 
-### Package Information
-
-This package uses modern Python packaging standards with metadata stored in `restapi.egg-info/`:
-
-#### Package Metadata Files
-- **`PKG-INFO`** - Contains package metadata (name, version, dependencies, description)
-- **`requires.txt`** - Lists runtime dependencies
-- **`SOURCES.txt`** - Lists all source files included in the package
-- **`top_level.txt`** - Specifies the top-level module (`restapi`)
-- **`dependency_links.txt`** - External dependency links (currently empty)
-
-#### Viewing Package Information
-```bash
-# View package metadata
-cat restapi.egg-info/PKG-INFO
-
-# View dependencies
-cat restapi.egg-info/requires.txt
-
-# View included files
-cat restapi.egg-info/SOURCES.txt
-
-# View top-level modules
-cat restapi.egg-info/top_level.txt
-```
-
-#### Package Metadata Summary
-```
-Name: restapi
-Version: 0.1.0
-Python Required: >=3.13
-Dependencies:
-  - pyarrow>=20.0.0
-  - pyspark>=4.0.0
-  - pytest>=8.4.1
-```
-
-### Setup Options
-
-#### Option 1: Editable Installation (Recommended for Development)
+### Setup
 ```bash
 # Clone or download the source code
 cd restapi/
 
-# Install in editable mode using pip
-pip install --editable .
-
-# Or install using uv (if available)
-uv pip install --editable .
+# Install dependencies
+pip install pyspark requests
 
 # Run tests to verify installation
-python run_tests.py
-```
-
-#### Option 2: Direct Installation
-```bash
-# Install dependencies manually
-pip install pyarrow>=20.0.0 pyspark>=4.0.0 pytest>=8.4.1
-
-# Or install from pyproject.toml
-pip install .
-
-# Run tests to verify installation
-python run_tests.py
-```
-
-#### Option 3: Using uv (Modern Python Package Manager)
-```bash
-# Install with uv
-uv pip install --editable .
-
-# Or sync from lock file
-uv pip sync uv.lock
-
-# Run tests
-python run_tests.py
-```
-
-### Verifying Installation
-
-After installation, verify the package is correctly installed:
-
-```bash
-# Check package information
-python -c "import restapi; print(restapi.__file__)"
-
-# Check dependencies are available
-python -c "import pyspark; import pyarrow; print('Dependencies OK')"
-
-# Run comprehensive tests
 python run_tests.py
 ```
 
@@ -411,105 +337,13 @@ logger = logging.getLogger(__name__)
 4. **Performance Optimization** - Connection pooling, caching
 5. **Advanced Schema Handling** - Nested JSON, data type inference
 
-## Package Maintenance
-
-### Updating Package Metadata
-
-When you modify the project (add files, change dependencies, update version), you need to update the package metadata:
-
-#### 1. Update `pyproject.toml`
-```toml
-[project]
-name = "restapi"
-version = "0.1.0"  # Update version as needed
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "pyarrow>=20.0.0",
-    "pyspark>=4.0.0",
-    "pytest>=8.4.1",
-    # Add new dependencies here
-]
-```
-
-#### 2. Regenerate egg-info Files
-```bash
-# Reinstall in editable mode to update egg-info
-uv pip install --editable .
-
-# Or with regular pip
-pip install --editable .
-```
-
-#### 3. Verify Updates
-```bash
-# Check updated metadata
-cat restapi.egg-info/PKG-INFO
-
-# Check updated dependencies
-cat restapi.egg-info/requires.txt
-
-# Check updated source files
-cat restapi.egg-info/SOURCES.txt
-```
-
-### Understanding egg-info Files
-
-The `restapi.egg-info/` directory contains the following files:
-
-| File | Purpose | Example Content |
-|------|---------|----------------|
-| `PKG-INFO` | Package metadata | Name, version, dependencies, description |
-| `requires.txt` | Runtime dependencies | `pyarrow>=20.0.0\npyspark>=4.0.0\npytest>=8.4.1` |
-| `SOURCES.txt` | Source files list | `README.md\npyproject.toml\nrestapi.py\n...` |
-| `top_level.txt` | Top-level modules | `restapi` |
-| `dependency_links.txt` | External links | Usually empty |
-
-### Package Distribution
-
-#### Creating a Distribution Package
-```bash
-# Install build tools
-pip install build
-
-# Build distribution packages
-python -m build
-
-# This creates:
-# - dist/restapi-0.1.0-py3-none-any.whl
-# - dist/restapi-0.1.0.tar.gz
-```
-
-#### Publishing to PyPI (Optional)
-```bash
-# Install twine
-pip install twine
-
-# Upload to PyPI
-twine upload dist/*
-
-# Or upload to Test PyPI first
-twine upload --repository testpypi dist/*
-```
-
-### Development Workflow
-
-1. **Make changes** to source code or dependencies
-2. **Update `pyproject.toml`** if needed
-3. **Reinstall package** with `uv pip install --editable .`
-4. **Run tests** with `python run_tests.py`
-5. **Verify metadata** in `restapi.egg-info/`
-6. **Commit changes** including updated egg-info files
-
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Add tests for new functionality
-4. Update package metadata if needed
-5. Ensure all tests pass
-6. Submit a pull request
+4. Ensure all tests pass
+5. Submit a pull request
 
 ## License
 
