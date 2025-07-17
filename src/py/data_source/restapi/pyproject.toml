@@ -1,11 +1,110 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "restapi"
+name = "pyspark-rest-datasource"
 version = "0.1.0"
-description = "Add your description here"
+description = "Development-ready REST API Data Source for Apache Spark using Python Data Source API (Spark 4.0+)"
 readme = "README.md"
-requires-python = ">=3.13"
+license = "MIT"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+maintainers = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+requires-python = ">=3.9"
+keywords = ["pyspark", "spark", "rest", "api", "datasource", "dataframe"]
+classifiers = [
+        "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Information Analysis"
+]
 dependencies = [
-    "pyarrow>=20.0.0",
     "pyspark>=4.0.0",
-    "pytest>=8.4.1",
+    "pyarrow>=10.0.0", 
+    "requests>=2.25.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "flake8>=4.0.0",
+    "mypy>=1.0.0"
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "responses>=0.20.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/pyspark-rest-datasource"
+Documentation = "https://github.com/yourusername/pyspark-rest-datasource/blob/main/README.md"
+Repository = "https://github.com/yourusername/pyspark-rest-datasource.git"
+"Bug Tracker" = "https://github.com/yourusername/pyspark-rest-datasource/issues"
+Changelog = "https://github.com/yourusername/pyspark-rest-datasource/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyspark_rest_datasource*"]
+
+[tool.setuptools.package-data]
+"pyspark_rest_datasource" = ["py.typed"]
+
+# Development tools configuration
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311", "py312"]
+extend-exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+markers = [
+    "integration: marks tests as integration tests (may require network)",
+    "unit: marks tests as unit tests"
+]
+
+[dependency-groups]
+dev = [
+    "build>=1.2.2.post1",
+    "twine>=6.1.0",
 ]
