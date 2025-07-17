@@ -1,6 +1,5 @@
 README.md
 pyproject.toml
-rest-api-data-source.patch
 restapi.py
 run_tests.py
 test_format_api.py
