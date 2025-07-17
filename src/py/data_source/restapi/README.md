@@ -66,28 +66,28 @@ uv add pyspark-rest-datasource
 
 ### Package Information
 
-This package uses modern Python packaging standards with metadata stored in `restapi.egg-info/`:
+This package uses modern Python packaging standards with metadata stored in `pyspark_rest_datasource.egg-info/`:
 
 #### Package Metadata Files
 - **`PKG-INFO`** - Contains package metadata (name, version, dependencies, description)
 - **`requires.txt`** - Lists runtime dependencies
 - **`SOURCES.txt`** - Lists all source files included in the package
-- **`top_level.txt`** - Specifies the top-level module (`restapi`)
+- **`top_level.txt`** - Specifies the top-level module (`pyspark_rest_datasource`)
 - **`dependency_links.txt`** - External dependency links (currently empty)
 
 #### Viewing Package Information
 ```bash
 # View package metadata
-cat restapi.egg-info/PKG-INFO
+cat pyspark_rest_datasource.egg-info/PKG-INFO
 
 # View dependencies
-cat restapi.egg-info/requires.txt
+cat pyspark_rest_datasource.egg-info/requires.txt
 
 # View included files
-cat restapi.egg-info/SOURCES.txt
+cat pyspark_rest_datasource.egg-info/SOURCES.txt
 
 # View top-level modules
-cat restapi.egg-info/top_level.txt
+cat pyspark_rest_datasource.egg-info/top_level.txt
 ```
 
 #### Package Metadata Summary
@@ -107,7 +107,7 @@ Test PyPI: https://test.pypi.org/project/pyspark-rest-datasource/0.1.0/
 #### Option 1: Editable Installation (Recommended for Development)
 ```bash
 # Clone or download the source code
-cd restapi/
+cd pyspark-rest-datasource/
 
 # Install in editable mode using pip
 pip install --editable .
@@ -516,7 +516,7 @@ The `pyspark_rest_datasource.egg-info/` directory contains the following files:
 |------|---------|----------------|
 | `PKG-INFO` | Package metadata | Name, version, dependencies, description |
 | `requires.txt` | Runtime dependencies | `pyarrow>=20.0.0\npyspark>=4.0.0\npytest>=8.4.1` |
-| `SOURCES.txt` | Source files list | `README.md\npyproject.toml\nrestapi.py\n...` |
+| `SOURCES.txt` | Source files list | `README.md\npyproject.toml\npyspark_rest_datasource/\n...` |
 | `top_level.txt` | Top-level modules | `pyspark_rest_datasource` |
 | `dependency_links.txt` | External links | Usually empty |
 
