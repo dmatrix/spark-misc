@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+rest-api-data-source.patch
+restapi.py
+run_tests.py
+test_format_api.py
+uv.lock
+restapi.egg-info/PKG-INFO
+restapi.egg-info/SOURCES.txt
+restapi.egg-info/dependency_links.txt
+restapi.egg-info/requires.txt
+restapi.egg-info/top_level.txt
