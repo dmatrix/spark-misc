@@ -1,6 +1,21 @@
 # REST API Data Source for PySpark
 
-A production-ready REST API Data Source implementation for Apache Spark using the Python Data Source API (Spark 4.0+). This allows you to read from and write to REST APIs directly using Spark's DataFrame API.
+A development-ready REST API Data Source implementation for Apache Spark using the Python Data Source API (Spark 4.0+). This allows you to read from and write to REST APIs directly using Spark's DataFrame API.
+
+## 🚀 Package Status
+
+[![Test PyPI](https://img.shields.io/badge/Test%20PyPI-0.1.0-blue)](https://test.pypi.org/project/pyspark-rest-datasource/0.1.0/)
+[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Spark](https://img.shields.io/badge/spark-4.0+-red.svg)](https://spark.apache.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**Current Status**: Available on Test PyPI for testing  
+**Test PyPI Package**: https://test.pypi.org/project/pyspark-rest-datasource/0.1.0/
+
+```bash
+# Install from Test PyPI
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ pyspark-rest-datasource
+```
 
 ## Features
 
@@ -12,7 +27,7 @@ A production-ready REST API Data Source implementation for Apache Spark using th
 - Custom authentication headers support
 - Proper error handling and validation
 
-✅ **Production Ready**
+✅ **Development Ready**
 - Comprehensive test suite with real API calls
 - Error handling for network issues
 - Configurable timeouts and headers
@@ -22,12 +37,32 @@ A production-ready REST API Data Source implementation for Apache Spark using th
 ## Installation
 
 ### Prerequisites
-- Python 3.13+
+- Python 3.9+
 - Apache Spark 4.0+ (for Python Data Source API support)
-- Required packages (as specified in `pyproject.toml`):
-  - `pyarrow>=20.0.0`
+- Required packages:
   - `pyspark>=4.0.0`
-  - `pytest>=8.4.1`
+  - `pyarrow>=10.0.0`
+  - `requests>=2.25.0`
+
+### Install from Test PyPI
+
+The package is currently available on Test PyPI for testing:
+
+```bash
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ pyspark-rest-datasource
+```
+
+**Test PyPI Package**: https://test.pypi.org/project/pyspark-rest-datasource/0.1.0/
+
+### Install from Production PyPI (Coming Soon)
+
+Once uploaded to production PyPI, you'll be able to install with:
+
+```bash
+pip install pyspark-rest-datasource
+# or
+uv add pyspark-rest-datasource
+```
 
 ### Package Information
 
@@ -57,13 +92,14 @@ cat restapi.egg-info/top_level.txt
 
 #### Package Metadata Summary
 ```
-Name: restapi
+Name: pyspark-rest-datasource
 Version: 0.1.0
-Python Required: >=3.13
+Python Required: >=3.9
 Dependencies:
-  - pyarrow>=20.0.0
   - pyspark>=4.0.0
-  - pytest>=8.4.1
+  - pyarrow>=10.0.0
+  - requests>=2.25.0
+Test PyPI: https://test.pypi.org/project/pyspark-rest-datasource/0.1.0/
 ```
 
 ### Setup Options
@@ -109,17 +145,20 @@ python run_tests.py
 
 ### Verifying Installation
 
-After installation, verify the package is correctly installed:
+After installation from Test PyPI, verify the package works correctly:
 
 ```bash
-# Check package information
-python -c "import restapi; print(restapi.__file__)"
+# Test basic import
+python -c "from pyspark_rest_datasource import RestApiDataSource; print('✅ Package imported successfully!')"
+
+# Test package functionality
+python -c "from pyspark_rest_datasource import RestApiDataSource; print('Package name:', RestApiDataSource.name())"
 
 # Check dependencies are available
-python -c "import pyspark; import pyarrow; print('Dependencies OK')"
+python -c "import pyspark; import pyarrow; import requests; print('✅ All dependencies OK')"
 
-# Run comprehensive tests
-python run_tests.py
+# Run example script
+python example.py
 ```
 
 ## Usage
@@ -129,7 +168,7 @@ python run_tests.py
 #### Reading from REST APIs
 ```python
 from pyspark.sql import SparkSession
-from restapi import RestApiDataSource
+from pyspark_rest_datasource import RestApiDataSource
 
 # Initialize Spark
 spark = SparkSession.builder.appName("REST API Example").getOrCreate()
@@ -219,7 +258,21 @@ df = spark.read \
 
 ## Testing
 
-### Running Tests
+### Testing the Package
+
+After installing from Test PyPI, you can test the package:
+
+```bash
+# Test basic import
+python -c "from pyspark_rest_datasource import RestApiDataSource; print('✅ Package works!')"
+
+# Run the example script
+python example.py
+```
+
+### Development Testing
+
+For development, you can run the original test files:
 
 ```bash
 # Run all tests
@@ -319,6 +372,7 @@ root
 ✅ Error handling test passed - Got expected error: PythonException
 
 🧪 Testing custom headers
+
 📊 Custom headers DataFrame count: 1
 ✅ Custom headers test passed
 
