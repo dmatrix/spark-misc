@@ -68,6 +68,11 @@ class RestApiReader(DataSourceReader):
     def __init__(self, schema: StructType, options: Dict[str, str]):
         self.schema = schema
         self.options = options
+        
+        # Validate required options - need either 'url' or 'urls'
+        if not (("url" in options and options["url"]) or ("urls" in options and options["urls"])):
+            raise ValueError("URL option is required (either 'url' or 'urls')")
+        
         self.timeout = int(options.get("timeout", "30"))
         self._partitions = []  # Will be set by DataSource
     
@@ -213,6 +218,11 @@ class RestApiWriter(DataSourceWriter):
     def __init__(self, options: Dict[str, str], schema: StructType):
         self.options = options
         self.schema = schema
+        
+        # Validate required options - need either 'url' or 'urls'
+        if not (("url" in options and options["url"]) or ("urls" in options and options["urls"])):
+            raise ValueError("URL option is required (either 'url' or 'urls')")
+        
         self.url = options.get("url", "")
         self.method = options.get("method", "POST")
         self.headers = self._parse_headers(options.get("headers", "{}"))

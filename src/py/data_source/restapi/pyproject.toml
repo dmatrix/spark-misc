@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyspark-rest-datasource"
-version = "0.2.0"
+version = "0.2.3"
 description = "Simple single-file REST API Data Source for Apache Spark using Python Data Source API (Spark 4.0+) with partitioning support"
 readme = "README.md"
 license = "MIT"
