@@ -103,7 +103,7 @@ class TestRestApiDataSourceAPI:
         assert len(rows) == 1
         
         user = rows[0]
-        assert user.id == "1"
+        assert user.id == 1  # API returns integer, not string
         assert user.name == "Leanne Graham"
         assert user.email == "Sincere@april.biz"
         
@@ -138,8 +138,10 @@ class TestRestApiDataSourceAPI:
         # Verify some posts have the expected structure
         first_post = rows[0]
         assert hasattr(first_post, 'id')
-        assert hasattr(first_post, 'name')  # This will contain the title
-        assert first_post.id == "1"
+        assert hasattr(first_post, 'title')  # Posts have title, not name
+        assert hasattr(first_post, 'body')
+        assert hasattr(first_post, 'userId')
+        assert first_post.id == 1  # API returns integer, not string
         
         print(f"✅ Posts test passed - Retrieved {len(rows)} posts")
     
@@ -218,9 +220,13 @@ class TestRestApiDataSourceAPI:
         assert "name" in field_names
         assert "email" in field_names
         
-        # Verify data types (all should be strings in our implementation)
+        # Verify data types (schema inference should detect correct types)
+        from pyspark.sql.types import IntegerType
         for field in df.schema.fields:
-            assert field.dataType == StringType()
+            if field.name == "id":
+                assert field.dataType == IntegerType()  # ID should be integer
+            else:
+                assert field.dataType == StringType()  # Other fields should be strings
         
         print("✅ Schema inference test passed")
     
@@ -304,8 +310,7 @@ class TestRestApiDataSourceAPI:
         from restapi import RestApiDataSource
         
         # Create a data source instance
-        data_source = RestApiDataSource()
-        data_source.options = {"url": "https://test.com"}
+        data_source = RestApiDataSource(options={"url": "https://test.com"})
         
         schema = StructType([
             StructField("id", StringType(), True),
@@ -343,8 +348,7 @@ class TestRestApiDataSourceAPI:
         from restapi import RestApiDataSource
         
         # Create a data source instance without URL
-        data_source = RestApiDataSource()
-        data_source.options = {}  # No URL provided
+        data_source = RestApiDataSource(options={})  # No URL provided
         
         schema = StructType([
             StructField("id", StringType(), True),
@@ -360,7 +364,7 @@ class TestRestApiDataSourceAPI:
         
         # Test that writer raises ValueError when URL is missing
         try:
-            data_source.writer(schema)
+            data_source.writer(schema, overwrite=False)
             assert False, "writer should raise ValueError when URL is missing"
         except ValueError as e:
             assert "URL option is required" in str(e)
@@ -407,6 +411,7 @@ def run_data_source_tests():
         print(f"❌ Test failed: {e}")
         import traceback
         traceback.print_exc()
+        raise  # Re-raise the exception to properly fail the test
     finally:
         test_instance.teardown_class()
 

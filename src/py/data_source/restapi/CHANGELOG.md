@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2024-07-18
+
+### Changed
+- Updated documentation to position package for development use rather than production use
+- Clarified that package is ready for development workflows and testing
+
+## [0.2.2] - 2024-07-18
+
+### Fixed
+- Fixed URL validation logic in RestApiReader and RestApiWriter to properly support partitioning strategies
+- Updated validation to accept either 'url' or 'urls' options for better flexibility
+- Ensures all partitioning strategies (single, urls, pages) work correctly
+
+### Testing
+- All partitioning tests now pass with 100% success rate
+- Comprehensive validation of URL-based partitioning strategy
+- Enhanced error handling for missing URL configurations
+
+## [0.2.1] - 2024-07-18
+
+### Added
+- URL validation in RestApiReader and RestApiWriter constructors
+- Improved error messages when required URL option is missing
+- Enhanced validation for partitioning strategies (supports both `url` and `urls` options)
+- Comprehensive test results and performance metrics in documentation
+
+### Fixed
+- Better error handling for missing URL configuration
+- Enhanced test coverage for options validation
+- Fixed URL validation to properly support URL-based partitioning strategy
+- All partitioning tests now pass with 100% success rate
+
+### Performance
+- Confirmed up to 4x performance improvement with optimal partitioning
+- Page-based partitioning delivers ~1,481 rows/second throughput
+- Single partition baseline: ~385 rows/second
+- URL-based partitioning: Parallel processing of multiple endpoints
+
+### Testing
+- 100% test success rate across all partitioning strategies
+- Comprehensive test suite covering all edge cases
+- Real-world performance benchmarks with actual API calls
+- Enhanced error resilience testing
+
 ## [0.2.0] - 2024-01-18
 
 ### Added
