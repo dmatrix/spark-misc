@@ -1,16 +1,16 @@
 # REST API Data Source for PySpark
 
-A development-ready REST API Data Source implementation for Apache Spark using the Python Data Source API (Spark 4.0+). This allows you to read from and write to REST APIs directly using Spark's DataFrame API.
+A simple, single-file REST API Data Source implementation for Apache Spark using the Python Data Source API (Spark 4.0+). This allows you to read from and write to REST APIs directly using Spark's DataFrame API with full partitioning support for parallel processing.
 
 ## 🚀 Package Status
 
-[![Test PyPI](https://img.shields.io/badge/Test%20PyPI-0.1.0-blue)](https://test.pypi.org/project/pyspark-rest-datasource/0.1.0/)
+[![Test PyPI](https://img.shields.io/badge/Test%20PyPI-0.2.0-blue)](https://test.pypi.org/project/pyspark-rest-datasource/0.2.0/)
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Spark](https://img.shields.io/badge/spark-4.0+-red.svg)](https://spark.apache.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Current Status**: Available on Test PyPI for testing  
-**Test PyPI Package**: https://test.pypi.org/project/pyspark-rest-datasource/0.1.0/
+**Test PyPI Package**: https://test.pypi.org/project/pyspark-rest-datasource/0.2.0/
 
 ```bash
 # Install from Test PyPI
@@ -27,12 +27,20 @@ pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://
 - Custom authentication headers support
 - Proper error handling and validation
 
+✅ **Advanced Partitioning Support**
+- **Single partition** - Default mode for simple APIs
+- **URL-based partitioning** - Multiple endpoints processed in parallel
+- **Page-based partitioning** - Pagination with parallel page processing
+- **Parallel processing** - Utilizes all available Spark cores
+- **Pure DataFrame API** - No RDD operations, fully DataFrame-based
+
 ✅ **Development Ready**
 - Comprehensive test suite with real API calls
 - Error handling for network issues
 - Configurable timeouts and headers
 - Proper logging and debugging
 - Full compliance with PySpark Data Source API
+- Single-file implementation for easy deployment
 
 ## Installation
 
@@ -52,7 +60,7 @@ The package is currently available on Test PyPI for testing:
 pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ pyspark-rest-datasource
 ```
 
-**Test PyPI Package**: https://test.pypi.org/project/pyspark-rest-datasource/0.1.0/
+**Test PyPI Package**: https://test.pypi.org/project/pyspark-rest-datasource/0.2.0/
 
 ### Install from Production PyPI (Coming Soon)
 
@@ -66,40 +74,31 @@ uv add pyspark-rest-datasource
 
 ### Package Information
 
-This package uses modern Python packaging standards with metadata stored in `pyspark_rest_datasource.egg-info/`:
+This package uses modern Python packaging standards with a simple single-file structure:
 
-#### Package Metadata Files
-- **`PKG-INFO`** - Contains package metadata (name, version, dependencies, description)
-- **`requires.txt`** - Lists runtime dependencies
-- **`SOURCES.txt`** - Lists all source files included in the package
-- **`top_level.txt`** - Specifies the top-level module (`pyspark_rest_datasource`)
-- **`dependency_links.txt`** - External dependency links (currently empty)
+#### Package Structure
+- **`restapi.py`** - Main implementation file containing all REST API Data Source classes
+- **`example.py`** - Example usage script demonstrating basic and advanced features
+- **`pyproject.toml`** - Package configuration and dependencies
+- **`README.md`** - Complete documentation with examples
+- **`CHANGELOG.md`** - Version history and feature updates
 
-#### Viewing Package Information
-```bash
-# View package metadata
-cat pyspark_rest_datasource.egg-info/PKG-INFO
-
-# View dependencies
-cat pyspark_rest_datasource.egg-info/requires.txt
-
-# View included files
-cat pyspark_rest_datasource.egg-info/SOURCES.txt
-
-# View top-level modules
-cat pyspark_rest_datasource.egg-info/top_level.txt
-```
+#### Package Benefits
+- **Single file deployment** - Easy to understand and modify
+- **No complex package hierarchy** - All functionality in one place
+- **Easy debugging** - All code visible in a single file
+- **Simplified maintenance** - No synchronization between multiple files
 
 #### Package Metadata Summary
 ```
 Name: pyspark-rest-datasource
-Version: 0.1.0
+Version: 0.2.0
 Python Required: >=3.9
 Dependencies:
   - pyspark>=4.0.0
   - pyarrow>=10.0.0
   - requests>=2.25.0
-Test PyPI: https://test.pypi.org/project/pyspark-rest-datasource/0.1.0/
+Test PyPI: https://test.pypi.org/project/pyspark-rest-datasource/0.2.0/
 ```
 
 ### Setup Options
@@ -149,10 +148,10 @@ After installation from Test PyPI, verify the package works correctly:
 
 ```bash
 # Test basic import
-python -c "from pyspark_rest_datasource import RestApiDataSource; print('✅ Package imported successfully!')"
+python -c "from restapi import RestApiDataSource; print('✅ Package imported successfully!')"
 
 # Test package functionality
-python -c "from pyspark_rest_datasource import RestApiDataSource; print('Package name:', RestApiDataSource.name())"
+python -c "from restapi import RestApiDataSource; print('Package name:', RestApiDataSource.name())"
 
 # Check dependencies are available
 python -c "import pyspark; import pyarrow; import requests; print('✅ All dependencies OK')"
@@ -168,7 +167,7 @@ python example.py
 #### Reading from REST APIs
 ```python
 from pyspark.sql import SparkSession
-from pyspark_rest_datasource import RestApiDataSource
+from restapi import RestApiDataSource
 
 # Initialize Spark
 spark = SparkSession.builder.appName("REST API Example").getOrCreate()
@@ -224,14 +223,58 @@ result = spark.sql("SELECT name, email FROM users_api WHERE id = '1'")
 result.show()
 ```
 
+### Advanced Partitioning
+
+The REST API Data Source supports three partitioning strategies for parallel processing:
+
+#### 1. Single Partition (Default)
+```python
+# Standard single partition - processes one API call
+df = spark.read \
+    .format("restapi") \
+    .option("url", "https://jsonplaceholder.typicode.com/posts") \
+    .load()
+```
+
+#### 2. URL-based Partitioning
+```python
+# Multiple URLs processed in parallel across Spark cores
+df = spark.read \
+    .format("restapi") \
+    .option("partitionStrategy", "urls") \
+    .option("urls", "https://jsonplaceholder.typicode.com/posts/1,https://jsonplaceholder.typicode.com/posts/2,https://jsonplaceholder.typicode.com/posts/3") \
+    .load()
+```
+
+#### 3. Page-based Partitioning
+```python
+# Paginated API calls processed in parallel
+df = spark.read \
+    .format("restapi") \
+    .option("partitionStrategy", "pages") \
+    .option("url", "https://jsonplaceholder.typicode.com/posts") \
+    .option("totalPages", "5") \
+    .option("pageSize", "20") \
+    .load()
+```
+
 ### Configuration Options
 
+#### Basic Options
 | Option | Default | Description |
 |--------|---------|-------------|
 | `url` | *required* | REST API endpoint URL |
 | `method` | `GET` | HTTP method (GET, POST, PUT, DELETE) |
 | `headers` | `{}` | Custom headers as JSON string |
 | `timeout` | `30` | Request timeout in seconds |
+
+#### Partitioning Options
+| Option | Default | Description |
+|--------|---------|-------------|
+| `partitionStrategy` | `single` | Partitioning strategy: `single`, `urls`, `pages` |
+| `urls` | - | Comma-separated URLs for URL-based partitioning |
+| `totalPages` | `1` | Number of pages for page-based partitioning |
+| `pageSize` | `100` | Items per page for page-based partitioning |
 
 ### Authentication Examples
 
@@ -264,7 +307,7 @@ After installing from Test PyPI, you can test the package:
 
 ```bash
 # Test basic import
-python -c "from pyspark_rest_datasource import RestApiDataSource; print('✅ Package works!')"
+python -c "from restapi import RestApiDataSource; print('✅ Package works!')"
 
 # Run the example script
 python example.py
@@ -475,7 +518,7 @@ When you modify the project (add files, change dependencies, update version), yo
 ```toml
 [project]
 name = "pyspark-rest-datasource"
-version = "0.1.0"  # Update version as needed
+version = "0.2.0"  # Update version as needed
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -499,26 +542,14 @@ pip install --editable .
 #### 3. Verify Updates
 ```bash
 # Check updated metadata
-cat pyspark_rest_datasource.egg-info/PKG-INFO
+python -c "import restapi; print('✅ Module loaded successfully')"
 
-# Check updated dependencies
-cat pyspark_rest_datasource.egg-info/requires.txt
+# Check package dependencies
+cat pyproject.toml | grep -A 5 "dependencies ="
 
-# Check updated source files
-cat pyspark_rest_datasource.egg-info/SOURCES.txt
+# Check build outputs
+ls -la dist/
 ```
-
-### Understanding egg-info Files
-
-The `pyspark_rest_datasource.egg-info/` directory contains the following files:
-
-| File | Purpose | Example Content |
-|------|---------|----------------|
-| `PKG-INFO` | Package metadata | Name, version, dependencies, description |
-| `requires.txt` | Runtime dependencies | `pyarrow>=20.0.0\npyspark>=4.0.0\npytest>=8.4.1` |
-| `SOURCES.txt` | Source files list | `README.md\npyproject.toml\npyspark_rest_datasource/\n...` |
-| `top_level.txt` | Top-level modules | `pyspark_rest_datasource` |
-| `dependency_links.txt` | External links | Usually empty |
 
 ### Package Distribution
 
@@ -531,8 +562,8 @@ pip install build
 python -m build
 
 # This creates:
-# - dist/pyspark_rest_datasource-0.1.0-py3-none-any.whl
-# - dist/pyspark_rest_datasource-0.1.0.tar.gz
+# - dist/pyspark_rest_datasource-0.2.0-py3-none-any.whl
+# - dist/pyspark_rest_datasource-0.2.0.tar.gz
 ```
 
 #### Publishing to PyPI (Optional)
@@ -549,12 +580,12 @@ twine upload --repository testpypi dist/*
 
 ### Development Workflow
 
-1. **Make changes** to source code or dependencies
-2. **Update `pyproject.toml`** if needed
+1. **Make changes** to `restapi.py` or `example.py`
+2. **Update `pyproject.toml`** if dependencies change
 3. **Reinstall package** with `uv pip install --editable .`
 4. **Run tests** with `python run_tests.py`
-5. **Verify metadata** in `pyspark_rest_datasource.egg-info/`
-6. **Commit changes** including updated egg-info files
+5. **Test partitioning** with `python example_partition_usage.py`
+6. **Build and upload** new package version
 
 ## Contributing
 
@@ -578,4 +609,4 @@ For questions or issues:
 
 ---
 
-**Ready to use with any REST API that returns JSON data!** 🚀
+**Ready for development with any REST API that returns JSON data!** 🚀

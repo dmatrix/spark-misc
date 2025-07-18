@@ -9,7 +9,7 @@ to read from and write to REST APIs using Spark DataFrames.
 import json
 import logging
 from pyspark.sql import SparkSession
-from pyspark_rest_datasource import RestApiDataSource
+from restapi import RestApiDataSource
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -91,7 +91,7 @@ def main():
         print("="*80)
         
         headers = {
-            "User-Agent": "PySpark-REST-DataSource/0.1.0",
+            "User-Agent": "PySpark-REST-DataSource/0.2.0",
             "Accept": "application/json"
         }
         
