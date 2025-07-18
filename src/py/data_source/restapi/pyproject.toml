@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyspark-rest-datasource"
-version = "0.1.0"
-description = "Development-ready REST API Data Source for Apache Spark using Python Data Source API (Spark 4.0+)"
+version = "0.2.0"
+description = "Simple single-file REST API Data Source for Apache Spark using Python Data Source API (Spark 4.0+) with partitioning support"
 readme = "README.md"
 license = "MIT"
 authors = [
@@ -57,12 +57,8 @@ Repository = "https://github.com/yourusername/pyspark-rest-datasource.git"
 "Bug Tracker" = "https://github.com/yourusername/pyspark-rest-datasource/issues"
 Changelog = "https://github.com/yourusername/pyspark-rest-datasource/blob/main/CHANGELOG.md"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["pyspark_rest_datasource*"]
-
-[tool.setuptools.package-data]
-"pyspark_rest_datasource" = ["py.typed"]
+[tool.setuptools]
+py-modules = ["restapi"]
 
 # Development tools configuration
 [tool.black]
