@@ -1,0 +1,3 @@
+{"completely": "wrong", "schema": "here", "invalid": true}
+{"another": "bad", "record": 123, "malformed": "data"}
+{"user_id": "user_005", "transaction_amount": "not_a_number", "extra_field": "unexpected", "missing_required_fields": true} 

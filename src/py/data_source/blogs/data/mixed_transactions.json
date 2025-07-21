@@ -1,0 +1,4 @@
+{"user_id": "user_001", "transaction_amount": 45.99, "transaction_date": "2024-01-15T10:30:00.000Z", "merchant_category": "grocery", "customer_tier": "gold"}
+{"user_id": "user_002", "transaction_amount": 125.50, "transaction_date": "2024-01-15T14:22:15.000Z", "merchant_category": "restaurant", "customer_tier": "silver"}
+{"user_id": "user_004", "transaction_amount": "invalid_amount", "transaction_date": "2024-01-15T11:45:00.000Z", "merchant_category": "electronics", "customer_tier": "gold"}
+{"transaction_amount": 55.75, "transaction_date": "2024-01-15T16:20:00.000Z", "merchant_category": "gas_station", "customer_tier": "bronze"} 
