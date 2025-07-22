@@ -308,18 +308,6 @@ window_spec = Window.partitionBy("customer_id") \
                            desc("your_secondary_field"))
 ```
 
-## 📚 Architecture Patterns
-
-### Lambda Architecture
-- **Batch Layer**: Use strict schema enforcement
-- **Speed Layer**: Use permissive mode for real-time processing
-- **Serving Layer**: Apply deduplication and business logic validation
-
-### Medallion Architecture
-- **Bronze Layer**: Smart JSON loading with permissive mode
-- **Silver Layer**: Schema enforcement + business logic validation
-- **Gold Layer**: Advanced deduplication + aggregation
-
 ## 🚀 Developer Testing & Deployment
 
 ### Monitoring
