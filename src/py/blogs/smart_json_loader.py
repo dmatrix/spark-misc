@@ -2,6 +2,15 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, TimestampType
 from pyspark.sql.functions import col
 
+# Define schema once at module level for efficiency
+TRANSACTION_SCHEMA = StructType([
+    StructField("user_id", StringType(), nullable=False),
+    StructField("transaction_amount", DoubleType(), nullable=False),
+    StructField("transaction_date", TimestampType(), nullable=True),
+    StructField("merchant_category", StringType(), nullable=True),
+    StructField("customer_tier", StringType(), nullable=True)
+])
+
 def smart_json_load(spark, file_path):
     """
     Smart JSON Loading: Try strict first, fallback to permissive
@@ -11,21 +20,12 @@ def smart_json_load(spark, file_path):
     - Graceful recovery for messy data (PERMISSIVE)
     """
     
-    # Define schema
-    schema = StructType([
-        StructField("user_id", StringType(), nullable=False),
-        StructField("transaction_amount", DoubleType(), nullable=False),
-        StructField("transaction_date", TimestampType(), nullable=True),
-        StructField("merchant_category", StringType(), nullable=True),
-        StructField("customer_tier", StringType(), nullable=True)
-    ])
-    
     print(f"📋 Smart loading {file_path}...")
     
     # Step 1: Try FAILFAST for clean data
     try:
         print("🎯 Attempting FAILFAST mode...")
-        df = spark.read.option("mode", "FAILFAST").schema(schema).json(file_path)
+        df = spark.read.option("mode", "FAILFAST").schema(TRANSACTION_SCHEMA).json(file_path)
         count = df.count()
         
         # Force full evaluation to catch parsing errors - need to process all data
@@ -41,16 +41,25 @@ def smart_json_load(spark, file_path):
         print("⚠️  FAILFAST failed, switching to PERMISSIVE mode...")
         
         # Step 2: Fallback to PERMISSIVE
-        schema_with_corrupt = schema.add(StructField("_corrupt_record", StringType(), True))
-        df = spark.read.option("mode", "PERMISSIVE").schema(schema_with_corrupt).json(file_path)
+        # Note: In Spark 4.0, _corrupt_record is automatically added in PERMISSIVE mode
+        df = spark.read.option("mode", "PERMISSIVE").schema(TRANSACTION_SCHEMA).json(file_path)
         
         # Cache to avoid Spark 4.0 corrupt record query restrictions
         df = df.cache()
         total_records = df.count()
         
-        # Separate good from bad
-        good_df = df.filter(col("_corrupt_record").isNull() & col("user_id").isNotNull()).drop("_corrupt_record")
-        bad_df = df.filter(col("_corrupt_record").isNotNull() | col("user_id").isNull())
+        # Check if _corrupt_record column exists in the DataFrame
+        has_corrupt_column = "_corrupt_record" in df.columns
+        
+        if has_corrupt_column:
+            # Separate good from bad using _corrupt_record column
+            good_df = df.filter(col("_corrupt_record").isNull() & col("user_id").isNotNull()).drop("_corrupt_record")
+            bad_df = df.filter(col("_corrupt_record").isNotNull() | col("user_id").isNull())
+        else:
+            # In Spark 4.0, malformed records may result in null values in required fields
+            # Consider records with null user_id as potentially bad
+            good_df = df.filter(col("user_id").isNotNull())
+            bad_df = df.filter(col("user_id").isNull())
         
         good_count = good_df.count()
         bad_count = bad_df.count()

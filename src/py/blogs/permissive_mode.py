@@ -2,6 +2,16 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, TimestampType
 from pyspark.sql.functions import col
 
+# Define schema once at module level for efficiency
+PERMISSIVE_SCHEMA = StructType([
+    StructField("user_id", StringType(), nullable=True),
+    StructField("transaction_amount", DoubleType(), nullable=True),
+    StructField("transaction_date", TimestampType(), nullable=True),
+    StructField("merchant_category", StringType(), nullable=True),
+    StructField("customer_tier", StringType(), nullable=True),
+    StructField("_corrupt_record", StringType(), nullable=True)  # Captures bad records
+])
+
 def load_with_permissive_mode(spark, file_path):
     """
     Example 2: Permissive Mode with Corrupt Record Tracking
@@ -10,20 +20,10 @@ def load_with_permissive_mode(spark, file_path):
     Perfect for messy data where you want to save what you can.
     """
     
-    # Define schema with corrupt record column
-    schema = StructType([
-        StructField("user_id", StringType(), nullable=True),
-        StructField("transaction_amount", DoubleType(), nullable=True),
-        StructField("transaction_date", TimestampType(), nullable=True),
-        StructField("merchant_category", StringType(), nullable=True),
-        StructField("customer_tier", StringType(), nullable=True),
-        StructField("_corrupt_record", StringType(), nullable=True)  # Captures bad records
-    ])
-    
     print(f"📋 Loading {file_path} with permissive mode...")
     
     # PERMISSIVE mode - never fails, captures corruption
-    df = spark.read.option("mode", "PERMISSIVE").schema(schema).json(file_path)
+    df = spark.read.option("mode", "PERMISSIVE").schema(PERMISSIVE_SCHEMA).json(file_path)
     
     total_records = df.count()
     
