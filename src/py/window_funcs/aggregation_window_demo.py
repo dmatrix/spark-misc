@@ -1,3 +1,41 @@
+"""
+PySpark Window Functions Demo: Running Aggregations & Cumulative Calculations
+
+USE CASE:
+This demo demonstrates running totals, cumulative calculations, and year-to-date (YTD)
+tracking using window aggregation functions. Essential for financial reporting,
+performance tracking, and progressive analytics where you need both detail and context.
+
+KEY BENEFITS:
+• Track running totals without losing transaction-level detail
+• Calculate YTD metrics for ongoing performance monitoring
+• Analyze contribution percentages and relative performance
+• Create rolling window calculations for trend analysis
+• Build comprehensive financial and operational dashboards
+
+WINDOW FUNCTIONS DEMONSTRATED:
+• SUM() with different window frames for running totals
+• COUNT() for progressive transaction counting
+• AVG() for running averages and moving calculations
+• Window frames: unbounded, bounded, and rolling windows
+
+REAL-WORLD APPLICATIONS:
+• Financial reporting and YTD revenue tracking
+• Sales performance monitoring and quota tracking
+• Budget analysis and spending progression
+• KPI dashboards with cumulative metrics
+• Individual vs. team contribution analysis
+
+BUSINESS SCENARIOS COVERED:
+• 6 months of daily sales data analysis
+• Running totals and cumulative averages
+• Last N periods vs. cumulative comparisons
+• Individual contribution to regional totals
+• Progressive performance tracking
+
+Usage: python aggregation_window_demo.py
+"""
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, sum as spark_sum, count, avg as spark_avg, max as spark_max, min as spark_min, desc
 from pyspark.sql.window import Window

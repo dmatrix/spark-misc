@@ -1,3 +1,41 @@
+"""
+PySpark Window Functions Demo: Lead/Lag Operations for Time Series Analysis
+
+USE CASE:
+This demo showcases LAG and LEAD functions for time series analysis, trend detection,
+and comparative analysis across time periods. Perfect for financial analysis, stock
+price monitoring, and any scenario requiring period-over-period comparisons.
+
+KEY BENEFITS:
+• Access previous/next period values without complex self-joins
+• Calculate period-over-period changes and growth rates
+• Detect trends and pattern changes in time series data
+• Generate automated trading signals and alerts
+• Perform efficient temporal analysis at scale
+
+WINDOW FUNCTIONS DEMONSTRATED:
+• LAG() - Access previous row values (yesterday's price, last period's metric)
+• LEAD() - Access next row values (tomorrow's forecast, future period data)
+• Conditional logic with time-based comparisons
+• Pattern detection using adjacent period analysis
+
+REAL-WORLD APPLICATIONS:
+• Stock price analysis and trading signal generation
+• Revenue growth rate calculations
+• Trend detection in sales, metrics, or KPIs
+• Comparative analysis (vs. previous month/quarter/year)
+• Forecasting and predictive analytics preparation
+
+BUSINESS SCENARIOS COVERED:
+• Daily stock price trend analysis
+• Price change calculations and trend directions  
+• Pattern recognition (consecutive up/down movements)
+• Automated trading signal generation
+• Financial time series monitoring
+
+Usage: python lead_lag_demo.py
+"""
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lag, lead, desc, when, round as spark_round
 from pyspark.sql.window import Window

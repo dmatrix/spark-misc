@@ -1,3 +1,41 @@
+"""
+PySpark Window Functions Demo: Percentile Analysis & Statistical Distribution
+
+USE CASE:
+This demo showcases percentile functions for salary analysis, performance distribution,
+and statistical benchmarking. Essential for HR analytics, compensation planning,
+and understanding where individuals or entities rank within their peer groups.
+
+KEY BENEFITS:
+• Create fair and data-driven compensation structures
+• Identify outliers and anomalies in distributions
+• Build equitable salary bands and promotion criteria
+• Perform market benchmarking and competitive analysis
+• Generate statistical insights for strategic decision-making
+
+WINDOW FUNCTIONS DEMONSTRATED:
+• PERCENT_RANK() - Calculate percentile position (0.0 to 1.0)
+• NTILE() - Divide data into equal groups/buckets (quartiles, quintiles)
+• CUME_DIST() - Cumulative distribution analysis
+• Multi-level partitioning (company-wide vs. department-specific)
+
+REAL-WORLD APPLICATIONS:
+• HR compensation analysis and salary benchmarking
+• Performance evaluation and employee ranking
+• Market research and competitive positioning
+• Risk assessment and portfolio analysis
+• Academic grading and student performance analysis
+
+BUSINESS SCENARIOS COVERED:
+• Employee salary percentile analysis across company and departments
+• Salary distribution and tier classification
+• Company-wide salary band creation using quintiles
+• Compensation equity analysis and benchmarking
+• Performance-based promotion and compensation recommendations
+
+Usage: python percentile_analysis_demo.py
+"""
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, desc, when, round as spark_round, percent_rank, ntile, cume_dist
 from pyspark.sql.window import Window

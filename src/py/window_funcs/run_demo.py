@@ -1,10 +1,33 @@
 #!/usr/bin/env python3
 """
-PySpark Window Functions Demo Runner
+PySpark Window Functions Demo Runner - CLI Interface for All Window Function Examples
 
-This script provides a convenient way to run individual Window function demos
-by specifying the use case label. Each demo showcases different Window function
-patterns with real-world business scenarios.
+OVERVIEW:
+This CLI tool provides a convenient interface to run individual Window function demos
+by specifying use case labels. Each demo showcases different Window function patterns
+with comprehensive real-world business scenarios and production-ready code examples.
+
+KEY FEATURES:
+• Simple command-line interface for quick demo execution
+• Comprehensive help system with detailed descriptions
+• Error handling and user-friendly feedback
+• Individual demo execution with progress tracking
+• List all available demos with business context
+
+AVAILABLE DEMOS:
+• ranking - Performance rankings and bonus calculations using ROW_NUMBER, RANK, DENSE_RANK
+• aggregation - Running totals, YTD tracking, and cumulative calculations
+• lead_lag - Time series analysis and trend detection with LAG/LEAD functions
+• moving_averages - Trend smoothing and performance monitoring with rolling windows
+• percentile - Statistical analysis and salary distributions using NTILE, PERCENT_RANK
+• first_last_value - Customer journey analysis and marketing attribution modeling
+
+BENEFITS:
+• Educational tool for learning Window functions with real examples
+• Production-ready code snippets for immediate implementation
+• Blog-ready examples with clear explanations
+• Quick iteration and testing of different Window function patterns
+• Professional development reference and training material
 
 Usage:
     python run_demo.py <use_case>
@@ -12,9 +35,10 @@ Usage:
     python run_demo.py --list
 
 Examples:
-    python run_demo.py ranking
-    python run_demo.py aggregation
-    python run_demo.py lead_lag
+    python run_demo.py ranking          # Run ranking operations demo
+    python run_demo.py aggregation      # Run running aggregations demo
+    python run_demo.py lead_lag          # Run time series analysis demo
+    python run_demo.py --list           # Show all available demos
 """
 
 import argparse
