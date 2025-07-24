@@ -41,29 +41,63 @@ from pyspark.sql.window import Window
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
 
 def create_sales_data(spark):
-    """Create simple sales data with ties to demonstrate ranking differences"""
+    """Create expanded sales data with ties to demonstrate ranking differences"""
     data = [
-        # North Region - with one tie to show ranking differences
-        ("Alice Johnson", "North", 95000.0, 2024),
-        ("Bob Smith", "North", 87000.0, 2024),
-        ("Carol Davis", "North", 87000.0, 2024),  # Tie with Bob
-        ("David Wilson", "North", 80000.0, 2024),
+        # North Region - 12 salespeople with strategic ties
+        ("Alice Johnson", "North", 145000.0, 2024),     # Top performer
+        ("Bob Smith", "North", 132000.0, 2024),
+        ("Carol Davis", "North", 128000.0, 2024),
+        ("David Wilson", "North", 118000.0, 2024),
+        ("Emma Thompson", "North", 115000.0, 2024),
+        ("Frank Roberts", "North", 108000.0, 2024),
+        ("Grace Kim", "North", 102000.0, 2024),
+        ("Henry Park", "North", 98000.0, 2024),
+        ("Iris Chang", "North", 95000.0, 2024),
+        ("Jack Turner", "North", 87000.0, 2024),
+        ("Kelly Brown", "North", 87000.0, 2024),        # Tie with Jack
+        ("Liam Davis", "North", 82000.0, 2024),
         
-        # South Region - clear hierarchy
-        ("Frank Miller", "South", 110000.0, 2024),
-        ("Grace Lee", "South", 95000.0, 2024),
-        ("Henry Chen", "South", 85000.0, 2024),
-        ("Iris Taylor", "South", 75000.0, 2024),
+        # South Region - 12 salespeople with clear performance tiers
+        ("Maria Rodriguez", "South", 155000.0, 2024),   # Regional champion
+        ("Nathan Wilson", "South", 142000.0, 2024),
+        ("Olivia Martinez", "South", 138000.0, 2024),
+        ("Paul Anderson", "South", 125000.0, 2024),
+        ("Quinn Johnson", "South", 118000.0, 2024),
+        ("Ryan Miller", "South", 112000.0, 2024),
+        ("Sarah Lee", "South", 105000.0, 2024),
+        ("Thomas Chen", "South", 98000.0, 2024),
+        ("Uma Patel", "South", 92000.0, 2024),
+        ("Victor Garcia", "South", 88000.0, 2024),
+        ("Wendy Liu", "South", 85000.0, 2024),
+        ("Xavier Smith", "South", 78000.0, 2024),
         
-        # East Region - simple tie
-        ("Jack Anderson", "East", 90000.0, 2024),
-        ("Kelly White", "East", 90000.0, 2024),  # Tie with Jack
-        ("Luis Garcia", "East", 85000.0, 2024),
+        # East Region - 12 salespeople with multiple ties
+        ("Ava Thompson", "East", 138000.0, 2024),       # Top performer
+        ("Ben Rodriguez", "East", 125000.0, 2024),
+        ("Chloe Wilson", "East", 122000.0, 2024),
+        ("Dylan Martinez", "East", 115000.0, 2024),
+        ("Ella Johnson", "East", 108000.0, 2024),
+        ("Felix Anderson", "East", 102000.0, 2024),
+        ("Gina Miller", "East", 96000.0, 2024),
+        ("Hugo Chen", "East", 90000.0, 2024),
+        ("Ivy Garcia", "East", 90000.0, 2024),          # Tie with Hugo
+        ("James Lee", "East", 85000.0, 2024),
+        ("Kate Patel", "East", 82000.0, 2024),
+        ("Leo Smith", "East", 79000.0, 2024),
         
-        # West Region
-        ("Olivia Martinez", "West", 100000.0, 2024),
-        ("Paul Rodriguez", "West", 90000.0, 2024),
-        ("Quinn Thompson", "West", 80000.0, 2024),
+        # West Region - 12 salespeople with performance clusters
+        ("Maya Johnson", "West", 165000.0, 2024),       # Star performer
+        ("Noah Wilson", "West", 148000.0, 2024),
+        ("Sophia Martinez", "West", 140000.0, 2024),
+        ("Tyler Anderson", "West", 132000.0, 2024),
+        ("Zoe Rodriguez", "West", 128000.0, 2024),
+        ("Alex Miller", "West", 122000.0, 2024),
+        ("Bella Chen", "West", 115000.0, 2024),
+        ("Chris Garcia", "West", 110000.0, 2024),
+        ("Diana Lee", "West", 105000.0, 2024),
+        ("Ethan Patel", "West", 98000.0, 2024),
+        ("Fiona Smith", "West", 92000.0, 2024),
+        ("Gabriel Liu", "West", 88000.0, 2024),
     ]
     
     schema = StructType([
