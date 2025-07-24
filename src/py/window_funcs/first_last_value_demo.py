@@ -1,3 +1,41 @@
+"""
+PySpark Window Functions Demo: First/Last Value Analysis for Customer Journey
+
+USE CASE:
+This demo showcases FIRST_VALUE and LAST_VALUE functions for customer journey
+analysis, marketing attribution, and lifecycle tracking. Perfect for understanding
+customer acquisition channels, conversion paths, and lifetime value patterns.
+
+KEY BENEFITS:
+• Track complete customer journeys from acquisition to conversion
+• Implement marketing attribution models (first-touch, last-touch)
+• Calculate customer lifetime value (CLV) with acquisition context
+• Identify most effective marketing channels and touchpoints
+• Build comprehensive customer analytics and segmentation
+
+WINDOW FUNCTIONS DEMONSTRATED:
+• FIRST_VALUE() - Capture initial touchpoints and acquisition channels
+• LAST_VALUE() - Identify final interactions and conversion events
+• Window frames with unboundedFollowing for true last values
+• Conditional aggregations for revenue and conversion tracking
+
+REAL-WORLD APPLICATIONS:
+• Marketing attribution and channel effectiveness analysis
+• Customer acquisition cost (CAC) and lifetime value (LTV) analysis
+• E-commerce conversion funnel optimization
+• Customer journey mapping and experience optimization
+• Retention and churn analysis with acquisition context
+
+BUSINESS SCENARIOS COVERED:
+• Customer touchpoint and channel identification
+• First purchase detection and acquisition analysis
+• Customer lifetime value calculation and segmentation
+• Marketing attribution modeling (first-touch vs. last-touch)
+• Customer journey optimization insights
+
+Usage: python first_last_value_demo.py
+"""
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, first, last, desc, when, round as spark_round, max as spark_max, min as spark_min
 from pyspark.sql.window import Window

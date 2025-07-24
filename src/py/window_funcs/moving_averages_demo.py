@@ -1,3 +1,41 @@
+"""
+PySpark Window Functions Demo: Moving Averages & Trend Analysis
+
+USE CASE:
+This demo demonstrates moving averages and rolling window calculations for trend
+analysis, noise reduction, and performance monitoring. Essential for smoothing
+volatile data and identifying genuine trends versus random fluctuations.
+
+KEY BENEFITS:
+• Smooth out daily volatility to reveal underlying trends
+• Create early warning systems for performance issues
+• Monitor progress against targets with trend analysis
+• Build sophisticated performance monitoring dashboards
+• Implement data-driven alerting and notification systems
+
+WINDOW FUNCTIONS DEMONSTRATED:
+• AVG() with rolling window frames for moving averages
+• SUM(), MAX(), MIN() with bounded windows for rolling statistics
+• LAG() combined with moving averages for trend direction analysis
+• Conditional logic based on trend comparisons
+
+REAL-WORLD APPLICATIONS:
+• Sales performance monitoring and trend analysis
+• Financial market analysis and trading strategies
+• Quality control and process monitoring
+• Website traffic and user engagement analysis
+• Operational metrics and SLA monitoring
+
+BUSINESS SCENARIOS COVERED:
+• 3-day and 5-day moving averages comparison
+• Rolling window statistics (sum, max, min)
+• Trend direction analysis using moving average comparisons
+• Performance monitoring with target achievement tracking
+• Alert generation based on moving average thresholds
+
+Usage: python moving_averages_demo.py
+"""
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, avg as spark_avg, sum as spark_sum, max as spark_max, min as spark_min, count, desc, round as spark_round, when
 from pyspark.sql.window import Window

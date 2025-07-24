@@ -1,3 +1,40 @@
+"""
+PySpark Window Functions Demo: Ranking Operations
+
+USE CASE:
+This demo showcases ranking functions (ROW_NUMBER, RANK, DENSE_RANK) for performance
+analysis, employee evaluation, and bonus calculations. Perfect for scenarios where you
+need to rank employees, identify top performers, or handle tied values in rankings.
+
+KEY BENEFITS:
+• Handle tied values in three different ways based on business requirements
+• Create fair and transparent performance evaluation systems
+• Calculate performance-based bonuses and incentives
+• Identify top N performers across different regions/departments
+• Generate leaderboards and performance dashboards
+
+WINDOW FUNCTIONS DEMONSTRATED:
+• ROW_NUMBER() - Always unique ranks (1,2,3,4...)
+• RANK() - Same rank for ties, skips next ranks (1,1,3,4...)
+• DENSE_RANK() - Same rank for ties, no gaps (1,1,2,3...)
+
+REAL-WORLD APPLICATIONS:
+• Sales performance rankings and bonus calculations
+• Employee performance reviews and promotions
+• Academic grading and class rankings
+• Sports leaderboards and tournament rankings
+• Product popularity rankings in e-commerce
+
+BUSINESS SCENARIOS COVERED:
+• Regional sales performance analysis
+• Top performer identification
+• Tie-breaking strategies for fair evaluation
+• Performance-based compensation systems
+• Multi-level ranking comparisons
+
+Usage: python ranking_operations_demo.py
+"""
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, row_number, rank, dense_rank, desc, when
 from pyspark.sql.window import Window
