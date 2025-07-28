@@ -187,15 +187,15 @@ df_customer_analysis = (df
 
 ## 🎯 Strategy Selection Matrix
 
-| **Business Scenario** | **Primary Strategy** | **Secondary Strategy** | **Key Metric** | **Time Sensitivity** |
-|----------------------|---------------------|----------------------|----------------|-------------------|
-| **Executive Dashboards** | Moving Averages | Ranking Operations | Trend + Performance | Monthly |
-| **Sales Compensation** | Ranking Operations | Percentile Analysis | Fair Rankings | Quarterly |
-| **Financial Reporting** | Running Aggregations | Lead/Lag Operations | Accuracy + Compliance | Daily |
-| **Marketing Attribution** | First/Last Value | Lead/Lag Operations | ROI + Attribution | Campaign-based |
-| **Risk Management** | Percentile Analysis | Moving Averages | Outlier Detection | Real-time |
-| **Customer Analytics** | First/Last Value | Running Aggregations | Lifetime Value | Ongoing |
-| **Trading Algorithms** | Lead/Lag Operations | Moving Averages | Signal Quality | Real-time |
+| **Business Scenario** | **Primary Strategy** | **Secondary Strategy** | **Key Metric** | **Time Sensitivity** | **Demo File** |
+|----------------------|---------------------|----------------------|----------------|-------------------|---------------|
+| **Executive Dashboards** | Moving Averages | Ranking Operations | Trend + Performance | Monthly | `moving_averages_demo.py` |
+| **Sales Compensation** | Ranking Operations | Percentile Analysis | Fair Rankings | Quarterly | `ranking_operations_demo.py` |
+| **Financial Reporting** | Running Aggregations | Lead/Lag Operations | Accuracy + Compliance | Daily | `aggregation_window_demo.py` |
+| **Marketing Attribution** | First/Last Value | Lead/Lag Operations | ROI + Attribution | Campaign-based | `first_last_value_demo.py` |
+| **Risk Management** | Percentile Analysis | Moving Averages | Outlier Detection | Real-time | `percentile_analysis_demo.py` |
+| **Customer Analytics** | First/Last Value | Running Aggregations | Lifetime Value | Ongoing | `first_last_value_demo.py` |
+| **Trading Algorithms** | Lead/Lag Operations | Moving Averages | Signal Quality | Real-time | `lead_lag_demo.py` |
 
 ## 🚦 Performance Optimization Strategies
 
