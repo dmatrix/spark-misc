@@ -75,9 +75,67 @@ DEMOS = {
     )
 }
 
+def show_strategy_guide():
+    """Display information about the Window Functions Strategy Selection Guide"""
+    print("🎯 PySpark Window Functions: Strategy Selection Guide")
+    print("=" * 70)
+    print("\n📋 COMPREHENSIVE DECISION FRAMEWORK:")
+    print("   This guide helps you choose the optimal window function approach")
+    print("   for your specific business scenario with practical examples.")
+    print("\n🚀 WHAT'S INCLUDED:")
+    print("   • Decision framework with key questions to ask")
+    print("   • Six detailed scenarios matching window function patterns")
+    print("   • Strategy selection matrix for different business contexts")
+    print("   • Performance optimization strategies for various data volumes")
+    print("   • Implementation patterns and debugging tips")
+    print("   • Advanced combinations for complex analytical needs")
+    
+    print(f"\n📁 LOCATION: WINDOW_FUNCTIONS_STRATEGY_GUIDE.md")
+    print("   Located in the same directory as your demo files")
+    
+    print(f"\n💡 QUICK START:")
+    print("   1. Read the Decision Framework section")
+    print("   2. Find your scenario in the Quick Strategy Selector")
+    print("   3. Run the recommended demo file to see it in action")
+    print("   4. Adapt the pattern to your specific use case")
+    
+    print(f"\n🎯 EXAMPLE SCENARIOS:")
+    print("   • 'I need to rank top performers' → ranking_operations_demo.py")
+    print("   • 'I need running totals' → aggregation_window_demo.py")
+    print("   • 'I need trend analysis' → lead_lag_demo.py")
+    print("   • 'I need to smooth volatility' → moving_averages_demo.py")
+    print("   • 'I need relative positions' → percentile_analysis_demo.py")
+    print("   • 'I need customer journeys' → first_last_value_demo.py")
+    
+    # Try to open the file if possible
+    strategy_file = "WINDOW_FUNCTIONS_STRATEGY_GUIDE.md"
+    if Path(strategy_file).exists():
+        print(f"\n✅ Strategy guide found: {strategy_file}")
+        try:
+            if sys.platform.startswith('darwin'):  # macOS
+                subprocess.run(['open', strategy_file], check=True)
+                print("   📖 Opening guide in your default markdown viewer...")
+            elif sys.platform.startswith('linux'):  # Linux
+                subprocess.run(['xdg-open', strategy_file], check=True)
+                print("   📖 Opening guide in your default markdown viewer...")
+            elif sys.platform.startswith('win'):  # Windows
+                subprocess.run(['start', strategy_file], shell=True, check=True)
+                print("   📖 Opening guide in your default markdown viewer...")
+            else:
+                print("   📖 Please open the file manually in your preferred markdown viewer")
+        except:
+            print("   📖 Please open the file manually in your preferred markdown viewer")
+    else:
+        print(f"\n❌ Strategy guide not found: {strategy_file}")
+        print("   Please ensure the file is in the same directory as this script")
+
 def list_demos():
     """Display all available demos with descriptions"""
     print("🎯 Available PySpark Window Function Demos:")
+    print("=" * 60)
+    print("\n💡 NEW: Check out WINDOW_FUNCTIONS_STRATEGY_GUIDE.md for help choosing the right approach!")
+    print("   This comprehensive guide helps you select the optimal window function strategy")
+    print("   for your specific business scenario with decision frameworks and examples.")
     print("=" * 60)
     
     for label, (filename, description) in DEMOS.items():
@@ -149,6 +207,7 @@ Examples:
   python run_demo.py ranking
   python run_demo.py aggregation
   python run_demo.py --list
+  python run_demo.py --strategy
         """
     )
     
@@ -165,7 +224,18 @@ Examples:
         help='List all available demos with detailed descriptions'
     )
     
+    parser.add_argument(
+        '--strategy', '-s',
+        action='store_true',
+        help='Open the comprehensive Window Functions Strategy Selection Guide'
+    )
+    
     args = parser.parse_args()
+    
+    # Show strategy guide
+    if args.strategy:
+        show_strategy_guide()
+        return
     
     # Show list of demos
     if args.list:
@@ -176,6 +246,7 @@ Examples:
     if not args.use_case:
         parser.print_help()
         print(f"\n🔍 Use --list to see detailed descriptions of all {len(DEMOS)} available demos")
+        print(f"📋 Use --strategy to access the comprehensive strategy selection guide")
         return
     
     # Run the specified demo
