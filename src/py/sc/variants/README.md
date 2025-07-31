@@ -268,31 +268,44 @@ WHERE sensor_type = 'pressure'
 
 ### IoT Sensor Analysis
 ```
-ANALYSIS 1: Temperature Sensor Analytics
-+----------------+--------+-------------+-------------+-----------+-----+
-|       sensor_id|avg_temp|  avg_humidity|avg_pressure|   building|floor|
-+----------------+--------+-------------+-------------+-----------+-----+
-|temperature_045 |   32.15|         78.2|      1024.3|Building_12|   14|
-|temperature_123 |   31.87|         71.5|      1018.7| Building_5|    8|
+ANALYSIS 1: Pressure Monitoring Analytics
+Average Pressure Analysis Across All Sensors:
++---------------------+---------------------+---------------------+-------------+
+|avg_wellhead_pressure|avg_drilling_pressure|avg_mud_pump_pressure|reading_count|
++---------------------+---------------------+---------------------+-------------+
+|2261.39              |8440.13              |2990.71              |4906         |
++---------------------+---------------------+---------------------+-------------+
 ```
 
-### E-commerce Funnel Analysis
+### E-commerce Event Analysis
 ```
-Shopping Funnel Conversion Rates:
-+----------+----------------+-------------------+-----------------+
-|total_users|users_with_views|users_with_cart_adds|view_to_cart_rate|
-+----------+----------------+-------------------+-----------------+
-|     9,847|           9,847|              4,923|            50.02|
+ANALYSIS 1: Event Distribution Overview
+Event Distribution:
++----------+-----------+------------+----------+
+|event_type|event_count|unique_users|percentage|
++----------+-----------+------------+----------+
+|  purchase|      30141|        9543|     40.19|
+|    search|      26196|        9264|     34.93|
+|  wishlist|      18663|        8447|     24.88|
++----------+-----------+------------+----------+
 ```
 
-### Security Threat Analysis
+### Security Log Analysis
 ```
-Top Threats by Type and Source:
-+------------+-------------+-------------------+--------------+
-|source_system| threat_type|     attack_type   |incident_count|
-+------------+-------------+-------------------+--------------+
-|  antivirus |    malware  |               null|         3,456|
-|        ids |        null |     sql_injection |         2,103|
+ANALYSIS 1: Security Event Overview
+Security Event Distribution by System and Severity:
++-------------+--------+-----------+----------+
+|source_system|severity|event_count|percentage|
++-------------+--------+-----------+----------+
+|antivirus    |critical|5233       |8.72      |
+|antivirus    |high    |3518       |5.86      |
+|antivirus    |medium  |12256      |20.43     |
+|firewall     |high    |4246       |7.08      |
+|firewall     |medium  |6547       |10.91     |
+|firewall     |low     |13042      |21.74     |
+|ids          |critical|4328       |7.21      |
+|ids          |medium  |10830      |18.05     |
++-------------+--------+-----------+----------+
 ```
 
 ## 🎯 Key Takeaways
