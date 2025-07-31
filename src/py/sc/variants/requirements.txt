@@ -1,0 +1,29 @@
+# Apache Spark 4.0 Variant Data Type Use Cases Requirements
+# ============================================================
+
+# Core requirement - Apache Spark 4.0 with Variant support
+# Note: As of early 2025, Spark 4.0 may still be in preview/dev
+pyspark>=4.0.0
+
+
+# Python standard library modules used (no additional installation needed):
+# - json
+# - random
+# - datetime
+# - time
+# - hashlib
+# - ipaddress
+# - uuid
+# - sys
+# - subprocess
+# - importlib
+
+# Optional for enhanced development experience:
+# - jupyter for notebook-based exploration
+# - pandas>=1.5.0 for additional data manipulation if needed
+
+# System Requirements:
+# - Python 3.8+
+# - Java 17+ (for Spark 4.0)
+# - Minimum 8GB RAM recommended for processing large datasets
+# - Apache Spark 4.0 compatible environment
