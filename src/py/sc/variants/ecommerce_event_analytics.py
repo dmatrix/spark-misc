@@ -35,11 +35,19 @@ DISCOUNT_CODES = ["SAVE10", "WELCOME20", "FLASH15", "MEMBER5", "NEWUSER25", "LOY
 
 def generate_purchase_event(user_id, timestamp):
     """Generate purchase event data (simplified with nested payment)"""
-    total_amount = round(random.uniform(50.0, 2000.0), 2)
+    # Use timestamp for deterministic amount based on time of day (higher during peak hours)
+    hour = timestamp.hour
+    peak_multiplier = 1.5 if 10 <= hour <= 22 else 1.0  # Higher amounts during business hours
+    base_amount = random.uniform(50.0, 1500.0) * peak_multiplier
+    total_amount = round(base_amount, 2)
+    
+    # Use user_id for consistent customer type (same user tends to have same type)
+    user_hash = hash(user_id) % 4
+    customer_types = ["new", "returning", "vip", "premium"]
     
     return {
         "total_amount": total_amount,
-        "customer_type": random.choice(["new", "returning", "vip", "premium"]),
+        "customer_type": customer_types[user_hash],
         "payment": {
             "method": random.choice(PAYMENT_METHODS),
             "processor": random.choice(["stripe", "paypal", "square", "braintree"]),
@@ -54,18 +62,42 @@ def generate_search_event(user_id, timestamp):
         "smartphone case", "bluetooth speaker", "winter jacket", "desk chair", "water bottle"
     ]
     
+    # Use user_id for consistent search behavior (same user tends to search similar terms)
+    user_hash = hash(user_id) % len(search_terms)
+    base_term = search_terms[user_hash]
+    search_query = random.choice([base_term] * 3 + search_terms)  # 75% chance of user's preferred term
+    
+    # Use timestamp for realistic search patterns (more results during peak hours)
+    hour = timestamp.hour
+    peak_multiplier = 2.0 if 9 <= hour <= 17 else 1.0  # More results during business hours
+    results_count = int(random.randint(50, 500) * peak_multiplier)
+    
     return {
-        "search_query": random.choice(search_terms),
-        "results_count": random.randint(0, 1000),
-        "results_clicked": random.randint(0, 10)
+        "search_query": search_query,
+        "results_count": results_count,
+        "results_clicked": random.randint(0, min(10, results_count // 50))
     }
 
 def generate_wishlist_event(user_id, timestamp):
     """Generate wishlist event data (simplified)"""
+    # Use user_id for consistent product preferences (same user interacts with similar price ranges)
+    user_hash = hash(user_id) % 3
+    price_ranges = [(25.99, 150.0), (100.0, 400.0), (300.0, 799.99)]  # budget, mid, premium users
+    min_price, max_price = price_ranges[user_hash]
+    
+    # Use timestamp for realistic action patterns (more 'add' during evenings)
+    hour = timestamp.hour
+    if 18 <= hour <= 23:  # Evening hours - more wishlist additions
+        actions = ["add"] * 4 + ["remove", "move_to_cart"]
+    elif 9 <= hour <= 17:  # Business hours - more conversions
+        actions = ["add", "remove"] + ["move_to_cart"] * 3
+    else:  # Off hours - more removals/cleanup
+        actions = ["add", "move_to_cart"] + ["remove"] * 3
+    
     return {
         "product_id": f"p{random.randint(1000, 9999)}",
-        "action": random.choice(["add", "remove", "move_to_cart"]),
-        "product_price": round(random.uniform(25.99, 799.99), 2)
+        "action": random.choice(actions),
+        "product_price": round(random.uniform(min_price, max_price), 2)
     }
 
 def generate_fake_ecommerce_data(num_records=75000):
