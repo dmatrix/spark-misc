@@ -2,7 +2,9 @@
 
 Window functions are one of the most powerful yet underutilized features in PySpark. Unlike regular aggregations that collapse your data into summary rows, window functions perform calculations across related rows while preserving the original dataset structure. This makes them perfect for analytics tasks like ranking, running totals, trend analysis, and customer journey mapping.
 
-In this comprehensive guide, we'll explore six essential window function patterns through practical, real-world examples. Each demo is designed to be simple, digestible, and ready for production use.
+In this comprehensive guide, we'll explore six essential window function patterns through practical, real-world examples. Each demo is designed to be simple, digestible, and ready to use.
+
+> ⚡ **All demos use Spark Connect** with modern architecture for Spark 4.0+ environments.
 
 ## 🎯 What Are Window Functions?
 
@@ -308,17 +310,45 @@ df_attribution = (df.withColumn("first_touch_channel", first("channel").over(win
 
 ## 🚀 Getting Started
 
-Each demo file is standalone and ready to run:
+All demos are built using **Spark Connect**. Each demo file is standalone and ready to run:
 
 ```bash
-# Run any demo
+# Run individual demos directly
 python ranking_operations_demo.py
 python aggregation_window_demo.py
 python lead_lag_demo.py
 python moving_averages_demo.py
 python percentile_analysis_demo.py
 python first_last_value_demo.py
+
+# Or use the convenient runner script
+python run_demo.py ranking
+python run_demo.py aggregation
+python run_demo.py lead_lag
+python run_demo.py moving_averages
+python run_demo.py percentile
+python run_demo.py first_last_value
+
+# List all available demos
+python run_demo.py --list
 ```
+
+### ⚡ Spark Connect Configuration
+
+All demos use **Spark Connect** with the following configuration:
+
+```python
+spark = SparkSession.builder \
+    .appName("WindowFunctionDemo") \
+    .config("spark.api.mode", "connect") \
+    .remote("local[*]") \
+    .getOrCreate()
+```
+
+**Benefits of Spark Connect:**
+- Better separation between client and server processes
+- Modern architecture for Spark 4.0+
+- Simplified configuration and setup
 
 ### Prerequisites
 
@@ -326,6 +356,9 @@ python first_last_value_demo.py
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.window import Window
+
+# Spark Connect is included in PySpark 4.0+
+# No additional setup required for local development
 ```
 
 ## 💡 Key Takeaways

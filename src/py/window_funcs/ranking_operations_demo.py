@@ -33,6 +33,8 @@ BUSINESS SCENARIOS COVERED:
 • Multi-level ranking comparisons
 
 Usage: python ranking_operations_demo.py
+
+NOTE: This demo uses Spark Connect.
 """
 
 from pyspark.sql import SparkSession
@@ -213,14 +215,15 @@ def real_world_example(df):
     summary.show(truncate=False)
 
 if __name__ == "__main__":
-    # Initialize Spark
+    # Initialize Spark Connect
     spark = SparkSession.builder \
         .appName("RankingOperationsDemo") \
-        .master("local[*]") \
-        .config("spark.sql.adaptive.enabled", "true") \
+        .config("spark.api.mode", "connect") \
+        .remote("local[*]") \
         .getOrCreate()
     
-    spark.sparkContext.setLogLevel("ERROR")
+    # Note: spark.sparkContext is not available in Spark Connect
+    # Log level configuration is handled server-side
     
     # Create sample data
     df = create_sales_data(spark)

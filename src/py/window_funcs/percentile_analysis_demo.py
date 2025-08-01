@@ -34,6 +34,8 @@ BUSINESS SCENARIOS COVERED:
 • Performance-based promotion and compensation recommendations
 
 Usage: python percentile_analysis_demo.py
+
+NOTE: This demo uses Spark Connect.
 """
 
 from pyspark.sql import SparkSession
@@ -220,14 +222,15 @@ def real_world_example(df):
     dept_summary.show(truncate=False)
 
 if __name__ == "__main__":
-    # Initialize Spark
+    # Initialize Spark Connect
     spark = SparkSession.builder \
         .appName("PercentileAnalysisDemo") \
-        .master("local[*]") \
-        .config("spark.sql.adaptive.enabled", "true") \
+        .config("spark.api.mode", "connect") \
+        .remote("local[*]") \
         .getOrCreate()
     
-    spark.sparkContext.setLogLevel("ERROR")
+    # Note: spark.sparkContext is not available in Spark Connect
+    # Log level configuration is handled server-side
     
     # Create sample data
     df = create_employee_salary_data(spark)

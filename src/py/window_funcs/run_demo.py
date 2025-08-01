@@ -5,7 +5,8 @@ PySpark Window Functions Demo Runner - CLI Interface for All Window Function Exa
 OVERVIEW:
 This CLI tool provides a convenient interface to run individual Window function demos
 by specifying use case labels. Each demo showcases different Window function patterns
-with comprehensive real-world business scenarios and production-ready code examples.
+with comprehensive real-world business scenarios and code examples.
+All demos are built using Spark Connect.
 
 KEY FEATURES:
 • Simple command-line interface for quick demo execution
@@ -13,6 +14,7 @@ KEY FEATURES:
 • Error handling and user-friendly feedback
 • Individual demo execution with progress tracking
 • List all available demos with business context
+• Spark Connect architecture
 
 AVAILABLE DEMOS:
 • ranking - Performance rankings and bonus calculations using ROW_NUMBER, RANK, DENSE_RANK
@@ -24,10 +26,11 @@ AVAILABLE DEMOS:
 
 BENEFITS:
 • Educational tool for learning Window functions with real examples
-• Production-ready code snippets for immediate implementation
-• Blog-ready examples with clear explanations
+• Code snippets with Spark Connect for immediate implementation
+• Examples with clear explanations and modern architecture
 • Quick iteration and testing of different Window function patterns
 • Professional development reference and training material
+• Spark Connect configuration for Spark 4.0+ environments
 
 Usage:
     python run_demo.py <use_case>
@@ -51,27 +54,27 @@ from pathlib import Path
 DEMOS = {
     'ranking': (
         'ranking_operations_demo.py',
-        'Ranking Operations: ROW_NUMBER, RANK, DENSE_RANK for performance analysis and bonus calculations'
+        'Ranking Operations: ROW_NUMBER, RANK, DENSE_RANK for performance analysis and bonus calculations (Spark Connect)'
     ),
     'aggregation': (
         'aggregation_window_demo.py',
-        'Running Aggregations: Cumulative totals, YTD tracking, and contribution analysis'
+        'Running Aggregations: Cumulative totals, YTD tracking, and contribution analysis (Spark Connect)'
     ),
     'lead_lag': (
         'lead_lag_demo.py',
-        'Lead/Lag Operations: Time series analysis, trend detection, and trading signals'
+        'Lead/Lag Operations: Time series analysis, trend detection, and trading signals (Spark Connect)'
     ),
     'moving_averages': (
         'moving_averages_demo.py',
-        'Moving Averages: Trend smoothing, performance monitoring, and noise reduction'
+        'Moving Averages: Trend smoothing, performance monitoring, and noise reduction (Spark Connect)'
     ),
     'percentile': (
         'percentile_analysis_demo.py',
-        'Percentile Analysis: Salary distributions, benchmarking, and statistical analysis'
+        'Percentile Analysis: Salary distributions, benchmarking, and statistical analysis (Spark Connect)'
     ),
     'first_last_value': (
         'first_last_value_demo.py',
-        'First/Last Value: Customer journey analysis, attribution modeling, and lifecycle tracking'
+        'First/Last Value: Customer journey analysis, attribution modeling, and lifecycle tracking (Spark Connect)'
     )
 }
 
@@ -131,8 +134,9 @@ def show_strategy_guide():
 
 def list_demos():
     """Display all available demos with descriptions"""
-    print("🎯 Available PySpark Window Function Demos:")
+    print("🎯 Available PySpark Window Function Demos (Spark Connect):")
     print("=" * 60)
+    print("\n⚡ All demos use Spark Connect!")
     print("\n💡 NEW: Check out WINDOW_FUNCTIONS_STRATEGY_GUIDE.md for help choosing the right approach!")
     print("   This comprehensive guide helps you select the optimal window function strategy")
     print("   for your specific business scenario with decision frameworks and examples.")
@@ -192,10 +196,10 @@ def run_demo(use_case):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='PySpark Window Functions Demo Runner',
+        description='PySpark Window Functions Demo Runner (Spark Connect)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Available Demo Use Cases:
+Available Demo Use Cases (All using Spark Connect):
   ranking          - Ranking operations (ROW_NUMBER, RANK, DENSE_RANK)
   aggregation      - Running totals and cumulative calculations  
   lead_lag         - Time series analysis with LAG/LEAD functions
