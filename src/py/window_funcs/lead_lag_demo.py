@@ -34,6 +34,8 @@ BUSINESS SCENARIOS COVERED:
 • Financial time series monitoring
 
 Usage: python lead_lag_demo.py
+
+NOTE: This demo uses Spark Connect.
 """
 
 from pyspark.sql import SparkSession
@@ -186,14 +188,15 @@ def real_world_example(df):
     signal_summary.show(truncate=False)
 
 if __name__ == "__main__":
-    # Initialize Spark
+    # Initialize Spark Connect
     spark = SparkSession.builder \
         .appName("LeadLagDemo") \
-        .master("local[*]") \
-        .config("spark.sql.adaptive.enabled", "true") \
+        .config("spark.api.mode", "connect") \
+        .remote("local[*]") \
         .getOrCreate()
     
-    spark.sparkContext.setLogLevel("ERROR")
+    # Note: spark.sparkContext is not available in Spark Connect
+    # Log level configuration is handled server-side
     
     # Create sample data
     df = create_stock_price_data(spark)
