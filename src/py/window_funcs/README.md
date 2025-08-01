@@ -329,6 +329,12 @@ python run_demo.py moving_averages
 python run_demo.py percentile
 python run_demo.py first_last_value
 
+# Run ALL demos sequentially
+python run_demo.py all
+
+# Run all demos with clean output (no stderr noise when piping)
+python run_demo.py all --quiet
+
 # List all available demos
 python run_demo.py --list
 ```

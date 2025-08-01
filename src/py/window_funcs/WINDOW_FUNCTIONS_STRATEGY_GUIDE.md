@@ -341,6 +341,8 @@ pip install -r requirements.txt
 python ranking_operations_demo.py
 # or use the convenient runner
 python run_demo.py ranking
+# or run all demos to see all patterns
+python run_demo.py all
 
 # 2. Adapt to your use case
 # Modify demo code with your data schema and business logic

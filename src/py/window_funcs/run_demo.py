@@ -23,6 +23,7 @@ AVAILABLE DEMOS:
 • moving_averages - Trend smoothing and performance monitoring with rolling windows
 • percentile - Statistical analysis and salary distributions using NTILE, PERCENT_RANK
 • first_last_value - Customer journey analysis and marketing attribution modeling
+• all - Run all available window function demos sequentially
 
 BENEFITS:
 • Educational tool for learning Window functions with real examples
@@ -41,6 +42,7 @@ Examples:
     python run_demo.py ranking          # Run ranking operations demo
     python run_demo.py aggregation      # Run running aggregations demo
     python run_demo.py lead_lag          # Run time series analysis demo
+    python run_demo.py all              # Run all available demos
     python run_demo.py --list           # Show all available demos
 """
 
@@ -48,7 +50,29 @@ import argparse
 import subprocess
 import sys
 import os
+import signal
 from pathlib import Path
+from contextlib import contextmanager
+
+# Handle broken pipe errors when piping to head/tail
+# This restores the default SIGPIPE behavior for subprocesses
+signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
+@contextmanager
+def handle_broken_pipe():
+    """
+    Context manager to handle BrokenPipeError gracefully when piping output
+    to commands like head or tail that may close the pipe early.
+    """
+    try:
+        yield
+        sys.stdout.flush()
+    except BrokenPipeError:
+        # Python flushes standard streams on exit; redirect remaining output
+        # to devnull to avoid another BrokenPipeError at shutdown
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stdout.fileno())
+        sys.exit(0)
 
 # Demo mappings: label -> (filename, description)
 DEMOS = {
@@ -152,13 +176,55 @@ def list_demos():
     print("\n🚀 Usage Examples:")
     print("   python run_demo.py ranking          # Run ranking operations demo")
     print("   python run_demo.py aggregation      # Run running aggregations demo")
+    print("   python run_demo.py all              # Run ALL demos sequentially")
     print("   python run_demo.py --list           # Show this list")
 
-def run_demo(use_case):
+def run_all_demos(quiet=False):
+    """Execute all available demos sequentially"""
+    print("🚀 Running ALL Window Function Demos")
+    print("=" * 80)
+    print(f"📊 Total demos to run: {len(DEMOS)}")
+    print("=" * 80)
+    
+    successful_demos = 0
+    failed_demos = []
+    
+    for i, (use_case, (filename, description)) in enumerate(DEMOS.items(), 1):
+        print(f"\n{'='*20} DEMO {i}/{len(DEMOS)}: {use_case.upper().replace('_', ' ')} {'='*20}")
+        print(f"📁 File: {filename}")
+        print(f"📝 Description: {description}")
+        print("-" * 80)
+        
+        if run_demo(use_case, show_header=False, quiet=quiet):
+            successful_demos += 1
+            print(f"\n✅ Demo {i}/{len(DEMOS)} completed successfully!")
+        else:
+            failed_demos.append(use_case)
+            print(f"\n❌ Demo {i}/{len(DEMOS)} failed!")
+        
+        print("=" * 80)
+    
+    # Summary
+    print(f"\n🎯 ALL DEMOS SUMMARY")
+    print("=" * 50)
+    print(f"✅ Successful: {successful_demos}/{len(DEMOS)}")
+    print(f"❌ Failed: {len(failed_demos)}/{len(DEMOS)}")
+    
+    if failed_demos:
+        print(f"\n💥 Failed demos: {', '.join(failed_demos)}")
+        return False
+    else:
+        print(f"\n🎉 All {len(DEMOS)} demos completed successfully!")
+        print("\n💡 Key takeaway: Window functions provide powerful analytical capabilities")
+        print("   across ranking, aggregation, time series, moving averages, percentiles,")
+        print("   and customer journey analysis patterns.")
+        return True
+
+def run_demo(use_case, show_header=True, quiet=False):
     """Execute the specified demo"""
     if use_case not in DEMOS:
         print(f"❌ Error: Unknown use case '{use_case}'")
-        print(f"\n✅ Available options: {', '.join(DEMOS.keys())}")
+        print(f"\n✅ Available options: {', '.join(DEMOS.keys())}, all")
         print("\n🔍 Use 'python run_demo.py --list' to see all demos with descriptions")
         return False
     
@@ -169,19 +235,25 @@ def run_demo(use_case):
         print(f"❌ Error: Demo file '{filename}' not found")
         return False
     
-    print(f"🚀 Running: {use_case.upper().replace('_', ' ')} Demo")
-    print(f"📁 File: {filename}")
-    print(f"📝 Description: {description}")
-    print("=" * 80)
+    if show_header:
+        print(f"🚀 Running: {use_case.upper().replace('_', ' ')} Demo")
+        print(f"📁 File: {filename}")
+        print(f"📝 Description: {description}")
+        print("=" * 80)
     
     try:
         # Execute the demo file
+        # Suppress stderr if quiet mode is enabled or when running in "all" mode to avoid broken pipe noise
+        stderr_setting = subprocess.DEVNULL if (quiet or not show_header) else None
+        
         result = subprocess.run([sys.executable, filename], 
                               cwd=os.getcwd(),
-                              check=True)
+                              check=True,
+                              stderr=stderr_setting)
         
-        print("\n" + "=" * 80)
-        print(f"✅ {use_case.upper().replace('_', ' ')} Demo completed successfully!")
+        if show_header:
+            print("\n" + "=" * 80)
+            print(f"✅ {use_case.upper().replace('_', ' ')} Demo completed successfully!")
         return True
         
     except subprocess.CalledProcessError as e:
@@ -206,10 +278,13 @@ Available Demo Use Cases (All using Spark Connect):
   moving_averages  - Trend analysis with moving window calculations
   percentile       - Statistical analysis and salary distributions
   first_last_value - Customer journey and attribution analysis
+  all              - Run ALL available demos sequentially
 
 Examples:
   python run_demo.py ranking
   python run_demo.py aggregation
+  python run_demo.py all
+  python run_demo.py all --quiet          # Suppress stderr when piping
   python run_demo.py --list
   python run_demo.py --strategy
         """
@@ -218,8 +293,8 @@ Examples:
     parser.add_argument(
         'use_case',
         nargs='?',
-        choices=list(DEMOS.keys()),
-        help='Window function use case to demonstrate'
+        choices=list(DEMOS.keys()) + ['all'],
+        help='Window function use case to demonstrate (or "all" to run all demos)'
     )
     
     parser.add_argument(
@@ -234,28 +309,39 @@ Examples:
         help='Open the comprehensive Window Functions Strategy Selection Guide'
     )
     
-    args = parser.parse_args()
+    parser.add_argument(
+        '--quiet', '-q',
+        action='store_true',
+        help='Suppress stderr output from demo processes (useful when piping to head/tail)'
+    )
     
-    # Show strategy guide
-    if args.strategy:
-        show_strategy_guide()
-        return
-    
-    # Show list of demos
-    if args.list:
-        list_demos()
-        return
-    
-    # Show help if no use case provided
-    if not args.use_case:
-        parser.print_help()
-        print(f"\n🔍 Use --list to see detailed descriptions of all {len(DEMOS)} available demos")
-        print(f"📋 Use --strategy to access the comprehensive strategy selection guide")
-        return
-    
-    # Run the specified demo
-    success = run_demo(args.use_case)
-    sys.exit(0 if success else 1)
+    # Handle broken pipe errors gracefully when output is piped
+    with handle_broken_pipe():
+        args = parser.parse_args()
+        
+        # Show strategy guide
+        if args.strategy:
+            show_strategy_guide()
+            return
+        
+        # Show list of demos
+        if args.list:
+            list_demos()
+            return
+        
+        # Show help if no use case provided
+        if not args.use_case:
+            parser.print_help()
+            print(f"\n🔍 Use --list to see detailed descriptions of all {len(DEMOS)} available demos")
+            print(f"📋 Use --strategy to access the comprehensive strategy selection guide")
+            return
+        
+        # Run the specified demo or all demos
+        if args.use_case == 'all':
+            success = run_all_demos(quiet=args.quiet)
+        else:
+            success = run_demo(args.use_case, quiet=args.quiet)
+        sys.exit(0 if success else 1)
 
 if __name__ == '__main__':
     main() 
