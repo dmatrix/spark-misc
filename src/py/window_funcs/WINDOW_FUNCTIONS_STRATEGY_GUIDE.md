@@ -297,6 +297,32 @@ df_journey = (df
 
 ## 🚀 Getting Started with Your Strategy
 
+### **Prerequisites: Spark Connect Setup**
+
+All demo files use **Spark Connect** for modern, future-ready architecture. 
+
+**Installation:**
+```bash
+# Install required dependencies
+pip install -r requirements.txt
+```
+
+**Configuration:**
+```python
+# Required PySpark 4.0+ configuration
+spark = SparkSession.builder \
+    .appName("WindowFunctionAnalysis") \
+    .config("spark.api.mode", "connect") \
+    .remote("local[*]") \
+    .getOrCreate()
+```
+
+**Benefits of Spark Connect**:
+- Better separation between client and server processes
+- Modern architecture for Spark 4.0+
+- Simplified configuration and setup
+- No separate server required with `local[*]` remote
+
 ### **Quick Start Recommendations**
 
 1. **Identify Your Primary Use Case**: Match your scenario to the strategies above
@@ -308,11 +334,17 @@ df_journey = (df
 ### **Development Workflow**
 
 ```bash
-# 1. Explore the strategy with demo data
+# 0. Install dependencies
+pip install -r requirements.txt
+
+# 1. Explore the strategy with demo data (using Spark Connect)
 python ranking_operations_demo.py
+# or use the convenient runner
+python run_demo.py ranking
 
 # 2. Adapt to your use case
 # Modify demo code with your data schema and business logic
+# Keep the Spark Connect configuration for modern architecture
 
 # 3. Test with sample data
 # Validate results and performance on representative subset

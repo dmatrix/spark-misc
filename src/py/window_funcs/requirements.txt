@@ -1,0 +1,25 @@
+# PySpark Window Functions Demo Requirements
+# Updated for Spark Connect and modern PySpark architecture
+
+# Core PySpark with Spark Connect support
+pyspark>=4.0.0
+
+# Optional: Development and data analysis dependencies
+# Uncomment if needed for your specific use case
+
+# For advanced data manipulation (if extending demos)
+# pandas>=2.0.0
+# numpy>=1.24.0
+# pyarrow>=10.0.0
+
+# For development and testing (optional)
+# pytest>=7.0.0
+# pytest-spark>=0.6.0
+
+# For Jupyter notebook support (optional)
+# jupyter>=1.0.0
+# ipython>=8.0.0
+
+# For data visualization (optional)
+# matplotlib>=3.6.0
+# seaborn>=0.12.0
