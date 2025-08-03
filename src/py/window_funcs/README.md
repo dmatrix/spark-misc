@@ -1,8 +1,8 @@
-# Mastering PySpark Window Functions: 6 Real-World Use Cases
+# PySpark Window Functions: 6 Real-World Use Cases
 
-Window functions are one of the most powerful yet underutilized features in PySpark. Unlike regular aggregations that collapse your data into summary rows, window functions perform calculations across related rows while preserving the original dataset structure. This makes them perfect for analytics tasks like ranking, running totals, trend analysis, and customer journey mapping.
+Window functions are one of the most useful yet underutilized features in PySpark. Unlike regular aggregations that collapse your data into summary rows, window functions perform calculations across related rows while preserving the original dataset structure. This makes them well-suited for analytics tasks like ranking, running totals, trend analysis, and customer journey mapping.
 
-In this comprehensive guide, we'll explore six essential window function patterns through practical, real-world examples. Each demo is designed to be simple, digestible, and ready to use.
+This guide covers six common window function patterns through practical, real-world examples. Each demo is designed to be simple and ready to use.
 
 > ⚡ **All demos use Spark Connect** with modern architecture for Spark 4.0+ environments.
 
@@ -72,7 +72,7 @@ df_with_tiers = (df.withColumn("regional_rank", row_number().over(window_spec))
 
 **Business Problem**: You need to track running totals, cumulative averages, and year-to-date performance metrics as new data arrives.
 
-Running aggregations transform your data into a continuous story, showing how metrics evolve over time without losing the detail of individual transactions.
+Running aggregations show how metrics evolve over time while preserving the detail of individual transactions.
 
 ### Building Running Totals
 
@@ -81,9 +81,9 @@ Running aggregations transform your data into a continuous story, showing how me
 # - running_total: Sum of all sales from start to current row
 # - running_count: Count of transactions processed so far  
 # - running_avg: Running average of sales amounts
-df_running = (df.withColumn("running_total", spark_sum("sales_amount").over(window_spec))
+df_running = (df.withColumn("running_total", sum("sales_amount").over(window_spec))
                 .withColumn("running_count", count("*").over(window_spec))
-                .withColumn("running_avg", spark_avg("sales_amount").over(window_spec)))
+                .withColumn("running_avg", avg("sales_amount").over(window_spec)))
 ```
 
 ### Advanced: Window Frames for Flexible Calculations
@@ -92,9 +92,9 @@ df_running = (df.withColumn("running_total", spark_sum("sales_amount").over(wind
 # Compare different window frame types:
 # - unbounded_window: From start of partition to current row
 # - last_3_window: Only last 3 rows including current row
-df_frames = (df.withColumn("cumulative_total", spark_sum("sales_amount").over(unbounded_window))
-               .withColumn("last_3_total", spark_sum("sales_amount").over(last_3_window))
-               .withColumn("cumulative_avg", spark_avg("sales_amount").over(unbounded_window)))
+df_frames = (df.withColumn("cumulative_total", sum("sales_amount").over(unbounded_window))
+               .withColumn("last_3_total", sum("sales_amount").over(last_3_window))
+               .withColumn("cumulative_avg", avg("sales_amount").over(unbounded_window)))
 ```
 
 **When to Use**: Financial running totals, YTD calculations, progressive KPI tracking, contribution analysis.
@@ -165,8 +165,8 @@ Moving averages are the cornerstone of trend analysis, helping you see the fores
 # Calculate different moving averages:
 # - ma_3_day: 3-day moving average of sales
 # - ma_5_day: 5-day moving average of sales
-df_moving_avg = (df.withColumn("ma_3_day", spark_round(spark_avg("daily_sales").over(moving_3_day), 2))
-                   .withColumn("ma_5_day", spark_round(spark_avg("daily_sales").over(moving_5_day), 2)))
+df_moving_avg = (df.withColumn("ma_3_day", round(avg("daily_sales").over(moving_3_day), 2))
+                   .withColumn("ma_5_day", round(avg("daily_sales").over(moving_5_day), 2)))
 ```
 
 ### Trend Direction Analysis
@@ -176,7 +176,7 @@ df_moving_avg = (df.withColumn("ma_3_day", spark_round(spark_avg("daily_sales").
 # - ma_5_day: Current 5-day moving average
 # - prev_ma_5_day: Previous 5-day moving average
 # - trend_direction: Compare current vs previous to show trend
-df_trends = (df.withColumn("ma_5_day", spark_avg("daily_sales").over(moving_5_day))
+df_trends = (df.withColumn("ma_5_day", avg("daily_sales").over(moving_5_day))
                .withColumn("prev_ma_5_day", lag("ma_5_day", 1).over(window_spec))
                .withColumn("trend_direction",
                           when(col("ma_5_day") > col("prev_ma_5_day"), "📈 IMPROVING")
@@ -190,7 +190,7 @@ df_trends = (df.withColumn("ma_5_day", spark_avg("daily_sales").over(moving_5_da
 # - ma_5_day: 5-day moving average for trend analysis
 # - target_achievement: Check if daily target was met
 # - performance_alert: Alert based on moving average vs target
-df_monitoring = (df.withColumn("ma_5_day", spark_avg("daily_sales").over(moving_5_day))
+df_monitoring = (df.withColumn("ma_5_day", avg("daily_sales").over(moving_5_day))
                    .withColumn("target_achievement",
                               when(col("daily_sales") >= daily_target, "✅ TARGET MET")
                               .otherwise("❌ BELOW TARGET"))
@@ -218,8 +218,8 @@ Percentile functions transform absolute values into relative positions, answerin
 # - company_percentile: Rank within entire company (0-100%)
 # - dept_percentile: Rank within department (0-100%)
 # - company_quartile: Company quartile position (1-4)
-df_percentiles = (df.withColumn("company_percentile", spark_round(percent_rank().over(company_window) * 100, 1))
-                    .withColumn("dept_percentile", spark_round(percent_rank().over(dept_window) * 100, 1))
+df_percentiles = (df.withColumn("company_percentile", round(percent_rank().over(company_window) * 100, 1))
+                    .withColumn("dept_percentile", round(percent_rank().over(dept_window) * 100, 1))
                     .withColumn("company_quartile", ntile(4).over(company_window)))
 ```
 
@@ -231,7 +231,7 @@ df_percentiles = (df.withColumn("company_percentile", spark_round(percent_rank()
 # - percentile_rank: Exact percentile position
 # - salary_band: Assign band based on quintile
 df_bands = (df.withColumn("company_quintile", ntile(5).over(company_window))
-              .withColumn("percentile_rank", spark_round(percent_rank().over(company_window) * 100, 1))
+              .withColumn("percentile_rank", round(percent_rank().over(company_window) * 100, 1))
               .withColumn("salary_band",
                          when(col("company_quintile") >= 4, "Senior Level")
                          .otherwise("Junior/Mid Level")))
@@ -261,7 +261,7 @@ df_compensation = (df.withColumn("company_percentile", percent_rank().over(compa
 
 **Business Problem**: You need to understand customer acquisition channels, track lifetime value, and perform marketing attribution analysis across the entire customer journey.
 
-First and last value functions help you capture the bookends of customer interactions, essential for understanding acquisition patterns and measuring marketing effectiveness.
+First and last value functions help you capture the bookends of customer interactions, needed for understanding acquisition patterns and measuring marketing effectiveness.
 
 ### Customer Journey Mapping
 
@@ -284,7 +284,7 @@ df_first_last = (df.withColumn("first_touchpoint", first("touchpoint").over(wind
 # - customer_segment: Classify customer by value
 df_clv = (df.withColumn("first_purchase_date",
                        first(when(col("revenue") > 0, col("event_date"))).over(window_spec))
-            .withColumn("total_clv", spark_sum("revenue").over(full_window))
+            .withColumn("total_clv", sum("revenue").over(full_window))
             .withColumn("customer_segment",
                        when(col("total_clv") >= 300, "💎 HIGH VALUE")
                        .otherwise("📊 STANDARD")))
@@ -299,7 +299,7 @@ df_clv = (df.withColumn("first_purchase_date",
 # - total_revenue: Total revenue from customer
 df_attribution = (df.withColumn("first_touch_channel", first("channel").over(window_spec))
                     .withColumn("last_touch_channel", last("channel").over(full_window))
-                    .withColumn("total_revenue", spark_sum("revenue").over(full_window)))
+                    .withColumn("total_revenue", sum("revenue").over(full_window)))
 ```
 
 **When to Use**: Customer journey analysis, marketing attribution, acquisition tracking, lifetime value calculation, retention analysis.
@@ -370,10 +370,10 @@ from pyspark.sql.window import Window
 ## 💡 Key Takeaways
 
 1. **Window functions preserve data structure** while adding analytical insights
-2. **Partitioning and ordering** are crucial for meaningful results
+2. **Partitioning and ordering** are important for meaningful results
 3. **Different ranking functions** handle ties in distinct ways
 4. **Frame specifications** control which rows participate in calculations
-5. **Combining multiple window functions** creates powerful analytical pipelines
+5. **Combining multiple window functions** creates comprehensive analytical pipelines
 
 ## 🎯 Choosing the Right Window Function
 
@@ -386,8 +386,8 @@ from pyspark.sql.window import Window
 | **Distribution Analysis** | `PERCENT_RANK`, `NTILE` | Salary bands, performance tiers |
 | **Journey Analysis** | `FIRST_VALUE`, `LAST_VALUE` | Customer acquisition, attribution |
 
-Window functions transform complex analytical questions into elegant, readable code. Master these six patterns, and you'll have the tools to tackle most real-world data analytics challenges with PySpark.
+Window functions transform complex analytical questions into clear, readable code. Learn these six patterns to handle most common data analytics use cases with PySpark.
 
 ---
 
-*Ready to dive deeper? Each demo file contains detailed explanations, sample data, and production-ready code examples. Happy analyzing! 🎉* 
+*Each demo file contains detailed explanations, sample data, and developer-ready code examples for experimentation and exploration.* 
