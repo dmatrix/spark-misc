@@ -214,26 +214,6 @@ With PySpark 4.0's Spark Connect, your application runs as a **thin client** tha
 - **Network Overhead**: Results are streamed back via Apache Arrow, minimizing serialization costs
 - **Logical Plan Transfer**: DataFrame operations are sent as lightweight logical plans, not data
 
-### **Data Volume Considerations**
-
-#### **Small to Medium Data (< 1TB)**
-- **Strategy**: Use Spark Connect for reduced resource footprint
-- **Approach**: Use any window function combination; client overhead is minimal
-- **Focus**: Business logic correctness over performance optimization
-- **Spark Connect Advantage**: Reduced memory usage and improved application startup time
-
-#### **Large Data (1TB - 10TB)**
-- **Strategy**: Optimize partitioning and window specifications
-- **Approach**: Carefully tune `partitionBy()` clauses; server-side execution unchanged
-- **Focus**: Balance between functionality and execution time
-- **Spark Connect Consideration**: Network latency negligible for large result sets
-
-#### **Very Large Data (> 10TB)**
-- **Strategy**: Consider pre-aggregation and incremental processing
-- **Approach**: Break complex window operations into stages
-- **Focus**: Scalability and resource management
-- **Spark Connect Note**: Heavy workloads may benefit from traditional Spark applications for specialized configurations
-
 ### **Query Performance Optimization**
 
 ```python
