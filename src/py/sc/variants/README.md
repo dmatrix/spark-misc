@@ -6,7 +6,7 @@ This repository demonstrates three comprehensive use cases for the new **Variant
 
 The Variant data type in Apache Spark 4.0 is designed for efficient storage and processing of semi-structured data like JSON. Key benefits include:
 
-- **8x faster performance** compared to JSON string processing
+- **1.5-3x faster performance** compared to JSON string processing
 - **No schema enforcement** - handle evolving data structures naturally
 - **Direct SQL querying** of nested fields without parsing overhead
 - **Efficient binary encoding** for optimized storage and retrieval
@@ -19,6 +19,7 @@ The Variant data type in Apache Spark 4.0 is designed for efficient storage and 
 | `iot_sensor_processing.py` | **10 critical offshore oil rig sensors**: pressure, flow, gas detection, temperature, vibration, position, weather, level, current, oil spill detection | 50,000 records |
 | `ecommerce_event_analytics.py` | E-commerce user behavior events | 75,000 records |
 | `security_log_analysis.py` | Security logs from EDR, Firewall, IDS, SIEM | 60,000 records |
+| `performance_benchmark.py` | **Comprehensive performance benchmark** comparing Variant vs JSON string processing with 1.5-3x performance improvements | 100,000 records |
 | `run_variant_usecase.py` | Main runner script for all use cases | - |
 
 ### 🛢️ Offshore Oil Rig - 10 Critical Sensors (Simplified)
@@ -72,6 +73,9 @@ python run_variant_usecase.py ecommerce
 # Security Log Analysis
 python run_variant_usecase.py security
 
+# Performance Benchmark
+python run_variant_usecase.py benchmark
+
 # Show help information
 python run_variant_usecase.py --help
 
@@ -84,6 +88,9 @@ python run_variant_usecase.py --info
 python iot_sensor_processing.py
 python ecommerce_event_analytics.py
 python security_log_analysis.py
+
+# Run performance benchmark to prove performance improvements
+python performance_benchmark.py
 ```
 
 ## 📋 Complete Usage Guide
@@ -97,12 +104,12 @@ The `run_variant_usecase.py` script provides a comprehensive interface for runni
 python run_variant_usecase.py --help
 
 # Output:
-# usage: run_variant_usecase.py [-h] [--info] [{iot,ecommerce,security,all}]
+# usage: run_variant_usecase.py [-h] [--info] [{iot,ecommerce,security,benchmark,all}]
 # 
 # Apache Spark 4.0 Variant Data Type Use Cases
 # 
 # positional arguments:
-#   {iot,ecommerce,security,all}  Use case to run: iot, ecommerce, security, or all (default: all)
+#   {iot,ecommerce,security,benchmark,all}  Use case to run: iot, ecommerce, security, benchmark, or all (default: all)
 # 
 # options:
 #   -h, --help            show this help message and exit
@@ -133,6 +140,7 @@ python run_variant_usecase.py all
 python run_variant_usecase.py iot         # ~7-8 seconds execution
 python run_variant_usecase.py ecommerce   # ~9-10 seconds execution  
 python run_variant_usecase.py security    # ~9-10 seconds execution
+python run_variant_usecase.py benchmark   # ~15-20 seconds execution
 ```
 
 ### Expected Output Structure
@@ -242,6 +250,7 @@ Each use case demonstrates the performance advantages of Variant:
 - **IoT (Oil Rig)**: 50K records, 7.5s total execution, 0.18s query time
 - **E-commerce**: 75K records, 9.1s total execution, 0.10s query time  
 - **Security**: 60K records, 9.5s total execution, 0.11s query time
+- **Performance Benchmark**: 100K records, comprehensive comparison tests
 
 ## 📝 Short SQL Queries
 
@@ -347,5 +356,7 @@ To extend these use cases:
 This demonstration code is provided for educational and evaluation purposes. Please refer to Apache Spark licensing for production usage.
 
 ---
+
+📖 **For detailed developer blog with comprehensive examples and performance benchmarks, see [`developer_blog.md`](developer_blog.md)**
 
 **Note**: This demonstration requires Apache Spark 4.0 with Variant data type support. For earlier versions of Spark, the Variant-specific functionality will not be available, but the data generation and basic analytics can still provide valuable insights into semi-structured data processing patterns.
