@@ -322,7 +322,7 @@ Security Event Distribution by System and Severity:
 1. **Schema Flexibility**: Handle evolving data structures without breaking existing queries
 2. **Performance**: Significant speed improvements over JSON string processing
 3. **Unified Analytics**: Single data type for diverse semi-structured data sources
-4. **Production Ready**: Open source standard suitable for enterprise deployments
+4. **Open Source Standard**: No vendor lock-in with open source implementation
 
 ## 🔧 Customization
 
@@ -353,7 +353,7 @@ To extend these use cases:
 
 ## 📝 License
 
-This demonstration code is provided for educational and evaluation purposes. Please refer to Apache Spark licensing for production usage.
+This demonstration code is provided for educational and evaluation purposes.
 
 ---
 

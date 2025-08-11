@@ -1,0 +1,8 @@
+name,age,city
+Valid Customer,25,Valid City
+,30,Valid City
+Valid Name,,Valid City
+Valid Name,35,
+,40,Valid City
+Valid Name,0,Valid City
+Very Long Name That Exceeds Normal Length,45,Very Long City Name

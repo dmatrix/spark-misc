@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Tue Jun 17 11:23:44 PDT 2025:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.16.1.1 - (1901046): instance a816c00e-0197-7f22-00f6-0000013dc240 
+on database directory /Users/jules/git-repos/spark-misc/src/py/sc/sdp/oil_rigs/metastore_db with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@76ed5528 
+Loaded from file:/Users/jules/spark_homes/spark-4.1.0-SNAPSHOT-bin-sdp-preview/jars/derby-10.16.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=21.0.6+8-LTS-188
+user.dir=/Users/jules/git-repos/spark-misc/src/py/sc/sdp/oil_rigs
+os.name=Mac OS X
+os.arch=aarch64
+os.version=15.5
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

@@ -279,7 +279,7 @@ def run_performance_analysis():
     print("BENCHMARK COMPLETE")
     print("=" * 80)
     print(f"🎯 Result: Variant is {results['overall_speedup']:.1f}x faster than JSON strings")
-    print("🚀 Ready for production: Upgrade to Spark 4.0 and migrate your JSON workloads!")
+    print("🚀 Explore Spark 4.0: Test Variant with your own JSON workloads!")
     print("📖 See README.md for complete use case examples and implementation details")
 
 if __name__ == "__main__":

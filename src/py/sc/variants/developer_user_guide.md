@@ -534,7 +534,7 @@ FROM user_events
 WHERE VARIANT_GET(event_data, '$.user_id', 'string') IS NOT NULL;
 ```
 
-### 3. **Production-Ready Performance**
+### 3. **Scalable Performance**
 - **1.5-3x faster** than JSON string processing
 - **Binary encoding** reduces storage by 30-50%
 - **Direct field access** eliminates parsing overhead
@@ -556,11 +556,11 @@ python run_variant_usecase.py --info
 python run_variant_usecase.py all
 ```
 
-### Production Deployment Checklist
+### Evaluation and Testing Checklist
 - [ ] Upgrade to Apache Spark 4.0+
-- [ ] Identify JSON-heavy workloads for migration
+- [ ] Identify JSON-heavy workloads for testing
 - [ ] Benchmark current performance vs Variant
-- [ ] Migrate schema-flexible data to Variant columns
+- [ ] Test schema-flexible data with Variant columns
 - [ ] Update ETL pipelines to use `PARSE_JSON()` 
 - [ ] Optimize queries with `VARIANT_GET()` functions
 
