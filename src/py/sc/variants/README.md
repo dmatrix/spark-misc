@@ -357,6 +357,6 @@ This demonstration code is provided for educational and evaluation purposes. Ple
 
 ---
 
-📖 **For detailed developer blog with comprehensive examples and performance benchmarks, see [`developer_blog.md`](developer_blog.md)**
+📖 **For detailed developer user guide with comprehensive examples and performance benchmarks, see [`developer_user_guide.md`](developer_user_guide.md)**
 
 **Note**: This demonstration requires Apache Spark 4.0 with Variant data type support. For earlier versions of Spark, the Variant-specific functionality will not be available, but the data generation and basic analytics can still provide valuable insights into semi-structured data processing patterns.
