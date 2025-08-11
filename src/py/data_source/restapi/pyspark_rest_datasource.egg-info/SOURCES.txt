@@ -1,0 +1,12 @@
+CHANGELOG.md
+LICENSE
+MANIFEST.in
+README.md
+example.py
+pyproject.toml
+restapi.py
+pyspark_rest_datasource.egg-info/PKG-INFO
+pyspark_rest_datasource.egg-info/SOURCES.txt
+pyspark_rest_datasource.egg-info/dependency_links.txt
+pyspark_rest_datasource.egg-info/requires.txt
+pyspark_rest_datasource.egg-info/top_level.txt
