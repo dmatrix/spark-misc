@@ -17,7 +17,7 @@ A comprehensive PySpark Data Source implementation for accessing REST APIs with 
 ## 🚀 Installation
 
 ```bash
-pip install pyspark-rest-datasource
+pip install -i https://test.pypi.org/simple/ pyspark-rest-datasource
 ```
 
 ## 📖 Quick Start
