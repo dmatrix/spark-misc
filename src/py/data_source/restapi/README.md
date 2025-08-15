@@ -269,7 +269,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🔗 Links
 
 - **GitHub**: https://github.com/dmatrix/spark-misc
-- **PyPI**: https://pypi.org/project/pyspark-rest-datasource/
+- **PyPI**: https://test.pypi.org/project/pyspark-rest-datasource/
 - **Documentation**: See README_PARTITIONING.md for detailed partitioning guide
 
 ## 🎉 Version History
