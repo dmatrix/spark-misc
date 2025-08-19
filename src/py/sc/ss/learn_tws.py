@@ -7,9 +7,9 @@ This is the simplest possible example to understand transformWithState:
 - Clear, focused code
 - Optimized for Databricks cloud environment
 - Uses RocksDB state store with full multi-column family support
-- Production-grade checkpointing with DBFS
+- Uses DBFS checkpointing for fault tolerance
 
-Author: Jules S. Damji
+Author: Jules S. Damji && Cursor AI
 """
 
 from typing import Iterator, Any, Dict, List
@@ -77,9 +77,27 @@ class FlightProcessor(StatefulProcessor):
         # Get current state for this flight
         # Databricks RocksDB handles this efficiently with multi-column family support!
         if self.flight_state.exists():
-            current = self.flight_state.get().iloc[0]
-            current_state = current['state']
-            current_count = current['count']
+            state_data = self.flight_state.get()
+            
+            # The state store returns a DataFrame, extract the actual values
+            if isinstance(state_data, pd.DataFrame):
+                if len(state_data) > 0:
+                    current = state_data.iloc[0]
+                    current_state = current['state']
+                    current_count = current['count']
+                else:
+                    current_state = "unknown"
+                    current_count = 0
+            else:
+                # Fallback for other data types
+                current_state = "unknown"
+                current_count = 0
+            
+            # Handle None values
+            if current_count is None:
+                current_count = 0
+            if current_state is None:
+                current_state = "unknown"
             # Optional: Add logging to see Databricks state management in action
             if current_count % 5 == 0:  # Log every 5th update
                 print(f"🗄️  Databricks RocksDB: {key} state retrieved (count: {current_count})")
@@ -99,7 +117,13 @@ class FlightProcessor(StatefulProcessor):
                 current_count += 1
                 # Optional: Show state transitions
                 if current_count <= 3:  # Show first few transitions
-                    print(f"✅ {flight_name}: {update['state']} -> {current_state} (update #{current_count})")
+                    print(f"✅ {flight_name}: {current_state} (update #{current_count})")
+            else:
+                # Still increment count even if transition is invalid (for demo purposes)
+                current_count += 1
+                # Optional: Show invalid transitions for debugging
+                if current_count <= 3:
+                    print(f"⚠️  {flight_name}: {current_state} -> {new_state} (invalid transition, staying at {current_state})")
         
         # Save the new state to Databricks RocksDB
         new_state_data = pd.DataFrame({

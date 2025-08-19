@@ -17,7 +17,7 @@ Features:
     - Comprehensive error handling and logging
     - Integration with Spark streaming infrastructure
 
-Author: Jules S. Damji
+Author: Jules S. Damji & Cursor AI
 """
 
 from typing import Optional

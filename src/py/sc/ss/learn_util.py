@@ -4,7 +4,7 @@ Ultra-Simple Utilities for Learning transformWithState
 Just the essential functions needed to understand the basics.
 No complex configurations or options - just pure learning.
 
-Author: Jules S. Damji
+Author: Jules S. Damji & Cursor AI
 """
 
 from typing import Optional
@@ -34,7 +34,7 @@ def create_spark() -> SparkSession:
     
     # Get or create Spark session (Databricks manages the cluster)
     spark = SparkSession.builder \
-        .appName("LearnTransformWithState_Databricks") \
+        .appName("LearnTransformWithState") \
         .config("spark.sql.streaming.stateStore.providerClass", "org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider") \
         .config("spark.sql.streaming.stateStore.rocksdb.formatVersion", "5") \
         .config("spark.sql.streaming.stateStore.rocksdb.trackTotalNumberOfRows", "true") \

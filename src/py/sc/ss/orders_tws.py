@@ -11,7 +11,7 @@ order events, ensuring data consistency and providing real-time order status upd
 
 For utility functions like stream creation and query management, see tws_utility.py.
 
-Author: Jules S. Damji
+Author: Jules S. Damji & Cursor AI
 """
 
 from typing import Iterator, Any
