@@ -1,20 +1,19 @@
 """
-Ultra-Simple Learning Experience for transformWithState on Databricks
+Ultra-Simple Learning Experience for transformWithState
 
 Just one demo, minimal options, maximum learning.
-Perfect for absolute beginners on Databricks cloud environment.
+Perfect for absolute beginners learning Spark Structured Streaming.
 
 Features:
-- RocksDB state store with multi-column family support
-- DBFS checkpointing for fault tolerance
-- Production-grade streaming infrastructure
-- Auto-scaling clusters
+- RocksDB state store with JSON serialization
+- Local checkpointing for fault tolerance
+- Clean streaming infrastructure for learning
+- Auto-advancing state transitions
 
 Usage:
-    python learn_main.py           # Run the demo on Databricks
-    python learn_main.py --explain # Just explain concepts
+    python learn_main.py           # Run the demo
 
-Author: Jules S. Damji
+Author: Jules S. Damji & Cursor AI
 """
 
 import argparse
@@ -43,8 +42,8 @@ def main() -> None:
         return
     
     # Run the learning demo
-    print("🎓 Welcome to transformWithState Learning on Databricks!")
-    print("   This is the simplest possible example with production infrastructure.")
+    print("🎓 Welcome to transformWithState Learning!")
+    print("   This is the simplest possible example with clean infrastructure.")
     print("   Watch how flight states persist between batches with RocksDB.\n")
     
     # Create Spark and run demo
@@ -54,7 +53,7 @@ def main() -> None:
         run_learning_demo(spark)
     finally:
         spark.stop()
-        print("\n👋 Thanks for learning transformWithState on Databricks!")
+        print("\n👋 Thanks for learning transformWithState!")
 
 
 if __name__ == "__main__":
