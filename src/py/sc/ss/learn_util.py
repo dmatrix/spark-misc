@@ -16,23 +16,23 @@ from pyspark.sql.streaming import StreamingQuery
 
 def create_spark() -> SparkSession:
     """
-    Create a Spark session optimized for Databricks transformWithState learning.
+    Create a Spark session optimized for transformWithState learning.
     
-    Databricks provides full support for transformWithState including:
+    This setup provides full support for transformWithState including:
     - Advanced state store providers (RocksDB)
-    - Reliable checkpointing with DBFS
-    - Multi-column family state management
-    - Production-grade streaming infrastructure
+    - Reliable checkpointing with local filesystem
+    - JSON-based state management
+    - Clean streaming infrastructure for learning
     
     Args:
         None
         
     Returns:
-        SparkSession: A Databricks-optimized Spark session for transformWithState
+        SparkSession: A Spark session configured for transformWithState learning
     """
-    print("🔧 Creating Databricks Spark session for transformWithState...")
+    print("🔧 Creating Spark session for transformWithState...")
     
-    # Get or create Spark session (Databricks manages the cluster)
+    # Get or create Spark session with RocksDB configuration
     spark = SparkSession.builder \
         .appName("LearnTransformWithState") \
         .config("spark.sql.streaming.stateStore.providerClass", "org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider") \
@@ -49,10 +49,10 @@ def create_spark() -> SparkSession:
     # Set log level for cleaner output
     spark.sparkContext.setLogLevel("WARN")
     
-    print("✅ Databricks Spark ready with full transformWithState support!")
+    print("✅ Spark ready with full transformWithState support!")
     print("   🗄️  RocksDB state store enabled")
-    print("   📁 DBFS checkpointing available") 
-    print("   🚀 Production-grade streaming infrastructure")
+    print("   📁 Local checkpointing available")
+    print("   🚀 Clean streaming infrastructure for learning")
     return spark
 
 
@@ -100,21 +100,20 @@ def create_flight_data(spark: SparkSession) -> DataFrame:
 
 def run_learning_demo(spark: SparkSession) -> None:
     """
-    Run the transformWithState demo on Databricks for learning stateful processing.
+    Run the transformWithState demo for learning stateful processing.
     
-    This uses the actual transformWithState API with full Databricks support:
+    This uses the actual transformWithState API with full support for:
     - RocksDB state store for reliable state management
-    - DBFS checkpointing for fault tolerance
-    - Production-grade streaming infrastructure
+    - FS checkpointing for fault tolerance
     
     Args:
-        spark: The Databricks Spark session to use for the demo
+        spark: The Spark session to use for the demo
         
     Returns:
         None
     """
     print("\n" + "🎓" + "="*50)
-    print("LEARNING DEMO: transformWithState on Databricks")
+    print("LEARNING DEMO: transformWithState")
     print("="*50)
     
     # Import our simple processor
@@ -131,7 +130,7 @@ def run_learning_demo(spark: SparkSession) -> None:
     ])
     
     # Apply transformWithState - this is the key learning point!
-    # Databricks fully supports this with RocksDB state store
+    # Spark fully supports this with RocksDB state store
     flight_states = flight_data \
         .groupBy("flight") \
         .transformWithStateInPandas(
@@ -141,13 +140,13 @@ def run_learning_demo(spark: SparkSession) -> None:
             timeMode="ProcessingTime"
         )
     
-    # Use DBFS for reliable checkpointing in Databricks
+    # Use FS for reliable checkpointing 
     import uuid
     checkpoint_dir = f"/tmp/learn_checkpoint_{uuid.uuid4().hex[:8]}"
     
     print(f"📁 Using checkpoint location: {checkpoint_dir}")
     
-    # Start the stream with Databricks-optimized settings
+    # Start the stream with optimized settings
     query = flight_states \
         .writeStream \
         .outputMode("update") \
@@ -158,13 +157,13 @@ def run_learning_demo(spark: SparkSession) -> None:
         .trigger(processingTime='5 seconds') \
         .start()
     
-    print("\n🚀 Demo running on Databricks! Watch transformWithState in action...")
+    print("\n🚀 Demo running! Watch transformWithState in action...")
     print("📝 Key things to notice:")
     print("   - 🗄️  RocksDB manages state reliably for each flight")  
     print("   - ✅ State transitions are validated in real-time")
     print("   - 📈 Update counts increase over time")
     print("   - 💾 State persists across batches with checkpointing")
-    print("   - 🚀 This is production-grade transformWithState!")
+    print("   - 🚀 This is real transformWithState in action!")
     print(f"   - 📁 Checkpoint: {checkpoint_dir}")
     print("\n⏹️  Press Ctrl+C to stop when you've learned enough!")
     
@@ -173,7 +172,7 @@ def run_learning_demo(spark: SparkSession) -> None:
     except KeyboardInterrupt:
         print("\n🛑 Stopping demo...")
         query.stop()
-        print("✅ Demo complete! You've mastered transformWithState on Databricks.")
+        print("✅ Demo complete! You've mastered transformWithState basics.")
         print(f"📁 Checkpoint preserved at: {checkpoint_dir}")
     finally:
         # Ensure clean shutdown
@@ -193,7 +192,7 @@ def explain_basics() -> None:
         None
     """
     print("\n" + "📚" + "="*60)
-    print("TRANSFORM WITH STATE ON DATABRICKS")
+    print("TRANSFORM WITH STATE LEARNING")
     print("="*60)
     print("""
 🎯 THE BIG IDEA:
@@ -227,19 +226,19 @@ def explain_basics() -> None:
    4. Write the new state back to the notebook
    5. The notebook persists for the next batch!
 
-🏗️ DATABRICKS ADVANTAGES:
-   - 🗄️  RocksDB state store (production-grade)
-   - 📁 DBFS checkpointing (fault tolerance)
-   - 🚀 Auto-scaling clusters (performance)
-   - 💾 Multi-column family support (advanced features)
-   - 🔧 Managed infrastructure (no setup headaches)
+🏗️ LEARNING SETUP ADVANTAGES:
+   - 🗄️  RocksDB state store (reliable and fast)
+   - 📁 Local checkpointing (fault tolerance)
+   - 🚀 Simple configuration (easy to understand)
+   - 💾 JSON serialization (avoids complexity)
+   - 🔧 Clean infrastructure (focus on concepts)
 
 ⚙️ THE API:
    - transformWithState gives you full control
    - StatefulProcessor handles the state logic
    - You decide what to store and how to update it
-   - Databricks makes it production-ready!
+   - RocksDB makes it reliable for learning!
 """)
     print("="*60)
-    print("🚀 READY TO SEE IT ON DATABRICKS!")
+    print("🚀 READY TO SEE IT IN ACTION!")
     print("="*60)
