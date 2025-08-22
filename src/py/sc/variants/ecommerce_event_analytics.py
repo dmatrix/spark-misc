@@ -4,15 +4,33 @@ E-commerce Event Analytics with Spark 4.0 Variant Data Type
 
 This use case demonstrates processing heterogeneous e-commerce user events
 with different schemas using the Variant data type for flexible analytics.
+
+Key Features:
+- 3 event types: purchase (with nested payment data), search, wishlist
+- Realistic user behavior patterns with temporal weighting
+- CTE-optimized queries eliminating window function warnings
+- Cross-event user behavior analysis
+- Uses shared data_utility module
+
+Performance Optimizations:
+- CTE-based percentage calculations instead of window functions
+- Maintains distributed processing across Spark partitions
+- Optimized aggregation patterns for event data
+
+Data Structure:
+- Purchase events: total_amount, customer_type, nested payment info (method, processor, card_type)
+- Search events: search_query, results_count, results_clicked
+- Wishlist events: product_id, action, product_price
+
+Demonstrates Variant's ability to handle mixed event schemas in a single table
+while maintaining query performance and schema flexibility.
+
+Authors: Jules S. Damji & Cursor AI
 """
 
-import json
-import random
-from datetime import datetime, timedelta
-from pyspark.sql import SparkSession
-
 import time
-import uuid
+from pyspark.sql import SparkSession
+from data_utility import generate_ecommerce_data
 
 def create_spark_session():
     """Create Spark session with Variant support"""
@@ -22,138 +40,7 @@ def create_spark_session():
         .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
         .getOrCreate()
 
-# Product catalogs for realistic data
-CATEGORIES = ["electronics", "clothing", "books", "home", "sports", "toys", "beauty", "automotive"]
-BRANDS = ["TechCorp", "StyleBrand", "ReadMore", "HomeComfort", "SportMax", "FunToys", "GlowBeauty", "AutoPro"]
-PAYMENT_METHODS = ["credit_card", "debit_card", "paypal", "apple_pay", "google_pay", "bank_transfer"]
-SHIPPING_METHODS = ["standard", "express", "overnight", "pickup"]
-CITIES = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego"]
-STATES = ["NY", "CA", "IL", "TX", "AZ", "PA", "TX", "CA"]
-DISCOUNT_CODES = ["SAVE10", "WELCOME20", "FLASH15", "MEMBER5", "NEWUSER25", "LOYAL30"]
 
-
-
-def generate_purchase_event(user_id, timestamp):
-    """Generate purchase event data (simplified with nested payment)"""
-    # Use timestamp for deterministic amount based on time of day (higher during peak hours)
-    hour = timestamp.hour
-    peak_multiplier = 1.5 if 10 <= hour <= 22 else 1.0  # Higher amounts during business hours
-    base_amount = random.uniform(50.0, 1500.0) * peak_multiplier
-    total_amount = round(base_amount, 2)
-    
-    # Use user_id for consistent customer type (same user tends to have same type)
-    user_hash = hash(user_id) % 4
-    customer_types = ["new", "returning", "vip", "premium"]
-    
-    return {
-        "total_amount": total_amount,
-        "customer_type": customer_types[user_hash],
-        "payment": {
-            "method": random.choice(PAYMENT_METHODS),
-            "processor": random.choice(["stripe", "paypal", "square", "braintree"]),
-            "card_type": random.choice(["visa", "mastercard", "amex", "discover"])
-        }
-    }
-
-def generate_search_event(user_id, timestamp):
-    """Generate search event data (simplified)"""
-    search_terms = [
-        "wireless headphones", "running shoes", "laptop", "coffee maker", "yoga mat",
-        "smartphone case", "bluetooth speaker", "winter jacket", "desk chair", "water bottle"
-    ]
-    
-    # Use user_id for consistent search behavior (same user tends to search similar terms)
-    user_hash = hash(user_id) % len(search_terms)
-    base_term = search_terms[user_hash]
-    search_query = random.choice([base_term] * 3 + search_terms)  # 75% chance of user's preferred term
-    
-    # Use timestamp for realistic search patterns (more results during peak hours)
-    hour = timestamp.hour
-    peak_multiplier = 2.0 if 9 <= hour <= 17 else 1.0  # More results during business hours
-    results_count = int(random.randint(50, 500) * peak_multiplier)
-    
-    return {
-        "search_query": search_query,
-        "results_count": results_count,
-        "results_clicked": random.randint(0, min(10, results_count // 50))
-    }
-
-def generate_wishlist_event(user_id, timestamp):
-    """Generate wishlist event data (simplified)"""
-    # Use user_id for consistent product preferences (same user interacts with similar price ranges)
-    user_hash = hash(user_id) % 3
-    price_ranges = [(25.99, 150.0), (100.0, 400.0), (300.0, 799.99)]  # budget, mid, premium users
-    min_price, max_price = price_ranges[user_hash]
-    
-    # Use timestamp for realistic action patterns (more 'add' during evenings)
-    hour = timestamp.hour
-    if 18 <= hour <= 23:  # Evening hours - more wishlist additions
-        actions = ["add"] * 4 + ["remove", "move_to_cart"]
-    elif 9 <= hour <= 17:  # Business hours - more conversions
-        actions = ["add", "remove"] + ["move_to_cart"] * 3
-    else:  # Off hours - more removals/cleanup
-        actions = ["add", "move_to_cart"] + ["remove"] * 3
-    
-    return {
-        "product_id": f"p{random.randint(1000, 9999)}",
-        "action": random.choice(actions),
-        "product_price": round(random.uniform(min_price, max_price), 2)
-    }
-
-def generate_fake_ecommerce_data(num_records=75000):
-    """Generate large dataset of e-commerce events"""
-    print(f"Generating {num_records} e-commerce event records...")
-    
-    event_types = [
-        ("purchase", generate_purchase_event, 0.4),   # 40% of events
-        ("search", generate_search_event, 0.35),      # 35% of events
-        ("wishlist", generate_wishlist_event, 0.25)   # 25% of events
-    ]
-    
-    # Create weighted list for realistic distribution
-    weighted_events = []
-    for event_type, generator, weight in event_types:
-        weighted_events.extend([(event_type, generator)] * int(weight * 100))
-    
-    data = []
-    start_time = datetime(2024, 1, 1, 0, 0, 0)
-    
-    # Generate users for consistency
-    users = [f"user_{i:06d}" for i in range(1, 10001)]  # 10,000 users
-    
-    for i in range(num_records):
-        # Generate timestamp with realistic patterns (more activity during day)
-        hour_weight = random.choices(
-            range(24), 
-            weights=[2, 1, 1, 1, 2, 3, 5, 8, 10, 12, 15, 16, 16, 15, 14, 16, 18, 16, 12, 8, 6, 4, 3, 2]
-        )[0]
-        
-        timestamp = start_time + timedelta(
-            days=random.randint(0, 30),
-            hours=hour_weight,
-            minutes=random.randint(0, 59),
-            seconds=random.randint(0, 59)
-        )
-        
-        # Select event type and user
-        event_type, generator_func = random.choice(weighted_events)
-        user_id = random.choice(users)
-        
-        # Generate event data
-        event_data = generator_func(user_id, timestamp)
-        
-        data.append({
-            "event_id": f"evt_{uuid.uuid4().hex[:12]}",
-            "user_id": user_id,
-            "event_type": event_type,
-            "timestamp": timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-            "event_data_json": json.dumps(event_data)
-        })
-        
-        if (i + 1) % 15000 == 0:
-            print(f"Generated {i + 1} records...")
-    
-    return data
 
 def run_ecommerce_analysis():
     """Run the e-commerce event analytics"""
@@ -166,7 +53,7 @@ def run_ecommerce_analysis():
     try:
         # Generate fake data
         start_time = time.time()
-        fake_data = generate_fake_ecommerce_data(75000)
+        fake_data = generate_ecommerce_data(75000)
         print(f"Data generation completed in {time.time() - start_time:.2f} seconds")
         
         # Create DataFrame
@@ -196,14 +83,25 @@ def run_ecommerce_analysis():
         print("="*50)
         
         event_overview = spark.sql("""
+            WITH event_totals AS (
+                SELECT 
+                    event_type,
+                    COUNT(*) as event_count,
+                    COUNT(DISTINCT user_id) as unique_users
+                FROM user_events
+                GROUP BY event_type
+            ),
+            total_events AS (
+                SELECT SUM(event_count) as total_count FROM event_totals
+            )
             SELECT 
-                event_type,
-                COUNT(*) as event_count,
-                COUNT(DISTINCT user_id) as unique_users,
-                ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
-            FROM user_events
-            GROUP BY event_type
-            ORDER BY event_count DESC
+                et.event_type,
+                et.event_count,
+                et.unique_users,
+                ROUND(et.event_count * 100.0 / te.total_count, 2) as percentage
+            FROM event_totals et
+            CROSS JOIN total_events te
+            ORDER BY et.event_count DESC
         """)
         
         print("Event Distribution:")

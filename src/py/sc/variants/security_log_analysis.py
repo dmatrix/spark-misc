@@ -3,18 +3,41 @@ Security Log Analysis with Spark 4.0 Variant Data Type
 ======================================================
 
 This use case demonstrates processing heterogeneous security logs from various
-security tools (EDR, SIEM, Firewall, IDS) using the Variant data type for 
+security tools (Firewall, Antivirus/EDR, IDS) using the Variant data type for 
 flexible threat detection and analysis.
+
+Key Features:
+- 3 security systems: firewall (with nested geo-location), antivirus, IDS
+- Realistic threat patterns with severity assignment
+- CTE-optimized queries for performance and clarity
+- Cross-system threat correlation analysis
+- Uses shared data_utility module
+
+Performance Optimizations:
+- CTE-based event distribution calculations
+- Eliminates window function warnings and single-partition processing
+- Optimized for security event processing
+
+Data Structure:
+- Firewall events: source_ip, action, nested geo_location (source_country, dest_country, confidence)
+- Antivirus events: threat_type, action_taken, detection_score
+- IDS events: attack_type, source_ip, user_agent
+
+Security Analytics:
+- Geographic threat distribution analysis
+- Multi-system threat correlation
+- Severity-based event classification
+- Cross-system IP intelligence gathering
+
+Demonstrates Variant's capability to unify diverse security log formats
+while enabling threat detection and analysis workflows.
+
+Authors: Jules S. Damji & Cursor AI
 """
 
-import json
-import random
-from datetime import datetime, timedelta
-from pyspark.sql import SparkSession
-
 import time
-import hashlib
-import ipaddress
+from pyspark.sql import SparkSession
+from data_utility import generate_security_data
 
 def create_spark_session():
     """Create Spark session with Variant support"""
@@ -24,166 +47,7 @@ def create_spark_session():
         .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
         .getOrCreate()
 
-# Security data constants
-THREAT_TYPES = ["malware", "ransomware", "trojan", "virus", "adware", "spyware", "rootkit", "worm"]
-FILE_EXTENSIONS = [".exe", ".dll", ".bat", ".ps1", ".vbs", ".js", ".jar", ".scr", ".com"]
-ATTACK_TYPES = ["sql_injection", "xss", "csrf", "buffer_overflow", "directory_traversal", "command_injection", "ldap_injection"]
-COUNTRIES = ["US", "CN", "RU", "BR", "IN", "DE", "FR", "GB", "CA", "AU", "Unknown"]
-USER_AGENTS = [
-    "Chrome/91.0.4472.124",
-    "Firefox/89.0",
-    "Safari/14.1.1"
-]
-PROTOCOLS = ["TCP", "UDP", "ICMP", "HTTP", "HTTPS", "SSH", "FTP", "SMTP", "DNS"]
-ACTION_TAKEN = ["quarantined", "deleted", "blocked", "allowed", "monitored", "flagged"]
 
-def generate_random_ip():
-    """Generate random IP address"""
-    return str(ipaddress.IPv4Address(random.randint(1, 4294967294)))
-
-def generate_file_hash():
-    """Generate realistic file hash"""
-    random_string = f"file_{random.randint(100000, 999999)}"
-    return {
-        "md5": hashlib.md5(random_string.encode()).hexdigest(),
-        "sha256": hashlib.sha256(random_string.encode()).hexdigest(),
-        "sha1": hashlib.sha1(random_string.encode()).hexdigest()[:40]
-    }
-
-def generate_antivirus_event(event_id, timestamp):
-    """Generate antivirus/EDR security event (simplified)"""
-    return {
-        "threat_type": random.choice(THREAT_TYPES),
-        "action_taken": random.choice(ACTION_TAKEN),
-        "detection_score": round(random.uniform(0.1, 1.0), 3)
-    }
-
-def generate_firewall_event(event_id, timestamp):
-    """Generate firewall security event (simplified with nested geo_location)"""
-    return {
-        "source_ip": generate_random_ip(),
-        "action": random.choice(["blocked", "allowed", "dropped"]),
-        "geo_location": {
-            "source_country": random.choice(COUNTRIES),
-            "dest_country": "US",
-            "confidence": round(random.uniform(0.6, 1.0), 2)
-        }
-    }
-
-def generate_ids_event(event_id, timestamp):
-    """Generate IDS/IPS security event (simplified)"""
-    attack_type = random.choice(ATTACK_TYPES)
-    return {
-        "attack_type": attack_type,
-        "source_ip": generate_random_ip(),
-        "user_agent": random.choice(USER_AGENTS)
-    }
-
-def self_generate_attack_payload(attack_type):
-    """Generate realistic attack payloads"""
-    payloads = {
-        "sql_injection": [
-            "1' OR '1'='1", "'; DROP TABLE users; --", "UNION SELECT * FROM passwords",
-            "1' AND 1=1 --", "' OR 1=1 LIMIT 1 --"
-        ],
-        "xss": [
-            "<script>alert('XSS')</script>", "javascript:alert('XSS')",
-            "<img src=x onerror=alert('XSS')>", "<svg onload=alert('XSS')>"
-        ],
-        "command_injection": [
-            "; cat /etc/passwd", "| whoami", "&& ls -la", "; rm -rf /"
-        ],
-        "directory_traversal": [
-            "../../../etc/passwd", "..\\..\\..\\windows\\system32\\config\\sam",
-            "....//....//....//etc/passwd"
-        ]
-    }
-    return random.choice(payloads.get(attack_type, ["malicious_payload"]))
-
-
-
-def generate_fake_security_data(num_records=60000):
-    """Generate large dataset of security events"""
-    print(f"Generating {num_records} security event records...")
-    
-    event_types = [
-        ("firewall", generate_firewall_event, 0.4),     # 40% of events
-        ("antivirus", generate_antivirus_event, 0.35),  # 35% of events
-        ("ids", generate_ids_event, 0.25)               # 25% of events
-    ]
-    
-    # Create weighted list for realistic distribution
-    weighted_events = []
-    for event_type, generator, weight in event_types:
-        weighted_events.extend([(event_type, generator)] * int(weight * 100))
-    
-    data = []
-    start_time = datetime(2024, 1, 1, 0, 0, 0)
-    
-    for i in range(num_records):
-        # Generate timestamp with realistic patterns (more attacks during certain hours)
-        hour_weight = random.choices(
-            range(24), 
-            weights=[3, 2, 1, 1, 2, 3, 5, 8, 10, 12, 15, 16, 16, 15, 14, 16, 18, 16, 12, 8, 6, 4, 3, 2]
-        )[0]
-        
-        timestamp = start_time + timedelta(
-            days=random.randint(0, 30),
-            hours=hour_weight,
-            minutes=random.randint(0, 59),
-            seconds=random.randint(0, 59)
-        )
-        
-        # Select event type
-        event_type, generator_func = random.choice(weighted_events)
-        
-        # Generate event data
-        event_data = generator_func(f"evt_{i:06d}", timestamp)
-        
-        # Assign severity based on event type and content
-        severity = assign_severity(event_type, event_data)
-        
-        data.append({
-            "event_id": f"sec_{i:08d}",
-            "source_system": event_type,
-            "severity": severity,
-            "timestamp": timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-            "event_details_json": json.dumps(event_data)
-        })
-        
-        if (i + 1) % 12000 == 0:
-            print(f"Generated {i + 1} records...")
-    
-    return data
-
-def assign_severity(event_type, event_data):
-    """Assign severity based on event type and data"""
-    if event_type == "antivirus":
-        if event_data.get("threat_type") in ["ransomware", "rootkit"]:
-            return "critical"
-        elif event_data.get("detection_score", 0) > 0.8:
-            return "high"
-        else:
-            return "medium"
-    elif event_type == "firewall":
-        if event_data.get("geo_location", {}).get("is_tor") or event_data.get("geo_location", {}).get("source_country") in ["CN", "RU"]:
-            return "high"
-        elif event_data.get("action") == "blocked":
-            return "medium"
-        else:
-            return "low"
-    elif event_type == "ids":
-        rule_count = len(event_data.get("detection_rules", []))
-        if rule_count > 2 or event_data.get("attack_type") in ["sql_injection", "command_injection"]:
-            return "critical"
-        elif rule_count > 1:
-            return "high"
-        else:
-            return "medium"
-    elif event_type == "siem_correlation":
-        return event_data.get("risk_level", "medium")
-    
-    return "medium"
 
 def run_security_analysis():
     """Run the security log analysis"""
@@ -196,7 +60,7 @@ def run_security_analysis():
     try:
         # Generate fake data
         start_time = time.time()
-        fake_data = generate_fake_security_data(60000)
+        fake_data = generate_security_data(60000)
         print(f"Data generation completed in {time.time() - start_time:.2f} seconds")
         
         # Create DataFrame
@@ -226,15 +90,26 @@ def run_security_analysis():
         print("="*50)
         
         event_overview = spark.sql("""
+            WITH event_totals AS (
+                SELECT 
+                    source_system,
+                    severity,
+                    COUNT(*) as event_count
+                FROM security_events
+                GROUP BY source_system, severity
+            ),
+            total_events AS (
+                SELECT SUM(event_count) as total_count FROM event_totals
+            )
             SELECT 
-                source_system,
-                severity,
-                COUNT(*) as event_count,
-                ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
-            FROM security_events
-            GROUP BY source_system, severity
-            ORDER BY source_system, 
-                     CASE severity 
+                et.source_system,
+                et.severity,
+                et.event_count,
+                ROUND(et.event_count * 100.0 / te.total_count, 2) as percentage
+            FROM event_totals et
+            CROSS JOIN total_events te
+            ORDER BY et.source_system, 
+                     CASE et.severity 
                          WHEN 'critical' THEN 1 
                          WHEN 'high' THEN 2 
                          WHEN 'medium' THEN 3 
