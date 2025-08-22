@@ -1,43 +1,236 @@
-# Apache Spark 4.0 Variant Data Type Use Cases
+# Apache Spark 4.0 Variant Data Type Tutorial
 
-This repository demonstrates three comprehensive use cases for the new **Variant data type** in Apache Spark 4.0, showcasing how it handles semi-structured data with superior flexibility and performance compared to traditional JSON string processing.
+**Learn to Create, Process, and Analyze Semi-Structured Data with Variant**
 
-## 🚀 What is the Variant Data Type?
+This comprehensive tutorial teaches you how to work with Apache Spark 4.0's **Variant data type** through three real-world use cases. You'll learn both **PySpark DataFrame** and **SQL** approaches for handling semi-structured JSON data efficiently.
 
-The Variant data type in Apache Spark 4.0 is designed for efficient storage and processing of semi-structured data like JSON. Key benefits include:
+## What You'll Learn
 
-- **1.5-3x faster performance** compared to JSON string processing
-- **No schema enforcement** - handle evolving data structures naturally
-- **Direct SQL querying** of nested fields without parsing overhead
-- **Efficient binary encoding** for optimized storage and retrieval
-- **Open source standard** - no vendor lock-in
+This tutorial covers everything you need to master Variant data type:
 
-## 📁 Files Overview
+### 📚 **Core Concepts**
+- What is the Variant data type and when to use it
+- Converting JSON strings to Variant format
+- Querying nested data with `VARIANT_GET()`
+- Schema flexibility for evolving data structures
 
-| File | Description | Dataset Size |
-|------|-------------|--------------|
-| `iot_sensor_processing.py` | **10 critical offshore oil rig sensors**: pressure, flow, gas detection, temperature, vibration, position, weather, level, current, oil spill detection | 50,000 records |
-| `ecommerce_event_analytics.py` | E-commerce user behavior events | 75,000 records |
-| `security_log_analysis.py` | Security logs from EDR, Firewall, IDS, SIEM | 60,000 records |
-| `performance_benchmark.py` | **Comprehensive performance benchmark** comparing Variant vs JSON string processing with 1.5-3x performance improvements | 100,000 records |
-| `run_variant_usecase.py` | Main runner script for all use cases | - |
+### 🛠️ **Practical Skills**
+- **SQL Approach**: Writing Variant queries with Spark SQL
+- **DataFrame Approach**: Using PySpark DataFrame operations
+- **Data Creation**: Generating realistic semi-structured data
+- **Performance**: Optimizing queries with CTEs
 
-### 🛢️ Offshore Oil Rig - 10 Critical Sensors (Simplified)
+### 🎯 **Real-World Applications**
+- **Oil Rig IoT**: Sensor data with 10 different measurement types
+- **E-commerce**: User events with nested payment structures  
+- **Security Logs**: Multi-system events with geo-location data
 
-The oil rig use case focuses on the **10 most important sensors** with **3 key measurements each** for safe and efficient offshore drilling operations:
+## Architecture
 
-1. **Pressure Sensors** - `wellhead_pressure`, `drilling_pressure`, `mud_pump_pressure` (PSI)
-2. **Flow Meters** - `mud_flow_rate` (gpm), `oil_flow_rate` (bph), `gas_flow_rate` (cfh)
-3. **Gas Detection** - `h2s_concentration` (ppm), `methane_concentration` (ppm), `oxygen_level` (%)
-4. **Temperature Sensors** - `equipment_temperature`, `ambient_temperature`, `sea_water_temperature` (°C)
-5. **Vibration Sensors** - `overall_vibration`, `x_axis`, `y_axis` (mm/s RMS)
-6. **Position Sensors** - `drill_bit_depth` (m), `hook_load` (tons), `rotary_position` (degrees)
-7. **Weather Sensors** - `wind_speed` (knots), `wave_height` (m), `barometric_pressure` (mbar)
-8. **Level Sensors** - `fluid_level` (%), `volume` (liters), `tank_type` (category)
-9. **Current Sensors** - `current_speed` (knots), `current_direction` (degrees), `water_temperature` (°C)
-10. **Oil Spill Detection** - `oil_detected` (boolean), `spill_thickness` (mm), `detection_confidence` (0-1)
+This project follows a modular architecture:
 
-**Simplified Design**: Each sensor type now has exactly **3 core measurements** for cleaner analytics and easier blog content demonstrations.
+```
+variants/
+├── data_utility.py              # Shared data generation utilities (442 lines)
+├── iot_sensor_processing.py     # Oil rig sensor analytics (200 lines)
+├── ecommerce_event_analytics.py # E-commerce event analytics (230 lines)
+├── security_log_analysis.py     # Security log analytics (238 lines)
+├── sample_data_generator.py     # Configurable data generator (193 lines)
+├── sql_to_dataframe_example.py  # SQL to DataFrame conversion guide
+
+├── run_variant_usecase.py       # Main test runner
+└── test_environment.py          # Environment validation
+```
+
+### Shared Data Utility Module
+
+The `data_utility.py` module centralizes all data generation logic:
+
+- Common constants (threat types, payment methods, countries, etc.)
+- Helper functions (IP generation, file hashing, timestamp patterns)
+- Oil rig generators (10 sensor types with 3 measurements each)
+- E-commerce generators (purchase, search, wishlist events)
+- Security generators (firewall, antivirus, IDS events)
+- Bulk data generation functions for all use cases
+- Comprehensive oil rig data (all 10 sensors in single JSON record)
+
+## Tutorial Structure
+
+| Tutorial Module | File | Learning Focus | Dataset Size | Key Techniques |
+|-----------------|------|----------------|--------------|----------------|
+| **Module 1: IoT Sensors** | `iot_sensor_processing.py` | Basic Variant operations with 10 sensor types | 50,000 records | `VARIANT_GET()`, aggregations, filtering |
+| **Module 2: E-commerce** | `ecommerce_event_analytics.py` | Nested data structures and user analytics | 75,000 records | Nested JSON, payment data, CTEs |
+| **Module 3: Security** | `security_log_analysis.py` | Multi-source data correlation | 60,000 records | Geographic data, cross-system analysis |
+| **Module 4: SQL ↔ DataFrame** | `sql_to_dataframe_example.py` | Converting between SQL and DataFrame APIs | 10 records | `expr()`, `agg()`, step-by-step patterns |
+
+
+## Tutorial Modules
+
+### 📊 Module 1: IoT Sensor Data (Beginner)
+
+**Learning Goal**: Master basic Variant operations with structured sensor data
+
+**What You'll Practice**:
+
+- **Creating Variant DataFrames** from JSON strings
+- **Basic VARIANT_GET()** syntax for field extraction
+- **Aggregations** (AVG, COUNT) on Variant fields
+- **Filtering** records based on Variant data
+
+**Key SQL Patterns**:
+```sql
+-- Convert JSON to Variant
+SELECT PARSE_JSON(sensor_data_json) as sensor_data FROM sensors
+
+-- Extract nested values
+SELECT VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double') as pressure
+FROM oil_rig_sensors
+
+-- Aggregate Variant data
+SELECT AVG(VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double')) as avg_pressure
+FROM oil_rig_sensors WHERE sensor_type = 'pressure'
+```
+
+**Key DataFrame Patterns**:
+```python
+# Convert to Variant
+df_variant = df.select("*", parse_json("sensor_data_json").alias("sensor_data"))
+
+# Extract and aggregate
+df_result = df_variant.agg(
+    expr("AVG(VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double'))").alias('avg_pressure')
+)
+```
+
+### 🛒 Module 2: E-commerce Events (Intermediate)
+
+**Learning Goal**: Handle complex nested JSON structures and user behavior analytics
+
+**What You'll Practice**:
+
+- **Deeply nested JSON** with payment structures
+- **CTE (Common Table Expression)** optimizations
+- **Cross-event analysis** and user segmentation
+- **Multiple data types** in single Variant column
+
+**Key SQL Patterns**:
+```sql
+-- Access nested payment data
+SELECT 
+    VARIANT_GET(event_data, '$.payment.method', 'string') as payment_method,
+    VARIANT_GET(event_data, '$.payment.card_type', 'string') as card_type,
+    VARIANT_GET(event_data, '$.total_amount', 'double') as amount
+FROM ecommerce_events WHERE event_type = 'purchase'
+
+-- CTE for percentage calculations (avoiding window functions)
+WITH event_totals AS (
+    SELECT event_type, COUNT(*) as event_count
+    FROM user_events GROUP BY event_type
+),
+total_events AS (
+    SELECT SUM(event_count) as total_count FROM event_totals
+)
+SELECT et.event_type, 
+       ROUND(et.event_count * 100.0 / te.total_count, 2) as percentage
+FROM event_totals et CROSS JOIN total_events te
+```
+
+**Key DataFrame Patterns**:
+```python
+# Extract nested payment info
+df_payments = df_variant.select(
+    expr("VARIANT_GET(event_data, '$.payment.method', 'string')").alias('method'),
+    expr("VARIANT_GET(event_data, '$.total_amount', 'double')").alias('amount')
+).filter(col('method').isNotNull())
+
+# User behavior analysis
+df_user_stats = df_variant.groupBy('user_id').agg(
+    count('*').alias('total_events'),
+    sum(expr("VARIANT_GET(event_data, '$.total_amount', 'double')")).alias('total_spent')
+)
+```
+
+### 🔒 Module 3: Security Logs (Advanced)
+
+**Learning Goal**: Master multi-source data correlation and geographic analysis
+
+**What You'll Practice**:
+
+- **Heterogeneous data sources** (Firewall, Antivirus, IDS)
+- **Geographic data analysis** with nested coordinates
+- **Cross-system correlation** and threat intelligence
+- **Advanced filtering** and threat classification
+
+**Key SQL Patterns**:
+```sql
+-- Geographic threat analysis
+SELECT 
+    VARIANT_GET(event_details, '$.geo_location.source_country', 'string') as country,
+    COUNT(*) as attack_count,
+    COUNT(DISTINCT VARIANT_GET(event_details, '$.source_ip', 'string')) as unique_ips
+FROM security_events 
+WHERE source_system = 'firewall'
+GROUP BY VARIANT_GET(event_details, '$.geo_location.source_country', 'string')
+ORDER BY attack_count DESC
+
+-- Multi-system threat correlation
+SELECT source_ip, COUNT(DISTINCT source_system) as systems_triggered
+FROM (
+    SELECT VARIANT_GET(event_details, '$.source_ip', 'string') as source_ip, source_system
+    FROM security_events 
+    WHERE VARIANT_GET(event_details, '$.source_ip', 'string') IS NOT NULL
+) GROUP BY source_ip HAVING COUNT(DISTINCT source_system) > 1
+```
+
+**Key DataFrame Patterns**:
+```python
+# Geographic analysis
+df_geo = df_variant.select(
+    expr("VARIANT_GET(event_details, '$.geo_location.source_country', 'string')").alias('country'),
+    expr("VARIANT_GET(event_details, '$.source_ip', 'string')").alias('source_ip')
+).filter(col('country').isNotNull())
+
+df_country_stats = df_geo.groupBy('country').agg(
+    count('*').alias('attack_count'),
+    countDistinct('source_ip').alias('unique_ips')
+).orderBy(desc('attack_count'))
+```
+
+### 🔄 Module 4: SQL ↔ DataFrame Conversion (Expert)
+
+**Learning Goal**: Master converting between SQL and DataFrame approaches
+
+**What You'll Practice**:
+
+- **Three conversion methods**: Direct translation, aggregation-focused, step-by-step
+- **Performance considerations** for each approach
+- **When to use SQL vs DataFrame** APIs
+- **Complex query optimization** techniques
+
+**Example Conversion**:
+```sql
+-- Original SQL
+SELECT AVG(VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double')) as avg_pressure,
+       COUNT(*) as reading_count
+FROM oil_rig_sensors WHERE sensor_type = 'pressure'
+```
+
+**Method 1: Direct Translation**
+```python
+df_result = df_variant.filter(col('sensor_type') == 'pressure').agg(
+    expr("AVG(VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double'))").alias('avg_pressure'),
+    count('*').alias('reading_count')
+)
+```
+
+**Method 2: Step-by-Step**
+```python
+# Extract first, then aggregate
+df_extracted = df_variant.filter(col('sensor_type') == 'pressure').select(
+    expr("VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double')").alias('pressure')
+)
+df_result = df_extracted.agg(avg('pressure').alias('avg_pressure'), count('*').alias('reading_count'))
+```
 
 ## 🛠 Prerequisites
 
@@ -46,317 +239,258 @@ The oil rig use case focuses on the **10 most important sensors** with **3 key m
 - **PySpark** compatible with Spark 4.0
 - Sufficient memory for processing large datasets (recommend 8GB+ RAM)
 
-## 🏃‍♂️ Quick Start
+## 🚀 Tutorial Quick Start
 
-### Install Dependencies
+### Step 1: Verify Your Environment
 ```bash
-# Install PySpark 4.0 (when available)
-pip install pyspark>=4.0.0
-
-# For preview/development versions:
-pip install pyspark==4.0.0.dev0
+# Test Spark 4.0 and Variant support
+python test_environment.py
 ```
 
-### Run All Use Cases
+### Step 2: Start with Module 1 (Beginner)
 ```bash
-python run_variant_usecase.py
-```
-
-### Run Individual Use Cases
-```bash
-# Offshore Oil Rig Sensor Processing
+# Learn basic Variant operations with IoT sensor data
 python run_variant_usecase.py iot
+```
+**What you'll see**: Basic `VARIANT_GET()` operations, aggregations, and 10 different sensor types
 
-# E-commerce Event Analytics
+### Step 3: Progress to Module 2 (Intermediate)  
+```bash
+# Master nested JSON and CTE optimizations
 python run_variant_usecase.py ecommerce
+```
+**What you'll see**: Complex nested payment data, user behavior analysis, CTE patterns
 
-# Security Log Analysis
+### Step 4: Advance to Module 3 (Advanced)
+```bash
+# Handle multi-source data correlation
 python run_variant_usecase.py security
-
-# Performance Benchmark
-python run_variant_usecase.py benchmark
-
-# Show help information
-python run_variant_usecase.py --help
-
-# Show detailed use case information
-python run_variant_usecase.py --info
 ```
+**What you'll see**: Geographic analysis, cross-system correlation, threat intelligence
 
-### Run Individual Files Directly
+### Step 5: Master SQL ↔ DataFrame Conversion
 ```bash
-python iot_sensor_processing.py
-python ecommerce_event_analytics.py
-python security_log_analysis.py
-
-# Run performance benchmark to prove performance improvements
-python performance_benchmark.py
+# Learn three conversion methods
+python sql_to_dataframe_example.py
 ```
+**What you'll see**: Side-by-side SQL and DataFrame code with performance comparisons
 
-## 📋 Complete Usage Guide
-
-The `run_variant_usecase.py` script provides a comprehensive interface for running and exploring the Variant data type demonstrations:
-
-### Command Line Options
-
+### Step 6: Run Complete Tutorial
 ```bash
-# Show help and available options
-python run_variant_usecase.py --help
-
-# Output:
-# usage: run_variant_usecase.py [-h] [--info] [{iot,ecommerce,security,benchmark,all}]
-# 
-# Apache Spark 4.0 Variant Data Type Use Cases
-# 
-# positional arguments:
-#   {iot,ecommerce,security,benchmark,all}  Use case to run: iot, ecommerce, security, benchmark, or all (default: all)
-# 
-# options:
-#   -h, --help            show this help message and exit
-#   --info                Show detailed information about all use cases
-```
-
-### Detailed Information
-
-```bash
-# Show comprehensive details about all use cases
-python run_variant_usecase.py --info
-
-# This displays:
-# - Complete descriptions of each use case
-# - Dataset sizes and key features
-# - Benefits of the Variant data type
-```
-
-### Execution Examples
-
-```bash
-# Default: Run all use cases sequentially
-python run_variant_usecase.py
-# or explicitly:
+# Execute all modules in sequence
 python run_variant_usecase.py all
-
-# Run specific use cases by name
-python run_variant_usecase.py iot         # ~7-8 seconds execution
-python run_variant_usecase.py ecommerce   # ~9-10 seconds execution  
-python run_variant_usecase.py security    # ~9-10 seconds execution
-python run_variant_usecase.py benchmark   # ~15-20 seconds execution
 ```
 
-### Expected Output Structure
+### 4. Generate Sample Data
+```bash
+# Generate 1 comprehensive record each (default)
+python sample_data_generator.py
 
-Each use case provides:
-- **Dependency verification**: Checks PySpark 4.0 and Variant support
-- **Data generation timing**: Synthetic data creation performance
-- **Multiple analytics**: 5-7 different analysis queries per use case
-- **Performance metrics**: Query execution times using Variant
-- **Dataset schema**: Shows the Variant column structure
-- **Summary statistics**: Key insights and record counts
+# Generate 100 comprehensive records each
+python sample_data_generator.py --count 100
 
-## 🔬 Use Case Details
+# Custom counts per use case
+python sample_data_generator.py --oil-rig 50 --ecommerce 75 --security 100
 
-### 1. Offshore Oil Rig Sensor Processing (`iot_sensor_processing.py`)
+# Save to custom directory
+python sample_data_generator.py --count 10 --output-dir ./sample_data
 
-**Scenario**: Offshore oil rig monitoring system collecting data from 10 critical sensor types for safe drilling operations.
+# Just show samples without saving
+python sample_data_generator.py --no-output --show-samples 5
+```
 
-**10 Critical Sensor Types** (3 key measurements each):
-- **Pressure sensors**: `wellhead_pressure`, `drilling_pressure`, `mud_pump_pressure`
-- **Flow meters**: `mud_flow_rate`, `oil_flow_rate`, `gas_flow_rate`
-- **Gas detection**: `h2s_concentration`, `methane_concentration`, `oxygen_level`
-- **Temperature sensors**: `equipment_temperature`, `ambient_temperature`, `sea_water_temperature`
-- **Vibration sensors**: `overall_vibration`, `x_axis`, `y_axis`
-- **Position sensors**: `drill_bit_depth`, `hook_load`, `rotary_position`
-- **Weather sensors**: `wind_speed`, `wave_height`, `barometric_pressure`
-- **Level sensors**: `fluid_level`, `volume`, `tank_type`
-- **Current sensors**: `current_speed`, `current_direction`, `water_temperature`
-- **Oil spill detection**: `oil_detected`, `spill_thickness`, `detection_confidence`
+**Note**: Oil rig data now generates **comprehensive records** containing all 10 sensor types in a single JSON structure, perfect for demonstrating Variant's nested data capabilities.
 
-**Key Analytics**:
-- Average pressure analysis across all wellhead, drilling, and mud pump systems
-- Average flow rate analysis for mud, oil, and gas production
-- Gas concentration safety analysis for H2S, methane, and oxygen levels
-- Weather and environmental monitoring of wind, waves, and barometric pressure
-- Multi-sensor operational summary with safety threshold analysis
+### 5. SQL to DataFrame Conversion
+```bash
+# Learn how to convert SQL queries to PySpark DataFrame operations
+python sql_to_dataframe_example.py
+```
 
-**Variant Benefits Demonstrated**:
-- Flexible schema for 10 different sensor types with varying data structures
-- Efficient VARIANT_GET queries for nested sensor data
-- Fast performance analysis across heterogeneous sensor readings
+## Performance Optimizations
 
-### 2. E-commerce Event Analytics (`ecommerce_event_analytics.py`)
+### CTE-Based Query Optimization
 
-**Scenario**: E-commerce platform tracking simplified user interaction events (3 key measurements each).
+All analytical queries use Common Table Expressions (CTEs) instead of window functions to eliminate Spark warnings:
 
-**3 Key Event Types** (simplified structure):
-- **Purchase events**: `total_amount`, `customer_type`, `payment` (nested - method, processor, card_type)
-- **Search events**: `search_query`, `results_count`, `results_clicked`
-- **Wishlist events**: `product_id`, `action`, `product_price`
-
-**Key Analytics**:
-- Event distribution overview across the three event types
-- Purchase behavior analysis by customer type and spending
-- Search behavior analysis with top queries and effectiveness
-- Wishlist behavior analysis by action type and product pricing
-- User behavior patterns with spending analysis
-- Payment method analysis demonstrating nested Variant structure
-- Performance demonstration with high-value purchase queries
-
-**Variant Benefits Demonstrated**:
-- Flexible handling of 3 different event schemas with varying complexity
-- **Nested payment structure** in purchase events shows Variant's nested data capabilities
-- Efficient aggregation across heterogeneous event types
-- Blog-ready simplified queries perfect for educational content
-
-### 3. Security Log Analysis (`security_log_analysis.py`)
-
-**Scenario**: Cybersecurity platform analyzing simplified logs from 3 key security systems (3 measurements each).
-
-**3 Key Security Sources** (simplified structure):
-- **Firewall events**: `source_ip`, `action`, `geo_location` (nested - source_country, dest_country, confidence)
-- **Antivirus events**: `threat_type`, `action_taken`, `detection_score`
-- **IDS events**: `attack_type`, `source_ip`, `user_agent`
-
-**Key Analytics**:
-- Security event overview by system and severity levels
-- Antivirus threat analysis by type and remediation action
-- Geographic threat distribution analysis demonstrating nested Variant structure
-- Firewall action analysis by blocked/allowed/dropped traffic
-- IDS attack type analysis by user agent patterns
-- Cross-system source IP correlation analysis
-- Security event severity distribution across all systems
-
-**User Agent Focus** (IDS Events):
-- **Chrome/91.0.4472.124**: Most common browser in attack traffic
-- **Firefox/89.0**: Second most frequent in intrusion attempts
-- **Safari/14.1.1**: Third most common in web-based attacks
-
-**Variant Benefits Demonstrated**:
-- Flexible handling of 3 different security log schemas with varying complexity
-- **Nested geo_location structure** in firewall events shows Variant's nested data capabilities
-- Efficient correlation across heterogeneous security event types
-- Blog-ready simplified queries perfect for security analytics tutorials
-
-## 📊 Performance Characteristics
-
-Each use case demonstrates the performance advantages of Variant:
-
-- **Data Generation**: 50-75K records in under 1 second
-- **Data Processing**: Complete analytics suite in 7-10 seconds per use case
-- **Query Performance**: Individual VARIANT_GET queries in 0.1-0.2 seconds
-- **Memory Efficiency**: Optimized binary encoding reduces memory footprint
-- **Schema Flexibility**: No predefined schemas needed for varying data structures
-
-### Actual Performance Metrics
-- **IoT (Oil Rig)**: 50K records, 7.5s total execution, 0.18s query time
-- **E-commerce**: 75K records, 9.1s total execution, 0.10s query time  
-- **Security**: 60K records, 9.5s total execution, 0.11s query time
-- **Performance Benchmark**: 100K records, comprehensive comparison tests
-
-## 📝 Short SQL Queries
-
-All SQL queries have been simplified for educational and blog content purposes:
-
-- **Concise**: 3-8 lines per query instead of complex CTEs
-- **Clear**: Single-purpose queries with obvious intent
-- **VARIANT-focused**: Direct demonstration of `VARIANT_GET()` syntax
-- **Practical**: Real-world scenarios with meaningful results
-
-### Example VARIANT Query
+**Before (caused warnings):**
 ```sql
--- Simple, clear Variant data access (simplified structure)
-SELECT 
-    AVG(VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double')) as avg_wellhead_pressure,
-    AVG(VARIANT_GET(sensor_data, '$.drilling_pressure', 'double')) as avg_drilling_pressure,
-    AVG(VARIANT_GET(sensor_data, '$.mud_pump_pressure', 'double')) as avg_mud_pump_pressure,
-    COUNT(*) as reading_count
-FROM oil_rig_sensors 
-WHERE sensor_type = 'pressure'
+SELECT event_type, COUNT(*) as count,
+       ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
+FROM events GROUP BY event_type
 ```
 
-## 🔍 Sample Output
-
-### IoT Sensor Analysis
+**After (optimized with CTEs):**
+```sql
+WITH event_totals AS (
+    SELECT event_type, COUNT(*) as event_count
+    FROM events GROUP BY event_type
+),
+total_events AS (
+    SELECT SUM(event_count) as total_count FROM event_totals
+)
+SELECT et.event_type, et.event_count,
+       ROUND(et.event_count * 100.0 / te.total_count, 2) as percentage
+FROM event_totals et CROSS JOIN total_events te
 ```
+
+**Benefits:**
+- Eliminates `WARN WindowExec` messages
+- Maintains Spark's parallel processing
+- Better performance on large datasets
+- More readable and maintainable code
+
+## Sample Output
+
+### Oil Rig Analytics
+```
+==================================================
 ANALYSIS 1: Pressure Monitoring Analytics
-Average Pressure Analysis Across All Sensors:
-+---------------------+---------------------+---------------------+-------------+
-|avg_wellhead_pressure|avg_drilling_pressure|avg_mud_pump_pressure|reading_count|
-+---------------------+---------------------+---------------------+-------------+
-|2261.39              |8440.13              |2990.71              |4906         |
-+---------------------+---------------------+---------------------+-------------+
+==================================================
++---------------------+---------------------+---------------------+
+|avg_wellhead_pressure|avg_drilling_pressure|avg_mud_pump_pressure|
++---------------------+---------------------+---------------------+
+|2244.5393975663274   |8503.662278077       |3022.542389786555    |
++---------------------+---------------------+---------------------+
+
+Critical operational insights from 10 sensor types:
+- High pressure readings: 2,130 (safety threshold exceeded)
+- Dangerous H2S levels: 2,515 (>10 ppm detected)
+- High wind conditions: 2,017 (>30 knots)
+- Oil spill detections: 1,251 (environmental alerts)
 ```
 
-### E-commerce Event Analysis
+### E-commerce Analytics
 ```
-ANALYSIS 1: Event Distribution Overview
-Event Distribution:
-+----------+-----------+------------+----------+
-|event_type|event_count|unique_users|percentage|
-+----------+-----------+------------+----------+
-|  purchase|      30141|        9543|     40.19|
-|    search|      26196|        9264|     34.93|
-|  wishlist|      18663|        8447|     24.88|
-+----------+-----------+------------+----------+
-```
-
-### Security Log Analysis
-```
-ANALYSIS 1: Security Event Overview
-Security Event Distribution by System and Severity:
-+-------------+--------+-----------+----------+
-|source_system|severity|event_count|percentage|
-+-------------+--------+-----------+----------+
-|antivirus    |critical|5233       |8.72      |
-|antivirus    |high    |3518       |5.86      |
-|antivirus    |medium  |12256      |20.43     |
-|firewall     |high    |4246       |7.08      |
-|firewall     |medium  |6547       |10.91     |
-|firewall     |low     |13042      |21.74     |
-|ids          |critical|4328       |7.21      |
-|ids          |medium  |10830      |18.05     |
-+-------------+--------+-----------+----------+
+==================================================
+ANALYSIS 2: Purchase Behavior Analytics
+==================================================
++-------------+--------------+------------------+
+|customer_type|purchase_count|avg_order_value   |
++-------------+--------------+------------------+
+|returning    |7535          |1089.1132329130724|
+|vip          |7594          |1079.3609428496181|
+|premium      |7290          |1074.8872866941015|
+|new          |7766          |1074.745394025238 |
++-------------+--------------+------------------+
 ```
 
-## 🎯 Key Takeaways
+### Security Analytics
+```
+==================================================
+ANALYSIS 3: Geographic Threat Distribution
+==================================================
++--------------+------------+----------+
+|source_country|attack_count|unique_ips|
++--------------+------------+----------+
+|CN            |2189        |2189      |
+|RU            |2180        |2180      |
+|Unknown       |2230        |2230      |
++--------------+------------+----------+
+```
 
-1. **Schema Flexibility**: Handle evolving data structures without breaking existing queries
-2. **Performance**: Significant speed improvements over JSON string processing
-3. **Unified Analytics**: Single data type for diverse semi-structured data sources
-4. **Open Source Standard**: No vendor lock-in with open source implementation
+## 🎓 Tutorial Learning Outcomes
 
-## 🔧 Customization
+After completing this tutorial, you'll have mastered:
 
-Each use case can be customized by modifying:
+### ✅ **Core Variant Skills**
+- Converting JSON strings to Variant format using `PARSE_JSON()`
+- Extracting nested data with `VARIANT_GET()` syntax
+- Handling schema evolution without breaking queries
+- Working with mixed data types in single columns
 
-- **Data volume**: Change `num_records` parameters in generation functions
-- **Data complexity**: Adjust nested structure depth and variety
-- **Analysis queries**: Modify SQL queries to focus on specific business questions
-- **Performance testing**: Add timing measurements for specific operations
+### ✅ **SQL Mastery**
+```sql
+-- Schema-flexible queries
+SELECT VARIANT_GET(sensor_data, '$.pressure.wellhead_pressure', 'double') as pressure
+FROM oil_rig_sensors WHERE sensor_type = 'comprehensive'
 
-## 📈 Monitoring and Optimization
+-- Complex nested access
+SELECT VARIANT_GET(event_data, '$.payment.method', 'string') as payment_method,
+       VARIANT_GET(event_data, '$.payment.card_type', 'string') as card_type
+FROM ecommerce_events WHERE event_type = 'purchase'
+```
 
-The use cases include built-in performance monitoring:
+### ✅ **DataFrame Expertise**
+```python
+# Seamless SQL-to-DataFrame conversion
+df_result = df_variant.filter(col('sensor_type') == 'comprehensive').agg(
+    expr("AVG(VARIANT_GET(sensor_data, '$.pressure.wellhead_pressure', 'double'))").alias('avg_pressure'),
+    count('*').alias('reading_count')
+)
+```
 
-- Data generation timing
-- Query execution timing
-- Memory usage patterns
-- Dataset size reporting
+### ✅ **Production-Ready Patterns**
+- CTE-based query optimization for Spark performance
+- Error handling for missing or null Variant fields
+- Best practices for nested data structure design
+- Monitoring and debugging Variant queries
+
+## Testing
+
+### Environment Validation
+```bash
+python test_environment.py
+```
+Validates:
+- Python version compatibility (3.8+)
+- PySpark installation and version
+- Spark session creation
+- Variant data type support
+- System resources
+
+### Comprehensive Testing
+All use cases include:
+- Data generation validation
+- DataFrame creation and schema verification
+- Variant data type operations
+- Complex analytical queries
+- Performance measurements
+- Error handling and cleanup
+
+
+## Development
+
+### Code Organization
+- Modular design with shared utilities
+- Comprehensive error handling
+- Performance optimizations with CTEs
+- Extensive documentation and examples
+
+### Adding New Use Cases
+1. Import generators from `data_utility.py`
+2. Create analysis functions using Variant operations
+3. Add to `run_variant_usecase.py` for integration
+4. Follow CTE patterns for optimal performance
+5. Use comprehensive data structures for complex nested scenarios
+6. Reference `sql_to_dataframe_example.py` for DataFrame conversion patterns
+
+## 📚 Continue Learning
+
+### 🔗 **Official Resources**
+- **Apache Spark 4.0 Documentation**: [Variant Data Type Guide](https://spark.apache.org/docs/latest/sql-ref-datatypes.html#variant-data-type)
+- **PySpark API Reference**: [DataFrame and SQL Functions](https://spark.apache.org/docs/latest/api/python/)
+
+### 📖 **Deep Dive Tutorial**
+- **Complete Developer Guide**: `developer_user_guide.md` - Comprehensive tutorial with advanced patterns, expert-level implementations, and production best practices
+
+### 🛠️ **Practice Exercises**
+- Modify the sample data generators to create your own JSON structures
+- Experiment with different `VARIANT_GET()` path expressions
+- Try converting the provided SQL examples to DataFrame operations
+- Build your own CTE-optimized queries for complex analytics
 
 ## 🤝 Contributing
 
-To extend these use cases:
+1. Follow the DRY principle - use shared utilities
+2. Optimize queries with CTEs instead of window functions
+3. Add comprehensive tests for new features
+4. Update documentation for any changes
 
-1. Add new sensor types to IoT use case
-2. Include additional event types for e-commerce
-3. Integrate more security tools in security analysis
-4. Create hybrid use cases combining multiple domains
+## 📄 License
 
-## 📝 License
-
-This demonstration code is provided for educational and evaluation purposes.
+This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-📖 **For detailed developer user guide with comprehensive examples and performance benchmarks, see [`developer_user_guide.md`](developer_user_guide.md)**
-
-**Note**: This demonstration requires Apache Spark 4.0 with Variant data type support. For earlier versions of Spark, the Variant-specific functionality will not be available, but the data generation and basic analytics can still provide valuable insights into semi-structured data processing patterns.
+Start with `python test_environment.py` and then `python run_variant_usecase.py all`.

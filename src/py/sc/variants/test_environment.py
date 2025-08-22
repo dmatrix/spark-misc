@@ -5,6 +5,8 @@ Test Environment Setup for Apache Spark 4.0 Variant Use Cases
 
 This script tests the environment to ensure all requirements are met
 for running the Variant data type use cases.
+
+Authors: Jules S. Damji & Cursor AI
 """
 
 import sys
