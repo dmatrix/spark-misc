@@ -39,8 +39,13 @@ import time
 from pyspark.sql import SparkSession
 from data_utility import generate_security_data
 
-def create_spark_session():
-    """Create Spark session with Variant support"""
+def create_spark_session() -> SparkSession:
+    """Create Spark session with Variant support.
+    
+    Returns:
+        SparkSession: Configured Spark session with adaptive query execution
+            and partition coalescing enabled for optimal security log processing
+    """
     return SparkSession.builder \
         .appName("Security Log Analysis with Variant") \
         .config("spark.sql.adaptive.enabled", "true") \
@@ -49,8 +54,23 @@ def create_spark_session():
 
 
 
-def run_security_analysis():
-    """Run the security log analysis"""
+def run_security_analysis() -> None:
+    """Run the security log analysis.
+    
+    Generates 60,000 security event records from multiple sources (firewall, antivirus, IDS)
+    and performs comprehensive threat analysis including:
+    - Security event distribution overview with CTE-optimized calculations
+    - Geographic threat distribution analysis (source countries)
+    - Multi-system threat correlation (IPs triggering multiple systems)
+    - Critical threat detection (high-severity events)
+    - Cross-system IP intelligence gathering
+    
+    All queries use CTE patterns to eliminate Spark window function warnings
+    and maintain distributed processing for security event correlation.
+    
+    Returns:
+        None
+    """
     print("=" * 60)
     print("Security Log Analysis with Spark 4.0 Variant")
     print("=" * 60)

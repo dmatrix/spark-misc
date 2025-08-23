@@ -29,8 +29,13 @@ import time
 from pyspark.sql import SparkSession
 from data_utility import generate_oil_rig_data
 
-def create_spark_session():
-    """Create Spark session with Variant support"""
+def create_spark_session() -> SparkSession:
+    """Create Spark session with Variant support.
+    
+    Returns:
+        SparkSession: Configured Spark session with adaptive query execution
+            and partition coalescing enabled for optimal performance
+    """
     return SparkSession.builder \
         .appName("Offshore Oil Rig Sensor Processing with Variant") \
         .config("spark.sql.adaptive.enabled", "true") \
@@ -39,8 +44,23 @@ def create_spark_session():
 
 
 
-def run_oil_rig_analysis():
-    """Run the offshore oil rig sensor data analysis"""
+def run_oil_rig_analysis() -> None:
+    """Run the offshore oil rig sensor data analysis.
+    
+    Generates 50,000 oil rig sensor records, processes them using Spark's Variant
+    data type, and performs comprehensive analytics including:
+    - Sensor type distribution analysis
+    - Critical pressure monitoring (wellhead pressure > 3500 PSI)
+    - Gas detection safety analysis (H2S concentration > 10 ppm)
+    - Equipment health monitoring (vibration levels > 10 mm/s RMS)
+    - Environmental conditions analysis
+    
+    All queries are optimized using CTE patterns to avoid Spark window function
+    warnings and maintain parallel processing capabilities.
+    
+    Returns:
+        None
+    """
     print("=" * 60)
     print("Offshore Oil Rig Sensor Data Processing with Spark 4.0 Variant")
     print("=" * 60)

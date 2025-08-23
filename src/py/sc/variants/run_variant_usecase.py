@@ -29,25 +29,48 @@ Usage:
 
 import sys
 import time
-
 import importlib.util
 import argparse
 from datetime import datetime
+from typing import Tuple, List, Dict, Any
 
-def print_banner(title, width=70):
-    """Print a formatted banner"""
+def print_banner(title: str, width: int = 70) -> None:
+    """Print a formatted banner.
+    
+    Args:
+        title (str): Title text to display in the banner
+        width (int): Width of the banner in characters (default: 70)
+        
+    Returns:
+        None
+    """
     print("\n" + "=" * width)
     print(f"{title:^{width}}")
     print("=" * width + "\n")
 
-def print_section(title, width=50):
-    """Print a section divider"""
+def print_section(title: str, width: int = 50) -> None:
+    """Print a section divider.
+    
+    Args:
+        title (str): Section title to display
+        width (int): Width of the section divider in characters (default: 50)
+        
+    Returns:
+        None
+    """
     print("\n" + "-" * width)
     print(f" {title}")
     print("-" * width)
 
-def check_dependencies():
-    """Check if required dependencies are available"""
+def check_dependencies() -> bool:
+    """Check if required dependencies are available.
+    
+    Verifies that PySpark and required Spark SQL functions are properly installed
+    and accessible.
+    
+    Returns:
+        bool: True if all dependencies are satisfied, False otherwise
+    """
     print_section("Checking Dependencies")
     
     try:
@@ -68,8 +91,18 @@ def check_dependencies():
     print("✓ All dependencies satisfied")
     return True
 
-def run_use_case_module(module_name, description):
-    """Run a specific use case module"""
+def run_use_case_module(module_name: str, description: str) -> Tuple[bool, float]:
+    """Run a specific use case module.
+    
+    Args:
+        module_name (str): Name of the Python module to import and execute
+        description (str): Human-readable description of the use case
+        
+    Returns:
+        Tuple[bool, float]: Tuple containing:
+            - bool: True if execution was successful, False otherwise
+            - float: Execution time in seconds
+    """
     print_banner(f"Running: {description}")
     
     start_time = time.time()
@@ -104,8 +137,15 @@ def run_use_case_module(module_name, description):
         print(f"  Execution time: {execution_time:.2f} seconds")
         return False, execution_time
 
-def show_use_case_info():
-    """Display information about available use cases"""
+def show_use_case_info() -> None:
+    """Display information about available use cases.
+    
+    Prints detailed information about all available use cases including
+    descriptions, file names, dataset sizes, and key features.
+    
+    Returns:
+        None
+    """
     print_banner("Apache Spark 4.0 Variant Data Type Use Cases")
     
     use_cases = [
@@ -167,8 +207,15 @@ def show_use_case_info():
     print("  • Flexible evolution of data structures")
     print("  • Direct SQL querying of semi-structured data")
 
-def run_all_use_cases():
-    """Run all use cases sequentially"""
+def run_all_use_cases() -> None:
+    """Run all use cases sequentially.
+    
+    Executes all available use cases in order and provides a comprehensive
+    summary of execution results including timing and success/failure status.
+    
+    Returns:
+        None
+    """
     print_banner("Running All Use Cases")
     
     use_cases = [
@@ -217,8 +264,15 @@ def run_all_use_cases():
         print(f"\n⚠️  {len(results) - successful} use case(s) encountered errors.")
         print("   Check the output above for details.")
 
-def create_parser():
-    """Create argument parser"""
+def create_parser() -> argparse.ArgumentParser:
+    """Create argument parser.
+    
+    Creates and configures an ArgumentParser with all available command-line
+    options for running the use cases.
+    
+    Returns:
+        argparse.ArgumentParser: Configured argument parser
+    """
     parser = argparse.ArgumentParser(
         description="Apache Spark 4.0 Variant Data Type Use Cases",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -254,8 +308,15 @@ Use Cases:
     
     return parser
 
-def main():
-    """Main function to run use cases"""
+def main() -> None:
+    """Main function to run use cases.
+    
+    Parses command-line arguments, checks dependencies, and executes the
+    requested use case(s). Handles all user interaction and error reporting.
+    
+    Returns:
+        None
+    """
     parser = create_parser()
     args = parser.parse_args()
     

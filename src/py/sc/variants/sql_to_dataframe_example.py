@@ -18,19 +18,33 @@ Authors: Jules S. Damji & Cursor AI
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import avg, count, col, expr
+from pyspark.sql.dataframe import DataFrame
 from data_utility import generate_pressure_sensor_data
 import json
 from datetime import datetime
+from typing import List, Dict, Any
 
-def create_spark_session():
-    """Create Spark session with Variant support"""
+def create_spark_session() -> SparkSession:
+    """Create Spark session with Variant support.
+    
+    Returns:
+        SparkSession: Configured Spark session with adaptive query execution enabled
+    """
     return SparkSession.builder \
         .appName("SQL to DataFrame Conversion Example") \
         .config("spark.sql.adaptive.enabled", "true") \
         .getOrCreate()
 
-def create_sample_data():
-    """Create sample pressure sensor data"""
+def create_sample_data() -> List[Dict[str, str]]:
+    """Create sample pressure sensor data.
+    
+    Returns:
+        List[Dict[str, str]]: List of dictionaries containing sensor data with keys:
+            - sensor_id (str): Unique sensor identifier
+            - sensor_type (str): Type of sensor ('pressure')
+            - timestamp (str): Timestamp in 'YYYY-MM-DD HH:MM:SS' format
+            - sensor_data_json (str): JSON string containing sensor readings
+    """
     pressure_data = []
     for i in range(10):
         timestamp = datetime(2024, 1, 1, 12, i, 0)
@@ -46,8 +60,21 @@ def create_sample_data():
     
     return pressure_data
 
-def demonstrate_sql_to_dataframe_conversion():
-    """Demonstrate various ways to convert SQL to DataFrame operations"""
+def demonstrate_sql_to_dataframe_conversion() -> None:
+    """Demonstrate various ways to convert SQL to DataFrame operations.
+    
+    This function shows three different methods to convert a SQL query using
+    VARIANT_GET() functions to equivalent PySpark DataFrame operations:
+    
+    1. Direct translation using expr() with select()
+    2. Clean aggregation using expr() with agg()
+    3. Step-by-step approach with field extraction first
+    
+    Also includes performance comparison and recommendations for each method.
+    
+    Returns:
+        None
+    """
     
     spark = create_spark_session()
     

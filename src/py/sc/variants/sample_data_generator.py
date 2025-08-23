@@ -33,6 +33,7 @@ Authors: Jules S. Damji & Cursor AI
 import json
 import argparse
 import os
+from typing import List, Dict, Any
 from data_utility import (
     generate_comprehensive_oil_rig_data,
     generate_ecommerce_data, 
@@ -43,24 +44,48 @@ from data_utility import (
 # WRAPPER FUNCTIONS FOR ADDING USE CASE METADATA
 # ============================================================================
 
-def generate_oil_rig_data_with_metadata(num_records=1):
-    """Generate comprehensive oil rig sensor data with use case metadata"""
+def generate_oil_rig_data_with_metadata(num_records: int = 1) -> List[Dict[str, str]]:
+    """Generate comprehensive oil rig sensor data with use case metadata.
+    
+    Args:
+        num_records (int): Number of comprehensive oil rig records to generate (default: 1)
+        
+    Returns:
+        List[Dict[str, str]]: List of dictionaries containing oil rig sensor data with
+            added 'use_case' metadata field set to 'oil_rig'
+    """
     data = generate_comprehensive_oil_rig_data(num_records)
     # Add use case metadata to each record
     for record in data:
         record["use_case"] = "oil_rig"
     return data
 
-def generate_ecommerce_data_with_metadata(num_records=1):
-    """Generate e-commerce event data with use case metadata"""
+def generate_ecommerce_data_with_metadata(num_records: int = 1) -> List[Dict[str, str]]:
+    """Generate e-commerce event data with use case metadata.
+    
+    Args:
+        num_records (int): Number of e-commerce event records to generate (default: 1)
+        
+    Returns:
+        List[Dict[str, str]]: List of dictionaries containing e-commerce event data with
+            added 'use_case' metadata field set to 'ecommerce'
+    """
     data = generate_ecommerce_data(num_records)
     # Add use case metadata to each record
     for record in data:
         record["use_case"] = "ecommerce"
     return data
 
-def generate_security_data_with_metadata(num_records=1):
-    """Generate security log data with use case metadata"""
+def generate_security_data_with_metadata(num_records: int = 1) -> List[Dict[str, str]]:
+    """Generate security log data with use case metadata.
+    
+    Args:
+        num_records (int): Number of security log records to generate (default: 1)
+        
+    Returns:
+        List[Dict[str, str]]: List of dictionaries containing security log data with
+            added 'use_case' metadata field set to 'security'
+    """
     data = generate_security_data(num_records)
     # Add use case metadata to each record
     for record in data:
@@ -71,14 +96,31 @@ def generate_security_data_with_metadata(num_records=1):
 # OUTPUT FUNCTIONS
 # ============================================================================
 
-def save_as_json(data, filename):
-    """Save data as JSON file"""
+def save_as_json(data: List[Dict[str, Any]], filename: str) -> None:
+    """Save data as JSON file.
+    
+    Args:
+        data (List[Dict[str, Any]]): List of dictionaries to save as JSON
+        filename (str): Path to the output JSON file
+        
+    Returns:
+        None
+    """
     with open(filename, 'w') as f:
         json.dump(data, f, indent=2)
     print(f"Saved {len(data)} records to {filename}")
 
-def print_sample_data(data, use_case_name, num_samples=3):
-    """Print sample data to console"""
+def print_sample_data(data: List[Dict[str, Any]], use_case_name: str, num_samples: int = 3) -> None:
+    """Print sample data to console.
+    
+    Args:
+        data (List[Dict[str, Any]]): List of data records to display
+        use_case_name (str): Name of the use case for display headers
+        num_samples (int): Number of sample records to display (default: 3)
+        
+    Returns:
+        None
+    """
     print(f"\n{use_case_name.upper()} SAMPLE DATA:")
     print("=" * 50)
     
@@ -100,8 +142,20 @@ def print_sample_data(data, use_case_name, num_samples=3):
 # MAIN FUNCTION AND CLI
 # ============================================================================
 
-def main():
-    """Main function with command-line interface"""
+def main() -> None:
+    """Main function with command-line interface.
+    
+    Parses command-line arguments and generates sample data for all three use cases:
+    - Oil Rig IoT Sensor Processing (comprehensive records)
+    - E-commerce Event Analytics
+    - Security Log Analysis
+    
+    Supports various output options including custom record counts, output directory,
+    and display-only mode.
+    
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser(
         description="Generate sample data for Spark 4.0 Variant use cases",
         formatter_class=argparse.RawDescriptionHelpFormatter,
