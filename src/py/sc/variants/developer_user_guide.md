@@ -3,17 +3,17 @@
 *From Beginner to Expert: Learn SQL and DataFrame Approaches for Semi-Structured Data*
 
 ## Table of Contents
-1. [Tutorial Overview: Learning Path](#introduction)
-2. [Tutorial Architecture & Setup](#architecture)
-3. [Module 1: Basic Variant Operations (Beginner)](#oil-rig-structure)
-4. [Module 2: SQL ↔ DataFrame Mastery (Intermediate)](#sql-dataframe-conversion)
-5. [Module 3: Advanced Query Optimization (Advanced)](#cte-optimization)
-6. [Module 4: Expert-Level Implementations](#advanced-use-cases)
-7. [Best Practices & Production Tips](#best-practices)
+1. [Tutorial Overview: Learning Path](#tutorial-overview-learning-path)
+2. [Tutorial Architecture & Setup](#tutorial-architecture--setup)
+3. [Module 1: Basic Variant Operations (Beginner)](#module-1-basic-variant-operations-beginner)
+4. [Module 2: SQL ↔ DataFrame Mastery (Intermediate)](#module-2-sql--dataframe-mastery-intermediate)
+5. [Module 3: Advanced Query Optimization (Advanced)](#module-3-advanced-query-optimization-advanced)
+6. [Module 4: Expert-Level Implementations](#module-4-expert-level-implementations)
+7. [Best Practices & Production Tips](#best-practices--production-tips)
 
 ---
 
-## Tutorial Overview: Learning Path {#introduction}
+## Tutorial Overview: Learning Path
 
 Welcome to the comprehensive tutorial for mastering Apache Spark 4.0's **Variant data type**! This tutorial takes you from beginner to expert through hands-on examples using both **SQL** and **PySpark DataFrame** approaches.
 
@@ -45,7 +45,7 @@ By the end of this tutorial, you'll be able to:
 
 ---
 
-## Tutorial Architecture & Setup {#architecture}
+## Tutorial Architecture & Setup
 
 ### Project Structure
 
@@ -114,7 +114,7 @@ def generate_comprehensive_oil_rig_data(num_records=1):
 
 
 
-## Module 1: Basic Variant Operations (Beginner) {#oil-rig-structure}
+## Module 1: Basic Variant Operations (Beginner)
 
 ### Evolution from Individual to Comprehensive Records
 
@@ -220,7 +220,7 @@ WHERE sensor_type = 'comprehensive'
 
 ---
 
-## Module 2: SQL ↔ DataFrame Mastery (Intermediate) {#sql-dataframe-conversion}
+## Module 2: SQL ↔ DataFrame Mastery (Intermediate)
 
 ### Converting SQL Queries to DataFrame Operations
 
@@ -301,7 +301,7 @@ df_multi_sensor = df_with_variant \
 
 ---
 
-## Module 3: Advanced Query Optimization (Advanced) {#cte-optimization}
+## Module 3: Advanced Query Optimization (Advanced)
 
 ### Problem: Window Function Warnings
 
@@ -406,7 +406,7 @@ event_overview = spark.sql("""
 
 ---
 
-## Module 4: Expert-Level Implementations {#advanced-use-cases}
+## Module 4: Expert-Level Implementations
 
 ### Oil Rig Comprehensive Analytics
 
@@ -557,7 +557,7 @@ def threat_intelligence_analysis(spark, df):
 
 ---
 
-## Best Practices & Production Tips {#best-practices}
+## Best Practices & Production Tips
 
 ### 1. Data Structure Design
 
