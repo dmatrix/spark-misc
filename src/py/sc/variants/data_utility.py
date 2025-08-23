@@ -55,6 +55,7 @@ import hashlib
 import ipaddress
 import uuid
 from datetime import datetime, timedelta
+from typing import Dict, List, Tuple, Any, Optional, Callable, Union
 
 # ============================================================================
 # COMMON CONSTANTS
@@ -86,11 +87,11 @@ ACTION_TAKEN = ["quarantined", "deleted", "blocked", "allowed", "monitored", "fl
 # COMMON HELPER FUNCTIONS
 # ============================================================================
 
-def generate_random_ip():
+def generate_random_ip() -> str:
     """Generate random IP address"""
     return str(ipaddress.IPv4Address(random.randint(1, 4294967294)))
 
-def generate_file_hash():
+def generate_file_hash() -> Dict[str, str]:
     """Generate realistic file hash"""
     random_string = f"file_{random.randint(100000, 999999)}"
     return {
@@ -99,7 +100,7 @@ def generate_file_hash():
         "sha1": hashlib.sha1(random_string.encode()).hexdigest()[:40]
     }
 
-def generate_timestamp_with_pattern(start_time, days_range=30, hour_weights=None):
+def generate_timestamp_with_pattern(start_time: datetime, days_range: int = 30, hour_weights: Optional[List[int]] = None) -> datetime:
     """Generate timestamp with realistic patterns"""
     if hour_weights is None:
         # Default business hours pattern
@@ -118,7 +119,7 @@ def generate_timestamp_with_pattern(start_time, days_range=30, hour_weights=None
 # OIL RIG IoT SENSOR DATA GENERATORS
 # ============================================================================
 
-def generate_pressure_sensor_data(sensor_id, timestamp):
+def generate_pressure_sensor_data(sensor_id: str, timestamp: datetime) -> Dict[str, float]:
     """Generate pressure sensor data for drilling and wellhead operations"""
     return {
         "wellhead_pressure": round(random.uniform(500.0, 4000.0), 0),  # PSI
@@ -126,7 +127,7 @@ def generate_pressure_sensor_data(sensor_id, timestamp):
         "mud_pump_pressure": round(random.uniform(1000.0, 5000.0), 0)  # PSI
     }
 
-def generate_flow_sensor_data(sensor_id, timestamp):
+def generate_flow_sensor_data(sensor_id: str, timestamp: datetime) -> Dict[str, float]:
     """Generate flow meter sensor data for drilling mud and production fluids"""
     return {
         "mud_flow_rate": round(random.uniform(300.0, 800.0), 1),  # gallons per minute
@@ -134,7 +135,7 @@ def generate_flow_sensor_data(sensor_id, timestamp):
         "gas_flow_rate": round(random.uniform(1000.0, 50000.0), 0)  # cubic feet per hour
     }
 
-def generate_gas_sensor_data(sensor_id, timestamp):
+def generate_gas_sensor_data(sensor_id: str, timestamp: datetime) -> Dict[str, float]:
     """Generate gas detection sensor data for safety monitoring"""
     return {
         "h2s_concentration": round(random.uniform(0.0, 20.0), 2),  # ppm (dangerous above 10)
@@ -142,7 +143,7 @@ def generate_gas_sensor_data(sensor_id, timestamp):
         "oxygen_level": round(random.uniform(19.5, 21.0), 1)  # percentage
     }
 
-def generate_temperature_sensor_data(sensor_id, timestamp):
+def generate_temperature_sensor_data(sensor_id: str, timestamp: datetime) -> Dict[str, float]:
     """Generate temperature sensor data for equipment and environmental monitoring"""
     return {
         "equipment_temperature": round(random.uniform(40.0, 120.0), 1),  # Celsius
@@ -150,7 +151,7 @@ def generate_temperature_sensor_data(sensor_id, timestamp):
         "sea_water_temperature": round(random.uniform(5.0, 30.0), 1)  # Celsius
     }
 
-def generate_vibration_sensor_data(sensor_id, timestamp):
+def generate_vibration_sensor_data(sensor_id: str, timestamp: datetime) -> Dict[str, float]:
     """Generate vibration sensor data for equipment monitoring"""
     return {
         "overall_vibration": round(random.uniform(0.5, 15.0), 2),  # mm/s RMS
@@ -158,7 +159,7 @@ def generate_vibration_sensor_data(sensor_id, timestamp):
         "y_axis": round(random.uniform(0.1, 5.0), 2)  # mm/s RMS
     }
 
-def generate_position_sensor_data(sensor_id, timestamp):
+def generate_position_sensor_data(sensor_id: str, timestamp: datetime) -> Dict[str, float]:
     """Generate position sensor data for drilling equipment"""
     return {
         "drill_bit_depth": round(random.uniform(1000.0, 8000.0), 1),  # meters
@@ -166,7 +167,7 @@ def generate_position_sensor_data(sensor_id, timestamp):
         "rotary_position": round(random.uniform(0.0, 360.0), 1)  # degrees
     }
 
-def generate_weather_sensor_data(sensor_id, timestamp):
+def generate_weather_sensor_data(sensor_id: str, timestamp: datetime) -> Dict[str, float]:
     """Generate weather sensor data for offshore conditions"""
     return {
         "wind_speed": round(random.uniform(0.0, 50.0), 1),  # knots
@@ -174,7 +175,7 @@ def generate_weather_sensor_data(sensor_id, timestamp):
         "barometric_pressure": round(random.uniform(980.0, 1050.0), 1)  # mbar
     }
 
-def generate_level_sensor_data(sensor_id, timestamp):
+def generate_level_sensor_data(sensor_id: str, timestamp: datetime) -> Dict[str, Union[float, str]]:
     """Generate level sensor data for tanks and vessels"""
     return {
         "fluid_level": round(random.uniform(10.0, 95.0), 1),  # percentage
@@ -182,7 +183,7 @@ def generate_level_sensor_data(sensor_id, timestamp):
         "tank_type": random.choice(["fuel", "fresh_water", "drilling_mud"])  # type of tank
     }
 
-def generate_current_sensor_data(sensor_id, timestamp):
+def generate_current_sensor_data(sensor_id: str, timestamp: datetime) -> Dict[str, Union[float, int]]:
     """Generate current sensor data for marine environment"""
     return {
         "current_speed": round(random.uniform(0.1, 3.0), 2),  # knots
@@ -190,7 +191,7 @@ def generate_current_sensor_data(sensor_id, timestamp):
         "water_temperature": round(random.uniform(5.0, 30.0), 1)  # Celsius
     }
 
-def generate_spill_detection_data(sensor_id, timestamp):
+def generate_spill_detection_data(sensor_id: str, timestamp: datetime) -> Dict[str, Union[bool, float]]:
     """Generate oil spill detection sensor data"""
     oil_detected = random.choice([True, False, False, False])  # 25% detection rate
     return {
@@ -199,7 +200,7 @@ def generate_spill_detection_data(sensor_id, timestamp):
         "detection_confidence": round(random.uniform(0.7, 1.0), 2)  # confidence level
     }
 
-def get_oil_rig_sensor_types():
+def get_oil_rig_sensor_types() -> List[Tuple[str, Callable[[str, datetime], Dict[str, Any]]]]:
     """Get list of oil rig sensor types and their generators"""
     return [
         ("pressure", generate_pressure_sensor_data),
@@ -218,7 +219,7 @@ def get_oil_rig_sensor_types():
 # E-COMMERCE EVENT DATA GENERATORS
 # ============================================================================
 
-def generate_purchase_event(user_id, timestamp):
+def generate_purchase_event(user_id: str, timestamp: datetime) -> Dict[str, Any]:
     """Generate purchase event data (simplified with nested payment)"""
     # Use timestamp for deterministic amount based on time of day (higher during peak hours)
     hour = timestamp.hour
@@ -240,7 +241,7 @@ def generate_purchase_event(user_id, timestamp):
         }
     }
 
-def generate_search_event(user_id, timestamp):
+def generate_search_event(user_id: str, timestamp: datetime) -> Dict[str, Union[str, int]]:
     """Generate search event data (simplified)"""
     search_terms = [
         "wireless headphones", "running shoes", "laptop", "coffee maker", "yoga mat",
@@ -263,7 +264,7 @@ def generate_search_event(user_id, timestamp):
         "results_clicked": random.randint(0, min(10, results_count // 50))
     }
 
-def generate_wishlist_event(user_id, timestamp):
+def generate_wishlist_event(user_id: str, timestamp: datetime) -> Dict[str, Union[str, float]]:
     """Generate wishlist event data (simplified)"""
     # Use user_id for consistent product preferences (same user interacts with similar price ranges)
     user_hash = hash(user_id) % 3
@@ -285,7 +286,7 @@ def generate_wishlist_event(user_id, timestamp):
         "product_price": round(random.uniform(min_price, max_price), 2)
     }
 
-def get_ecommerce_event_types():
+def get_ecommerce_event_types() -> List[Tuple[str, Callable[[str, datetime], Dict[str, Any]], float]]:
     """Get list of e-commerce event types and their generators with weights"""
     return [
         ("purchase", generate_purchase_event, 0.4),   # 40% of events
@@ -297,7 +298,7 @@ def get_ecommerce_event_types():
 # SECURITY LOG DATA GENERATORS
 # ============================================================================
 
-def generate_antivirus_event(event_id, timestamp):
+def generate_antivirus_event(event_id: str, timestamp: datetime) -> Dict[str, Union[str, float]]:
     """Generate antivirus/EDR security event (simplified)"""
     return {
         "threat_type": random.choice(THREAT_TYPES),
@@ -305,7 +306,7 @@ def generate_antivirus_event(event_id, timestamp):
         "detection_score": round(random.uniform(0.1, 1.0), 3)
     }
 
-def generate_firewall_event(event_id, timestamp):
+def generate_firewall_event(event_id: str, timestamp: datetime) -> Dict[str, Any]:
     """Generate firewall security event (simplified with nested geo_location)"""
     return {
         "source_ip": generate_random_ip(),
@@ -317,7 +318,7 @@ def generate_firewall_event(event_id, timestamp):
         }
     }
 
-def generate_ids_event(event_id, timestamp):
+def generate_ids_event(event_id: str, timestamp: datetime) -> Dict[str, str]:
     """Generate IDS/IPS security event (simplified)"""
     attack_type = random.choice(ATTACK_TYPES)
     return {
@@ -326,7 +327,7 @@ def generate_ids_event(event_id, timestamp):
         "user_agent": random.choice(USER_AGENTS)
     }
 
-def assign_severity(event_type, event_data):
+def assign_severity(event_type: str, event_data: Dict[str, Any]) -> str:
     """Assign severity based on event type and data"""
     if event_type == "antivirus":
         if event_data.get("threat_type") in ["ransomware", "rootkit"]:
@@ -350,7 +351,7 @@ def assign_severity(event_type, event_data):
     
     return "medium"
 
-def get_security_event_types():
+def get_security_event_types() -> List[Tuple[str, Callable[[str, datetime], Dict[str, Any]], float]]:
     """Get list of security event types and their generators with weights"""
     return [
         ("firewall", generate_firewall_event, 0.4),     # 40% of events
@@ -362,7 +363,7 @@ def get_security_event_types():
 # BULK DATA GENERATION FUNCTIONS
 # ============================================================================
 
-def generate_comprehensive_oil_rig_data(num_records=1):
+def generate_comprehensive_oil_rig_data(num_records: int = 1) -> List[Dict[str, str]]:
     """Generate comprehensive oil rig sensor data with ALL 10 sensor types in each record"""
     print(f"Generating {num_records} comprehensive oil rig sensor records...")
     
@@ -400,7 +401,7 @@ def generate_comprehensive_oil_rig_data(num_records=1):
     
     return data
 
-def generate_oil_rig_data(num_records=1):
+def generate_oil_rig_data(num_records: int = 1) -> List[Dict[str, str]]:
     """Generate oil rig sensor data (individual sensor records for main use cases)"""
     print(f"Generating {num_records} oil rig sensor records...")
     
@@ -434,7 +435,7 @@ def generate_oil_rig_data(num_records=1):
     
     return data
 
-def generate_ecommerce_data(num_records=1):
+def generate_ecommerce_data(num_records: int = 1) -> List[Dict[str, str]]:
     """Generate e-commerce event data"""
     print(f"Generating {num_records} e-commerce event records...")
     
@@ -475,7 +476,7 @@ def generate_ecommerce_data(num_records=1):
     
     return data
 
-def generate_security_data(num_records=1):
+def generate_security_data(num_records: int = 1) -> List[Dict[str, str]]:
     """Generate security log data"""
     print(f"Generating {num_records} security event records...")
     

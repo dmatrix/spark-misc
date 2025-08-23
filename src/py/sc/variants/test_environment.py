@@ -10,10 +10,15 @@ Authors: Jules S. Damji & Cursor AI
 """
 
 import sys
+from typing import List, Tuple, Callable
 
 
-def test_python_version():
-    """Test Python version compatibility"""
+def test_python_version() -> bool:
+    """Test Python version compatibility.
+    
+    Returns:
+        bool: True if Python version is 3.8+, False otherwise
+    """
     print("Testing Python version...")
     major, minor = sys.version_info[:2]
     
@@ -24,8 +29,12 @@ def test_python_version():
         print(f"✗ Python {major}.{minor} is too old (3.8+ required)")
         return False
 
-def test_pyspark_installation():
-    """Test PySpark installation and version"""
+def test_pyspark_installation() -> bool:
+    """Test PySpark installation and version.
+    
+    Returns:
+        bool: True if PySpark is properly installed and importable, False otherwise
+    """
     print("\nTesting PySpark installation...")
     
     try:
@@ -44,8 +53,12 @@ def test_pyspark_installation():
         print("Install with: pip install pyspark>=4.0.0")
         return False
 
-def test_spark_session():
-    """Test Spark session creation"""
+def test_spark_session() -> bool:
+    """Test Spark session creation and basic operations.
+    
+    Returns:
+        bool: True if Spark session can be created and basic operations work, False otherwise
+    """
     print("\nTesting Spark session creation...")
     
     try:
@@ -71,8 +84,12 @@ def test_spark_session():
         print(f"✗ Spark session test failed: {e}")
         return False
 
-def test_variant_support():
-    """Test Variant data type support (may not be available in all Spark versions)"""
+def test_variant_support() -> bool:
+    """Test Variant data type support (may not be available in all Spark versions).
+    
+    Returns:
+        bool: True if JSON parsing functions are available (always returns True as fallback is available)
+    """
     print("\nTesting Variant data type support...")
     
     try:
@@ -103,8 +120,12 @@ def test_variant_support():
         print("The use cases will still demonstrate the concepts with available functions")
         return True  # Not failing this test as fallback is available
 
-def test_memory_resources():
-    """Test available memory resources"""
+def test_memory_resources() -> bool:
+    """Test available memory resources.
+    
+    Returns:
+        bool: True if sufficient memory is available or check cannot be performed (always returns True)
+    """
     print("\nTesting system resources...")
     
     try:
@@ -129,8 +150,12 @@ def test_memory_resources():
         print(f"⚠ Memory check failed: {e}")
         return True
 
-def test_file_access():
-    """Test file access for use case modules"""
+def test_file_access() -> bool:
+    """Test file access for use case modules.
+    
+    Returns:
+        bool: True if all required files are accessible, False otherwise
+    """
     print("\nTesting use case file access...")
     
     required_files = [
@@ -155,8 +180,12 @@ def test_file_access():
     
     return all_found
 
-def main():
-    """Run all environment tests"""
+def main() -> int:
+    """Run all environment tests.
+    
+    Returns:
+        int: Exit code (0 for success, 1 for failure)
+    """
     print("=" * 60)
     print("Apache Spark 4.0 Variant Use Cases - Environment Test")
     print("=" * 60)

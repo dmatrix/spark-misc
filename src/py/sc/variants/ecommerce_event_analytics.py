@@ -32,8 +32,13 @@ import time
 from pyspark.sql import SparkSession
 from data_utility import generate_ecommerce_data
 
-def create_spark_session():
-    """Create Spark session with Variant support"""
+def create_spark_session() -> SparkSession:
+    """Create Spark session with Variant support.
+    
+    Returns:
+        SparkSession: Configured Spark session with adaptive query execution
+            and partition coalescing enabled for optimal e-commerce analytics
+    """
     return SparkSession.builder \
         .appName("E-commerce Event Analytics with Variant") \
         .config("spark.sql.adaptive.enabled", "true") \
@@ -42,8 +47,22 @@ def create_spark_session():
 
 
 
-def run_ecommerce_analysis():
-    """Run the e-commerce event analytics"""
+def run_ecommerce_analysis() -> None:
+    """Run the e-commerce event analytics.
+    
+    Generates 75,000 e-commerce event records and performs comprehensive analytics including:
+    - Event distribution overview with CTE-optimized percentage calculations
+    - Purchase behavior analysis (customer types, payment methods, spending patterns)
+    - Search behavior analysis (query patterns, result interactions)
+    - Wishlist behavior analysis (product actions, price ranges)
+    - Cross-event user behavior correlation
+    
+    All queries use CTE patterns to eliminate Spark window function warnings
+    and maintain distributed processing across partitions.
+    
+    Returns:
+        None
+    """
     print("=" * 60)
     print("E-commerce Event Analytics with Spark 4.0 Variant")
     print("=" * 60)
