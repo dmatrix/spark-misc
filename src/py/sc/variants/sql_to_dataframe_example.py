@@ -17,7 +17,7 @@ Authors: Jules S. Damji & Cursor AI
 """
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import avg, count, col, expr
+from pyspark.sql.functions import avg, count, col, expr, parse_json
 from pyspark.sql.dataframe import DataFrame
 from data_utility import generate_pressure_sensor_data
 import json
@@ -98,7 +98,8 @@ def demonstrate_sql_to_dataframe_conversion() -> None:
             col('sensor_id'),
             col('sensor_type'), 
             col('timestamp').cast('timestamp'),
-            expr('PARSE_JSON(sensor_data_json)').alias('sensor_data')  # Key conversion step
+            # Using DataFrame API: parse_json() is available as a native function
+            parse_json(col('sensor_data_json')).alias('sensor_data')  # Key conversion step
         )
         
         print("Schema after Variant conversion:")
@@ -138,6 +139,7 @@ def demonstrate_sql_to_dataframe_conversion() -> None:
         # Method 1: Direct translation using expr()
         print("\n🔹 Method 1: Direct Translation using expr()")
         print("Most direct conversion - uses expr() to embed SQL expressions")
+        print("Note: VARIANT_GET() has no DataFrame API equivalent, so we use expr() with SQL")
         
         df_method1 = df_with_variant \
             .filter(col('sensor_type') == 'pressure') \

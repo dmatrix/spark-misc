@@ -30,6 +30,7 @@ Authors: Jules S. Damji & Cursor AI
 
 import time
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, parse_json
 from data_utility import generate_ecommerce_data
 
 def create_spark_session() -> SparkSession:
@@ -50,7 +51,8 @@ def create_spark_session() -> SparkSession:
 def run_ecommerce_analysis() -> None:
     """Run the e-commerce event analytics.
     
-    Generates 75,000 e-commerce event records and performs comprehensive analytics including:
+    Generates 75,000 e-commerce event records, converts JSON to Variant using DataFrame API,
+    and performs comprehensive analytics including:
     - Event distribution overview with CTE-optimized percentage calculations
     - Purchase behavior analysis (customer types, payment methods, spending patterns)
     - Search behavior analysis (query patterns, result interactions)
@@ -79,19 +81,16 @@ def run_ecommerce_analysis() -> None:
         print("\nCreating DataFrame...")
         df = spark.createDataFrame(fake_data)
         
-        # Create temp table and convert JSON to Variant
-        df.createOrReplaceTempView("events_raw")
-        
+        # Convert JSON strings to Variant data type using DataFrame API
         print("Converting JSON strings to Variant data type...")
-        events_df = spark.sql("""
-            SELECT 
-                event_id,
-                user_id,
-                event_type,
-                CAST(timestamp AS TIMESTAMP) as timestamp,
-                PARSE_JSON(event_data_json) as event_data
-            FROM events_raw
-        """)
+        events_df = df.select(
+            col('event_id'),
+            col('user_id'),
+            col('event_type'),
+            col('timestamp').cast('timestamp'),
+            # Using DataFrame API: parse_json() is available as a native function
+            parse_json(col('event_data_json')).alias('event_data')
+        )
         
         events_df.createOrReplaceTempView("user_events")
         print(f"Created events dataset with {events_df.count()} records")
@@ -131,6 +130,8 @@ def run_ecommerce_analysis() -> None:
         print("ANALYSIS 2: Purchase Behavior Analytics")
         print("="*50)
         
+        # Using SQL for VARIANT_GET: No native DataFrame API equivalent exists
+        # This demonstrates mixed API usage - DataFrame for parse_json(), SQL for VARIANT_GET()
         purchase_analysis = spark.sql("""
             SELECT 
                 VARIANT_GET(event_data, '$.customer_type', 'string') as customer_type,

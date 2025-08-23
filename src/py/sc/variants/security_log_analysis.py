@@ -37,6 +37,7 @@ Authors: Jules S. Damji & Cursor AI
 
 import time
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, parse_json
 from data_utility import generate_security_data
 
 def create_spark_session() -> SparkSession:
@@ -57,8 +58,8 @@ def create_spark_session() -> SparkSession:
 def run_security_analysis() -> None:
     """Run the security log analysis.
     
-    Generates 60,000 security event records from multiple sources (firewall, antivirus, IDS)
-    and performs comprehensive threat analysis including:
+    Generates 60,000 security event records from multiple sources (firewall, antivirus, IDS),
+    converts JSON to Variant using DataFrame API, and performs comprehensive threat analysis including:
     - Security event distribution overview with CTE-optimized calculations
     - Geographic threat distribution analysis (source countries)
     - Multi-system threat correlation (IPs triggering multiple systems)
@@ -87,19 +88,16 @@ def run_security_analysis() -> None:
         print("\nCreating DataFrame...")
         df = spark.createDataFrame(fake_data)
         
-        # Create temp table and convert JSON to Variant
-        df.createOrReplaceTempView("security_raw")
-        
+        # Convert JSON strings to Variant data type using DataFrame API
         print("Converting JSON strings to Variant data type...")
-        security_df = spark.sql("""
-            SELECT 
-                event_id,
-                source_system,
-                severity,
-                CAST(timestamp AS TIMESTAMP) as timestamp,
-                PARSE_JSON(event_details_json) as event_details
-            FROM security_raw
-        """)
+        security_df = df.select(
+            col('event_id'),
+            col('source_system'),
+            col('severity'),
+            col('timestamp').cast('timestamp'),
+            # Using DataFrame API: parse_json() is available as a native function
+            parse_json(col('event_details_json')).alias('event_details')
+        )
         
         security_df.createOrReplaceTempView("security_events")
         print(f"Created security dataset with {security_df.count()} records")
@@ -145,6 +143,8 @@ def run_security_analysis() -> None:
         print("ANALYSIS 2: Threat Analysis (Antivirus Events)")
         print("="*50)
         
+        # Using SQL for VARIANT_GET: No native DataFrame API equivalent exists
+        # This demonstrates mixed API usage - DataFrame for parse_json(), SQL for VARIANT_GET()
         threat_analysis = spark.sql("""
             SELECT 
                 VARIANT_GET(event_details, '$.threat_type', 'string') as threat_type,

@@ -27,6 +27,7 @@ Authors: Jules S. Damji & Cursor AI
 
 import time
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, parse_json
 from data_utility import generate_oil_rig_data
 
 def create_spark_session() -> SparkSession:
@@ -47,8 +48,8 @@ def create_spark_session() -> SparkSession:
 def run_oil_rig_analysis() -> None:
     """Run the offshore oil rig sensor data analysis.
     
-    Generates 50,000 oil rig sensor records, processes them using Spark's Variant
-    data type, and performs comprehensive analytics including:
+    Generates 50,000 oil rig sensor records, converts JSON to Variant using DataFrame API,
+    and performs comprehensive analytics including:
     - Sensor type distribution analysis
     - Critical pressure monitoring (wellhead pressure > 3500 PSI)
     - Gas detection safety analysis (H2S concentration > 10 ppm)
@@ -77,18 +78,15 @@ def run_oil_rig_analysis() -> None:
         print("\nCreating DataFrame...")
         df = spark.createDataFrame(fake_data)
         
-        # Create temp table and convert JSON to Variant
-        df.createOrReplaceTempView("oil_rig_raw")
-        
+        # Convert JSON strings to Variant data type using DataFrame API
         print("Converting JSON strings to Variant data type...")
-        sensor_df = spark.sql("""
-            SELECT 
-                sensor_id,
-                sensor_type,
-                CAST(timestamp AS TIMESTAMP) as timestamp,
-                PARSE_JSON(sensor_data_json) as sensor_data
-            FROM oil_rig_raw
-        """)
+        sensor_df = df.select(
+            col('sensor_id'),
+            col('sensor_type'),
+            col('timestamp').cast('timestamp'),
+            # Using DataFrame API: parse_json() is available as a native function
+            parse_json(col('sensor_data_json')).alias('sensor_data')
+        )
         
         sensor_df.createOrReplaceTempView("oil_rig_sensors")
         print(f"Created oil rig sensor dataset with {sensor_df.count()} records")
@@ -98,6 +96,8 @@ def run_oil_rig_analysis() -> None:
         print("ANALYSIS 1: Pressure Monitoring Analytics")
         print("="*50)
         
+        # Using SQL for VARIANT_GET: No native DataFrame API equivalent exists
+        # This demonstrates mixed API usage - DataFrame for parse_json(), SQL for VARIANT_GET()
         pressure_analysis = spark.sql("""
             SELECT 
                 AVG(VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double')) as avg_wellhead_pressure,
