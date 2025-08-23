@@ -288,11 +288,39 @@ df_multi_sensor = df_with_variant \
     )
 ```
 
+### Mixed API Approach: Best Practice for Variant Data
+
+**Why We Use Both DataFrame API and SQL:**
+
+| Function | API Availability | Recommended Approach |
+|----------|------------------|---------------------|
+| `PARSE_JSON()` | ✅ DataFrame: `parse_json()` | Use DataFrame API |
+| `VARIANT_GET()` | ❌ No DataFrame equivalent | Use `expr()` with SQL |
+| `FROM_JSON()` | ✅ DataFrame: `from_json()` | Use DataFrame API |
+
+**Example: Mixed API Pattern**
+```python
+from pyspark.sql.functions import col, parse_json, expr
+
+# Step 1: DataFrame API for JSON-to-Variant conversion
+df_variant = df.select(
+    col('id'),
+    parse_json(col('json_data')).alias('variant_data')  # DataFrame API
+)
+
+# Step 2: expr() for VARIANT_GET (no DataFrame equivalent)
+df_result = df_variant.select(
+    col('id'),
+    expr("VARIANT_GET(variant_data, '$.field', 'string')").alias('extracted_field')  # SQL via expr()
+)
+```
+
 ### Key Conversion Patterns
 
 | SQL Pattern | DataFrame Equivalent |
 |-------------|---------------------|
 | `WHERE column = 'value'` | `.filter(col('column') == 'value')` |
+| `PARSE_JSON(column)` | `parse_json(col('column'))` |
 | `VARIANT_GET(col, '$.field', 'type')` | `expr("VARIANT_GET(col, '$.field', 'type')")` |
 | `AVG(expression)` | `avg('column')` or `expr("AVG(expression)")` |
 | `COUNT(*)` | `count('*')` |
@@ -573,7 +601,31 @@ def threat_intelligence_analysis(spark, df):
 - Use dynamic field names that can't be predicted
 - Store large binary data in Variant fields
 
-### 2. Query Optimization
+### 2. API Selection Best Practices
+
+**Mixed API Approach (Recommended):**
+```python
+# ✅ Use DataFrame API where available
+from pyspark.sql.functions import col, parse_json, expr
+
+df_variant = df.select(parse_json(col('json_col')).alias('variant_data'))
+
+# ✅ Use expr() for SQL-only functions
+df_result = df_variant.select(expr("VARIANT_GET(variant_data, '$.field', 'type')"))
+```
+
+**✅ DO:**
+- Use DataFrame API for functions that have native support (`parse_json`, `from_json`)
+- Use `expr()` for SQL-only functions (`VARIANT_GET`, complex SQL expressions)
+- Combine both approaches seamlessly in the same query
+- Prefer DataFrame API for better type safety and IDE support
+
+**❌ DON'T:**
+- Force pure SQL when DataFrame API is available
+- Force pure DataFrame when SQL via `expr()` is needed
+- Mix approaches inconsistently across similar operations
+
+### 3. Query Optimization
 
 **✅ DO:**
 - Use CTEs instead of window functions when possible
@@ -587,7 +639,7 @@ def threat_intelligence_analysis(spark, df):
 - Ignore data type specifications in VARIANT_GET
 - Create unnecessary intermediate DataFrames
 
-### 3. Performance Tuning
+### 4. Performance Tuning
 
 **✅ DO:**
 ```python
@@ -621,7 +673,7 @@ large_df.collect()  # Memory issues
 df.write.parquet('output_path')  # No partitioning
 ```
 
-### 4. Error Handling
+### 5. Error Handling
 
 **✅ DO:**
 ```python
@@ -638,7 +690,7 @@ df.filter(
 )
 ```
 
-### 5. Testing and Debugging
+### 6. Testing and Debugging
 
 **✅ DO:**
 ```python
@@ -654,7 +706,7 @@ df.explain(True)
 df_intermediate.select('key_field').distinct().count()
 ```
 
-### 6. Code Organization
+### 7. Code Organization
 
 **✅ DO:**
 - Use shared utility modules for consistency
@@ -680,7 +732,7 @@ def extract_payment_info(df_variant):
     )
 ```
 
-### 7. Monitoring and Observability
+### 8. Monitoring and Observability
 
 **✅ DO:**
 - Monitor query execution times

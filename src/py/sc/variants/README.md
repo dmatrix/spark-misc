@@ -91,16 +91,22 @@ SELECT AVG(VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double')) as avg_pre
 FROM oil_rig_sensors WHERE sensor_type = 'pressure'
 ```
 
-**Key DataFrame Patterns**:
+**Key DataFrame Patterns (Mixed API Approach)**:
 ```python
-# Convert to Variant
-df_variant = df.select("*", parse_json("sensor_data_json").alias("sensor_data"))
+# Convert to Variant using DataFrame API
+from pyspark.sql.functions import col, parse_json, expr
+df_variant = df.select("*", parse_json(col("sensor_data_json")).alias("sensor_data"))
 
-# Extract and aggregate
+# Extract and aggregate using expr() for VARIANT_GET (no DataFrame equivalent)
 df_result = df_variant.agg(
     expr("AVG(VARIANT_GET(sensor_data, '$.wellhead_pressure', 'double'))").alias('avg_pressure')
 )
 ```
+
+**Why Mixed API?**
+- ✅ **parse_json()**: Available as DataFrame function
+- ❌ **VARIANT_GET()**: No DataFrame equivalent - use `expr()` with SQL
+- 🎯 **Best Practice**: Use DataFrame API where available, `expr()` for SQL-only functions
 
 ### 🛒 Module 2: E-commerce Events (Intermediate)
 
@@ -411,9 +417,15 @@ SELECT VARIANT_GET(event_data, '$.payment.method', 'string') as payment_method,
 FROM ecommerce_events WHERE event_type = 'purchase'
 ```
 
-### ✅ **DataFrame Expertise**
+### ✅ **DataFrame Expertise (Mixed API Mastery)**
 ```python
-# Seamless SQL-to-DataFrame conversion
+# Mixed API approach: DataFrame + SQL where needed
+from pyspark.sql.functions import col, parse_json, expr, count
+
+# Step 1: DataFrame API for JSON-to-Variant conversion
+df_variant = df.select(parse_json(col('json_col')).alias('variant_data'))
+
+# Step 2: expr() for VARIANT_GET (no DataFrame equivalent)
 df_result = df_variant.filter(col('sensor_type') == 'comprehensive').agg(
     expr("AVG(VARIANT_GET(sensor_data, '$.pressure.wellhead_pressure', 'double'))").alias('avg_pressure'),
     count('*').alias('reading_count')
