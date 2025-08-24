@@ -1,0 +1,9 @@
+[
+  {
+    "sensor_id": "RIG_01_COMPREHENSIVE_000000",
+    "sensor_type": "comprehensive",
+    "timestamp": "2024-01-28 06:25:43",
+    "sensor_data_json": "{\"pressure\": {\"wellhead_pressure\": 2152.0, \"drilling_pressure\": 5579.0, \"mud_pump_pressure\": 3987.0}, \"flow\": {\"mud_flow_rate\": 790.5, \"oil_flow_rate\": 209.2, \"gas_flow_rate\": 30247.0}, \"gas\": {\"h2s_concentration\": 7.48, \"methane_concentration\": 4732.0, \"oxygen_level\": 19.8}, \"temperature\": {\"equipment_temperature\": 88.3, \"ambient_temperature\": 43.6, \"sea_water_temperature\": 8.9}, \"vibration\": {\"overall_vibration\": 6.35, \"x_axis\": 1.97, \"y_axis\": 0.15}, \"position\": {\"drill_bit_depth\": 7089.3, \"hook_load\": 190.0, \"rotary_position\": 116.4}, \"weather\": {\"wind_speed\": 31.2, \"wave_height\": 8.7, \"barometric_pressure\": 1019.3}, \"level\": {\"fluid_level\": 20.6, \"volume\": 34012.0, \"tank_type\": \"fresh_water\"}, \"current\": {\"current_speed\": 1.55, \"current_direction\": 188, \"water_temperature\": 14.3}, \"spill_detection\": {\"oil_detected\": false, \"spill_thickness\": 0.0, \"detection_confidence\": 0.78}}",
+    "use_case": "oil_rig"
+  }
+]

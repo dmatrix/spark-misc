@@ -1,0 +1,26 @@
+[
+  {
+    "event_id": "evt_2954beec",
+    "user_id": "user_005892",
+    "event_type": "search",
+    "timestamp": "2024-01-28 07:38:30",
+    "event_data_json": "{\"search_query\": \"winter jacket\", \"results_count\": 418, \"results_clicked\": 1}",
+    "use_case": "ecommerce"
+  },
+  {
+    "event_id": "evt_2b4a7027",
+    "user_id": "user_009522",
+    "event_type": "wishlist",
+    "timestamp": "2024-01-23 03:39:52",
+    "event_data_json": "{\"product_id\": \"p8046\", \"action\": \"remove\", \"product_price\": 145.14}",
+    "use_case": "ecommerce"
+  },
+  {
+    "event_id": "evt_24500c35",
+    "user_id": "user_008728",
+    "event_type": "purchase",
+    "timestamp": "2024-01-04 16:33:29",
+    "event_data_json": "{\"total_amount\": 1314.86, \"customer_type\": \"vip\", \"payment\": {\"method\": \"credit_card\", \"processor\": \"stripe\", \"card_type\": \"amex\"}}",
+    "use_case": "ecommerce"
+  }
+]

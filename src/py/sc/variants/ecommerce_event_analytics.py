@@ -100,6 +100,7 @@ def run_ecommerce_analysis() -> None:
         print("ANALYSIS 1: Event Distribution Overview")
         print("="*50)
         
+        # Using SQL for CTEs
         event_overview = spark.sql("""
             WITH event_totals AS (
                 SELECT 

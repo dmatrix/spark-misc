@@ -6,7 +6,7 @@ This comprehensive tutorial teaches you how to work with Apache Spark 4.0's **Va
 
 ## What You'll Learn
 
-This tutorial covers everything you need to master Variant data type:
+This tutorial covers everything you need to learn about Variant data type:
 
 ### 📚 **Core Concepts**
 - What is the Variant data type and when to use it
@@ -68,7 +68,7 @@ The `data_utility.py` module centralizes all data generation logic:
 
 ### 📊 Module 1: IoT Sensor Data (Beginner)
 
-**Learning Goal**: Master basic Variant operations with structured sensor data
+**Learning Goal**: Understand and use basic Variant operations with structured sensor data
 
 **What You'll Practice**:
 
@@ -110,7 +110,7 @@ df_result = df_variant.agg(
 
 ### 🛒 Module 2: E-commerce Events (Intermediate)
 
-**Learning Goal**: Handle complex nested JSON structures and user behavior analytics
+**Learning Goal**: Build skills with complex nested JSON structures and user behavior analytics
 
 **What You'll Practice**:
 
@@ -158,7 +158,13 @@ df_user_stats = df_variant.groupBy('user_id').agg(
 
 ### 🔒 Module 3: Security Logs (Advanced)
 
-**Learning Goal**: Master multi-source data correlation and geographic analysis
+**Learning Goal**: Comprehend multi-source data correlation and geographic analysis
+
+## Use Case 3: Security Log Analysis
+
+Cybersecurity platforms aggregate logs from multiple sources. Firewall events include source IPs, actions, and nested geographic data. Antivirus logs contain threat types, remediation actions, and detection scores. Intrusion detection systems track attack patterns and user agent strings.
+
+Cross-system correlation becomes critical for threat detection. Variant enables unified queries across different log formats without complex schema mapping. Geographic analysis uses nested location data while maintaining query simplicity.
 
 **What You'll Practice**:
 
@@ -204,7 +210,7 @@ df_country_stats = df_geo.groupBy('country').agg(
 
 ### 🔄 Module 4: SQL ↔ DataFrame Conversion (Expert)
 
-**Learning Goal**: Master converting between SQL and DataFrame approaches
+**Learning Goal**: Learn to convert between SQL and DataFrame approaches
 
 **What You'll Practice**:
 
@@ -262,7 +268,7 @@ python run_variant_usecase.py iot
 
 ### Step 3: Progress to Module 2 (Intermediate)  
 ```bash
-# Master nested JSON and CTE optimizations
+# Learn nested JSON and CTE optimizations
 python run_variant_usecase.py ecommerce
 ```
 **What you'll see**: Complex nested payment data, user behavior analysis, CTE patterns
@@ -274,7 +280,7 @@ python run_variant_usecase.py security
 ```
 **What you'll see**: Geographic analysis, cross-system correlation, threat intelligence
 
-### Step 5: Master SQL ↔ DataFrame Conversion
+### Step 5: Learn SQL ↔ DataFrame Conversion
 ```bash
 # Learn three conversion methods
 python sql_to_dataframe_example.py
@@ -298,11 +304,8 @@ python sample_data_generator.py --count 100
 # Custom counts per use case
 python sample_data_generator.py --oil-rig 50 --ecommerce 75 --security 100
 
-# Save to custom directory
-python sample_data_generator.py --count 10 --output-dir ./sample_data
-
-# Just show samples without saving
-python sample_data_generator.py --no-output --show-samples 5
+# Show more sample records
+python sample_data_generator.py --show-samples 5
 ```
 
 **Note**: Oil rig data now generates **comprehensive records** containing all 10 sensor types in a single JSON structure, perfect for demonstrating Variant's nested data capabilities.
@@ -397,7 +400,7 @@ ANALYSIS 3: Geographic Threat Distribution
 
 ## 🎓 Tutorial Learning Outcomes
 
-After completing this tutorial, you'll have mastered:
+After completing this tutorial, you'll have learned:
 
 ### ✅ **Core Variant Skills**
 - Converting JSON strings to Variant format using `PARSE_JSON()`
@@ -405,7 +408,7 @@ After completing this tutorial, you'll have mastered:
 - Handling schema evolution without breaking queries
 - Working with mixed data types in single columns
 
-### ✅ **SQL Mastery**
+### ✅ **SQL Skills**
 ```sql
 -- Schema-flexible queries
 SELECT VARIANT_GET(sensor_data, '$.pressure.wellhead_pressure', 'double') as pressure
@@ -417,7 +420,7 @@ SELECT VARIANT_GET(event_data, '$.payment.method', 'string') as payment_method,
 FROM ecommerce_events WHERE event_type = 'purchase'
 ```
 
-### ✅ **DataFrame Expertise (Mixed API Mastery)**
+### ✅ **DataFrame Skills (Mixed API Approach)**
 ```python
 # Mixed API approach: DataFrame + SQL where needed
 from pyspark.sql.functions import col, parse_json, expr, count
@@ -479,9 +482,10 @@ All use cases include:
 
 ## 📚 Continue Learning
 
-### 🔗 **Official Resources**
-- **Apache Spark 4.0 Documentation**: [Variant Data Type Guide](https://spark.apache.org/docs/latest/sql-ref-datatypes.html#variant-data-type)
+### 🔗 **Resources**
+- **Apache Spark Documentation**: [SQL Reference](https://spark.apache.org/docs/latest/sql-ref.html)
 - **PySpark API Reference**: [DataFrame and SQL Functions](https://spark.apache.org/docs/latest/api/python/)
+- **Spark SQL Functions**: [Built-in Functions](https://spark.apache.org/docs/latest/sql-ref-functions.html)
 
 ### 📖 **Deep Dive Tutorial**
 - **Complete Developer Guide**: `developer_user_guide.md` - Comprehensive tutorial with advanced patterns, expert-level implementations, and production best practices
@@ -494,7 +498,7 @@ All use cases include:
 
 ## 🤝 Contributing
 
-1. Follow the DRY principle - use shared utilities
+1. Use shared utilities for consistency
 2. Optimize queries with CTEs instead of window functions
 3. Add comprehensive tests for new features
 4. Update documentation for any changes

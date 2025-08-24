@@ -1,0 +1,26 @@
+[
+  {
+    "event_id": "sec_00000000",
+    "source_system": "ids",
+    "severity": "medium",
+    "timestamp": "2024-01-21 23:31:22",
+    "event_details_json": "{\"attack_type\": \"ldap_injection\", \"source_ip\": \"226.102.32.138\", \"user_agent\": \"Safari/14.1.1\"}",
+    "use_case": "security"
+  },
+  {
+    "event_id": "sec_00000000",
+    "source_system": "antivirus",
+    "severity": "medium",
+    "timestamp": "2024-01-05 03:22:09",
+    "event_details_json": "{\"threat_type\": \"trojan\", \"action_taken\": \"flagged\", \"detection_score\": 0.762}",
+    "use_case": "security"
+  },
+  {
+    "event_id": "sec_00000000",
+    "source_system": "firewall",
+    "severity": "high",
+    "timestamp": "2024-01-18 23:20:40",
+    "event_details_json": "{\"source_ip\": \"209.19.221.192\", \"action\": \"allowed\", \"geo_location\": {\"source_country\": \"RU\", \"dest_country\": \"US\", \"confidence\": 0.67}}",
+    "use_case": "security"
+  }
+]

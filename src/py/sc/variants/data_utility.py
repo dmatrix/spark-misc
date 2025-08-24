@@ -435,6 +435,56 @@ def generate_oil_rig_data(num_records: int = 1) -> List[Dict[str, str]]:
     
     return data
 
+def generate_complete_ecommerce_data(num_records_per_type: int = 100) -> List[Dict[str, str]]:
+    """Generate complete e-commerce dataset with all event types.
+    
+    Creates a comprehensive dataset containing all three event types:
+    - purchase events (40% of total)
+    - search events (35% of total) 
+    - wishlist events (25% of total)
+    
+    Args:
+        num_records_per_type (int): Base number of records per event type (default: 100)
+        
+    Returns:
+        List[Dict[str, str]]: List of dictionaries containing complete e-commerce event data
+            with all event types represented
+    """
+    print(f"Generating complete e-commerce dataset with all event types...")
+    
+    event_types = get_ecommerce_event_types()
+    all_events = []
+    
+    for event_type, generator_func, weight in event_types:
+        # Calculate records for this event type based on weight
+        records_for_type = int(num_records_per_type * weight / 0.25)  # Normalize to smallest weight
+        print(f"Generating {records_for_type} {event_type} events...")
+        
+        for i in range(records_for_type):
+            event_id = f"evt_{random.randint(100000000, 999999999):08x}"
+            user_id = f"user_{random.randint(1, 10000):06d}"
+            # Generate timestamp with some randomness
+            timestamp = datetime(2024, 1, 1, 0, 0, 0) + timedelta(
+                hours=random.randint(0, 24*30),  # 30 days range
+                minutes=random.randint(0, 59),
+                seconds=random.randint(0, 59)
+            )
+            
+            event_data = generator_func(user_id, timestamp)
+            
+            all_events.append({
+                "event_id": event_id,
+                "user_id": user_id,
+                "event_type": event_type,
+                "timestamp": timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                "event_data_json": json.dumps(event_data)
+            })
+    
+    # Shuffle to mix event types
+    random.shuffle(all_events)
+    print(f"Generated {len(all_events)} total e-commerce events with all event types")
+    return all_events
+
 def generate_ecommerce_data(num_records: int = 1) -> List[Dict[str, str]]:
     """Generate e-commerce event data"""
     print(f"Generating {num_records} e-commerce event records...")
@@ -475,6 +525,56 @@ def generate_ecommerce_data(num_records: int = 1) -> List[Dict[str, str]]:
             print(f"Generated {i + 1} records...")
     
     return data
+
+def generate_complete_security_data(num_records_per_type: int = 100) -> List[Dict[str, str]]:
+    """Generate complete security dataset with all system types.
+    
+    Creates a comprehensive dataset containing all three security system types:
+    - firewall events (40% of total)
+    - antivirus events (35% of total)
+    - IDS events (25% of total)
+    
+    Args:
+        num_records_per_type (int): Base number of records per system type (default: 100)
+        
+    Returns:
+        List[Dict[str, str]]: List of dictionaries containing complete security event data
+            with all system types represented
+    """
+    print(f"Generating complete security dataset with all system types...")
+    
+    event_types = get_security_event_types()
+    all_events = []
+    
+    for event_type, generator_func, weight in event_types:
+        # Calculate records for this event type based on weight
+        records_for_type = int(num_records_per_type * weight / 0.25)  # Normalize to smallest weight
+        print(f"Generating {records_for_type} {event_type} events...")
+        
+        for i in range(records_for_type):
+            event_id = f"sec_{i:08d}"
+            # Generate timestamp with some randomness
+            timestamp = datetime(2024, 1, 1, 0, 0, 0) + timedelta(
+                hours=random.randint(0, 24*30),  # 30 days range
+                minutes=random.randint(0, 59),
+                seconds=random.randint(0, 59)
+            )
+            
+            event_data = generator_func(event_id, timestamp)
+            severity = assign_severity(event_type, event_data)
+            
+            all_events.append({
+                "event_id": event_id,
+                "source_system": event_type,
+                "severity": severity,
+                "timestamp": timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                "event_details_json": json.dumps(event_data)
+            })
+    
+    # Shuffle to mix event types
+    random.shuffle(all_events)
+    print(f"Generated {len(all_events)} total security events with all system types")
+    return all_events
 
 def generate_security_data(num_records: int = 1) -> List[Dict[str, str]]:
     """Generate security log data"""

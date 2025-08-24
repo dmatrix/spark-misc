@@ -21,11 +21,13 @@ Generates comprehensive records containing all 10 sensor types:
 - Demonstrates Variant's nested data capabilities
 
 Usage:
-    python sample_data_generator.py                    # Generate 1 comprehensive record each
-    python sample_data_generator.py --count 100        # Generate 100 comprehensive records each
+    python sample_data_generator.py                    # Generate complete sample sets (default: 1 each)
+    python sample_data_generator.py --count 100        # Generate 100 records each (complete sets)
+    python sample_data_generator.py --minimal          # Generate minimal sets (10 records each)
     python sample_data_generator.py --oil-rig 50 --ecommerce 75 --security 100  # Custom counts
-    python sample_data_generator.py --output-dir ./data  # Custom output directory
-    python sample_data_generator.py --no-output --show-samples 5  # Display only, no files
+    python sample_data_generator.py --show-samples 5   # Show 5 sample records per use case
+    
+All data is always saved to ./sample_data/ directory.
 
 Authors: Jules S. Damji & Cursor AI
 """
@@ -36,6 +38,8 @@ import os
 from typing import List, Dict, Any
 from data_utility import (
     generate_comprehensive_oil_rig_data,
+    generate_complete_ecommerce_data,
+    generate_complete_security_data,
     generate_ecommerce_data, 
     generate_security_data
 )
@@ -63,14 +67,18 @@ def generate_oil_rig_data_with_metadata(num_records: int = 1) -> List[Dict[str, 
 def generate_ecommerce_data_with_metadata(num_records: int = 1) -> List[Dict[str, str]]:
     """Generate e-commerce event data with use case metadata.
     
+    Always generates complete sets with all event types (purchase, search, wishlist).
+    
     Args:
-        num_records (int): Number of e-commerce event records to generate (default: 1)
+        num_records (int): Base number of records per event type (default: 1)
         
     Returns:
-        List[Dict[str, str]]: List of dictionaries containing e-commerce event data with
-            added 'use_case' metadata field set to 'ecommerce'
+        List[Dict[str, str]]: List of dictionaries containing complete e-commerce event data
+            with all event types represented and 'use_case' metadata field set to 'ecommerce'
     """
-    data = generate_ecommerce_data(num_records)
+    # Always generate complete set with all event types (purchase, search, wishlist)
+    data = generate_complete_ecommerce_data(num_records)
+    
     # Add use case metadata to each record
     for record in data:
         record["use_case"] = "ecommerce"
@@ -79,14 +87,18 @@ def generate_ecommerce_data_with_metadata(num_records: int = 1) -> List[Dict[str
 def generate_security_data_with_metadata(num_records: int = 1) -> List[Dict[str, str]]:
     """Generate security log data with use case metadata.
     
+    Always generates complete sets with all system types (firewall, antivirus, IDS).
+    
     Args:
-        num_records (int): Number of security log records to generate (default: 1)
+        num_records (int): Base number of records per system type (default: 1)
         
     Returns:
-        List[Dict[str, str]]: List of dictionaries containing security log data with
-            added 'use_case' metadata field set to 'security'
+        List[Dict[str, str]]: List of dictionaries containing complete security log data
+            with all system types represented and 'use_case' metadata field set to 'security'
     """
-    data = generate_security_data(num_records)
+    # Always generate complete set with all system types (firewall, antivirus, IDS)
+    data = generate_complete_security_data(num_records)
+    
     # Add use case metadata to each record
     for record in data:
         record["use_case"] = "security"
@@ -161,99 +173,90 @@ def main() -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python sample_data_generator.py                           # Generate 1 record each
-  python sample_data_generator.py --count 100               # Generate 100 records each
+  python sample_data_generator.py                           # Generate complete sets (1 per event type)
+  python sample_data_generator.py --count 100               # Generate 100 per event type (complete sets)
+  python sample_data_generator.py --minimal                 # Generate minimal sets (10 per event type)
   python sample_data_generator.py --oil-rig 50 --ecommerce 75 --security 100
-  python sample_data_generator.py --output-dir ./data
-  python sample_data_generator.py --no-output --show-samples 5
+  python sample_data_generator.py --show-samples 5          # Show 5 sample records per use case
         """
     )
     
     # Record count arguments
     parser.add_argument('--count', type=int, default=1,
-                       help='Number of records to generate for each use case (default: 1)')
+                       help='Base number of records per event type for each use case (default: 1)')
+    parser.add_argument('--minimal', action='store_true',
+                       help='Generate minimal sample sets (10 records per event type)')
     parser.add_argument('--oil-rig', type=int, 
-                       help='Number of oil rig sensor records (overrides --count)')
+                       help='Number of oil rig sensor records (overrides --count and --minimal)')
     parser.add_argument('--ecommerce', type=int,
-                       help='Number of e-commerce event records (overrides --count)')
+                       help='Base number per event type for e-commerce (overrides --count and --minimal)')
     parser.add_argument('--security', type=int,
-                       help='Number of security log records (overrides --count)')
+                       help='Base number per system type for security (overrides --count and --minimal)')
     
     # Output options
-    parser.add_argument('--output-dir', default='.',
-                       help='Output directory (default: current directory)')
-    parser.add_argument('--no-output', action='store_true',
-                       help='Do not save files, only show samples')
     parser.add_argument('--show-samples', type=int, default=3,
                        help='Number of sample records to display (default: 3)')
     
     args = parser.parse_args()
     
     # Determine record counts
-    oil_rig_count = args.oil_rig if args.oil_rig is not None else args.count
-    ecommerce_count = args.ecommerce if args.ecommerce is not None else args.count
-    security_count = args.security if args.security is not None else args.count
+    base_count = 10 if args.minimal else args.count
+    oil_rig_count = args.oil_rig if args.oil_rig is not None else base_count
+    ecommerce_count = args.ecommerce if args.ecommerce is not None else base_count
+    security_count = args.security if args.security is not None else base_count
+    
+    # Fixed output directory
+    output_dir = "sample_data"
     
     print("Sample Data Generator for Spark 4.0 Variant Use Cases")
     print("=" * 60)
     print(f"Oil Rig records: {oil_rig_count}")
-    print(f"E-commerce records: {ecommerce_count}")
-    print(f"Security records: {security_count}")
+    print(f"E-commerce base records per event type: {ecommerce_count}")
+    print(f"Security base records per system type: {security_count}")
+    print(f"Event generation: Complete sets (all event types)")
     print(f"Output format: JSON")
-    print(f"Output directory: {args.output_dir}")
+    print(f"Output directory: {output_dir}")
     print()
     
     # Create output directory if it doesn't exist
-    if not args.no_output:
-        os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
     
     # Generate data for each use case
-    all_data = []
     
     # Oil Rig Data
     oil_rig_data = generate_oil_rig_data_with_metadata(oil_rig_count)
-    all_data.extend(oil_rig_data)
     print_sample_data(oil_rig_data, "Oil Rig IoT Sensor", args.show_samples)
     
-    if not args.no_output:
-        filename = os.path.join(args.output_dir, "oil_rig_data.json")
-        save_as_json(oil_rig_data, filename)
+    filename = os.path.join(output_dir, "oil_rig_data.json")
+    save_as_json(oil_rig_data, filename)
     
     # E-commerce Data
     ecommerce_data = generate_ecommerce_data_with_metadata(ecommerce_count)
-    all_data.extend(ecommerce_data)
     print_sample_data(ecommerce_data, "E-commerce Events", args.show_samples)
     
-    if not args.no_output:
-        filename = os.path.join(args.output_dir, "ecommerce_data.json")
-        save_as_json(ecommerce_data, filename)
+    filename = os.path.join(output_dir, "ecommerce_data.json")
+    save_as_json(ecommerce_data, filename)
     
     # Security Data
     security_data = generate_security_data_with_metadata(security_count)
-    all_data.extend(security_data)
     print_sample_data(security_data, "Security Logs", args.show_samples)
     
-    if not args.no_output:
-        filename = os.path.join(args.output_dir, "security_data.json")
-        save_as_json(security_data, filename)
+    filename = os.path.join(output_dir, "security_data.json")
+    save_as_json(security_data, filename)
     
-    # Combined data file
-    if not args.no_output:
-        filename = os.path.join(args.output_dir, "combined_data.json")
-        save_as_json(all_data, filename)
+
     
     print(f"\nGeneration completed!")
-    print(f"Total records generated: {len(all_data)}")
+    total_records = len(oil_rig_data) + len(ecommerce_data) + len(security_data)
+    print(f"Total records generated: {total_records}")
     print(f"- Oil Rig: {len(oil_rig_data)} records")
     print(f"- E-commerce: {len(ecommerce_data)} records") 
     print(f"- Security: {len(security_data)} records")
     
-    if not args.no_output:
-        print(f"\nFiles saved to: {args.output_dir}")
-        print(f"- oil_rig_data.json")
-        print(f"- ecommerce_data.json")
-        print(f"- security_data.json")
-        print(f"- combined_data.json")
+    print(f"\nFiles saved to: {output_dir}")
+    print(f"- oil_rig_data.json")
+    print(f"- ecommerce_data.json")
+    print(f"- security_data.json")
 
 if __name__ == "__main__":
     main()
