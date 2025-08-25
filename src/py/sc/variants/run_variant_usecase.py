@@ -33,6 +33,7 @@ import importlib.util
 import argparse
 from datetime import datetime
 from typing import Tuple, List, Dict, Any
+from data_utility import create_spark_session
 
 def print_banner(title: str, width: int = 70) -> None:
     """Print a formatted banner.
@@ -91,12 +92,13 @@ def check_dependencies() -> bool:
     print("✓ All dependencies satisfied")
     return True
 
-def run_use_case_module(module_name: str, description: str) -> Tuple[bool, float]:
+def run_use_case_module(module_name: str, description: str, spark) -> Tuple[bool, float]:
     """Run a specific use case module.
     
     Args:
         module_name (str): Name of the Python module to import and execute
         description (str): Human-readable description of the use case
+        spark: Pre-configured SparkSession to pass to the analysis function
         
     Returns:
         Tuple[bool, float]: Tuple containing:
@@ -113,15 +115,15 @@ def run_use_case_module(module_name: str, description: str) -> Tuple[bool, float
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         
-        # Run the main analysis function
+        # Run the main analysis function with SparkSession
         if module_name == "iot_sensor_processing":
             # Special case for oil rig analysis
             if hasattr(module, "run_oil_rig_analysis"):
-                module.run_oil_rig_analysis()
+                module.run_oil_rig_analysis(spark)
             else:
                 print(f"Warning: No oil rig analysis function found in {module_name}")
         elif hasattr(module, f"run_{module_name.split('_')[0]}_analysis"):
-            getattr(module, f"run_{module_name.split('_')[0]}_analysis")()
+            getattr(module, f"run_{module_name.split('_')[0]}_analysis")(spark)
         else:
             print(f"Warning: No main analysis function found in {module_name}")
         
@@ -225,18 +227,27 @@ def run_all_use_cases() -> None:
 
     ]
     
-    results = []
-    total_start_time = time.time()
+    # Create a single SparkSession for all use cases
+    print("Creating shared SparkSession for all use cases...")
+    spark = create_spark_session("Spark 4.0 Variant Data Type Use Cases")
     
-    for i, (module_name, description) in enumerate(use_cases, 1):
-        print(f"\n[{i}/4] Starting {description}...")
-        success, exec_time = run_use_case_module(module_name, description)
-        results.append((description, success, exec_time))
+    try:
+        results = []
+        total_start_time = time.time()
         
-        if not success:
-            print(f"\n⚠️  Use case {i} failed, but continuing with remaining cases...")
-    
-    total_time = time.time() - total_start_time
+        for i, (module_name, description) in enumerate(use_cases, 1):
+            print(f"\n[{i}/3] Starting {description}...")
+            success, exec_time = run_use_case_module(module_name, description, spark)
+            results.append((description, success, exec_time))
+            
+            if not success:
+                print(f"\n⚠️  Use case {i} failed, but continuing with remaining cases...")
+        
+        total_time = time.time() - total_start_time
+    finally:
+        # Stop the SparkSession after all use cases are complete
+        print("\nStopping shared SparkSession...")
+        spark.stop()
     
     # Print summary
     print_banner("Execution Summary")
@@ -333,12 +344,23 @@ def main() -> None:
     print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     if args.use_case == 'iot':
-        run_use_case_module("iot_sensor_processing", "Offshore Oil Rig Sensor Data Processing")
+        spark = create_spark_session("Offshore Oil Rig Sensor Processing with Variant")
+        try:
+            run_use_case_module("iot_sensor_processing", "Offshore Oil Rig Sensor Data Processing", spark)
+        finally:
+            spark.stop()
     elif args.use_case == 'ecommerce':
-        run_use_case_module("ecommerce_event_analytics", "E-commerce Event Analytics")
+        spark = create_spark_session("E-commerce Event Analytics with Variant")
+        try:
+            run_use_case_module("ecommerce_event_analytics", "E-commerce Event Analytics", spark)
+        finally:
+            spark.stop()
     elif args.use_case == 'security':
-        run_use_case_module("security_log_analysis", "Security Log Analysis")
-
+        spark = create_spark_session("Security Log Analysis with Variant")
+        try:
+            run_use_case_module("security_log_analysis", "Security Log Analysis", spark)
+        finally:
+            spark.stop()
     elif args.use_case == 'all':
         run_all_use_cases()
 

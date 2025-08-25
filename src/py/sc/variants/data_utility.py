@@ -56,6 +56,27 @@ import ipaddress
 import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple, Any, Optional, Callable, Union
+from pyspark.sql import SparkSession
+
+# ============================================================================
+# SPARK SESSION CREATION
+# ============================================================================
+
+def create_spark_session(app_name: str = "Spark Variant Data Processing") -> SparkSession:
+    """Create Spark session with Variant support.
+    
+    Args:
+        app_name (str): Name of the Spark application (default: "Spark Variant Data Processing")
+    
+    Returns:
+        SparkSession: Configured Spark session with adaptive query execution
+            and partition coalescing enabled for optimal performance
+    """
+    return SparkSession.builder \
+        .appName(app_name) \
+        .config("spark.sql.adaptive.enabled", "true") \
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
+        .getOrCreate()
 
 # ============================================================================
 # COMMON CONSTANTS

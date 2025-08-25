@@ -31,25 +31,13 @@ Authors: Jules S. Damji & Cursor AI
 import time
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, parse_json
-from data_utility import generate_ecommerce_data
+from data_utility import generate_ecommerce_data, create_spark_session
 
-def create_spark_session() -> SparkSession:
-    """Create Spark session with Variant support.
-    
-    Returns:
-        SparkSession: Configured Spark session with adaptive query execution
-            and partition coalescing enabled for optimal e-commerce analytics
-    """
-    return SparkSession.builder \
-        .appName("E-commerce Event Analytics with Variant") \
-        .config("spark.sql.adaptive.enabled", "true") \
-        .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
-        .getOrCreate()
-
-
-
-def run_ecommerce_analysis() -> None:
+def run_ecommerce_analysis(spark: SparkSession) -> None:
     """Run the e-commerce event analytics.
+    
+    Args:
+        spark (SparkSession): Pre-configured Spark session to use for analysis
     
     Generates 75,000 e-commerce event records, converts JSON to Variant using DataFrame API,
     and performs comprehensive analytics including:
@@ -68,8 +56,6 @@ def run_ecommerce_analysis() -> None:
     print("=" * 60)
     print("E-commerce Event Analytics with Spark 4.0 Variant")
     print("=" * 60)
-    
-    spark = create_spark_session()
     
     try:
         # Generate fake data
@@ -279,7 +265,12 @@ def run_ecommerce_analysis() -> None:
         print(f"- Nested payment structure demonstrates Variant flexibility")
         
     finally:
-        spark.stop()
+        # Don't stop the spark session here since it's managed by the caller
+        pass
 
 if __name__ == "__main__":
-    run_ecommerce_analysis()
+    spark = create_spark_session("E-commerce Event Analytics with Variant")
+    try:
+        run_ecommerce_analysis(spark)
+    finally:
+        spark.stop()

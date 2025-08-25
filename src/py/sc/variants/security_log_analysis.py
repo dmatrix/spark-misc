@@ -38,25 +38,13 @@ Authors: Jules S. Damji & Cursor AI
 import time
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, parse_json
-from data_utility import generate_security_data
+from data_utility import generate_security_data, create_spark_session
 
-def create_spark_session() -> SparkSession:
-    """Create Spark session with Variant support.
-    
-    Returns:
-        SparkSession: Configured Spark session with adaptive query execution
-            and partition coalescing enabled for optimal security log processing
-    """
-    return SparkSession.builder \
-        .appName("Security Log Analysis with Variant") \
-        .config("spark.sql.adaptive.enabled", "true") \
-        .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
-        .getOrCreate()
-
-
-
-def run_security_analysis() -> None:
+def run_security_analysis(spark: SparkSession) -> None:
     """Run the security log analysis.
+    
+    Args:
+        spark (SparkSession): Pre-configured Spark session to use for analysis
     
     Generates 60,000 security event records from multiple sources (firewall, antivirus, IDS),
     converts JSON to Variant using DataFrame API, and performs comprehensive threat analysis including:
@@ -75,8 +63,6 @@ def run_security_analysis() -> None:
     print("=" * 60)
     print("Security Log Analysis with Spark 4.0 Variant")
     print("=" * 60)
-    
-    spark = create_spark_session()
     
     try:
         # Generate fake data
@@ -292,7 +278,12 @@ def run_security_analysis() -> None:
         print(f"- Nested geo_location structure demonstrates Variant flexibility")
         
     finally:
-        spark.stop()
+        # Don't stop the spark session here since it's managed by the caller
+        pass
 
 if __name__ == "__main__":
-    run_security_analysis()
+    spark = create_spark_session("Security Log Analysis with Variant")
+    try:
+        run_security_analysis(spark)
+    finally:
+        spark.stop()
