@@ -28,25 +28,13 @@ Authors: Jules S. Damji & Cursor AI
 import time
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, parse_json
-from data_utility import generate_oil_rig_data
+from data_utility import generate_oil_rig_data, create_spark_session
 
-def create_spark_session() -> SparkSession:
-    """Create Spark session with Variant support.
-    
-    Returns:
-        SparkSession: Configured Spark session with adaptive query execution
-            and partition coalescing enabled for optimal performance
-    """
-    return SparkSession.builder \
-        .appName("Offshore Oil Rig Sensor Processing with Variant") \
-        .config("spark.sql.adaptive.enabled", "true") \
-        .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
-        .getOrCreate()
-
-
-
-def run_oil_rig_analysis() -> None:
+def run_oil_rig_analysis(spark: SparkSession) -> None:
     """Run the offshore oil rig sensor data analysis.
+    
+    Args:
+        spark (SparkSession): Pre-configured Spark session to use for analysis
     
     Generates 50,000 oil rig sensor records, converts JSON to Variant using DataFrame API,
     and performs comprehensive analytics including:
@@ -65,8 +53,6 @@ def run_oil_rig_analysis() -> None:
     print("=" * 60)
     print("Offshore Oil Rig Sensor Data Processing with Spark 4.0 Variant")
     print("=" * 60)
-    
-    spark = create_spark_session()
     
     try:
         # Generate fake data
@@ -233,7 +219,12 @@ def run_oil_rig_analysis() -> None:
         print("- Oil spill detection for environmental protection")
         
     finally:
-        spark.stop()
+        # Don't stop the spark session here since it's managed by the caller
+        pass
 
 if __name__ == "__main__":
-    run_oil_rig_analysis()
+    spark = create_spark_session("Offshore Oil Rig Sensor Processing with Variant")
+    try:
+        run_oil_rig_analysis(spark)
+    finally:
+        spark.stop()
