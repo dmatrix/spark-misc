@@ -5,7 +5,7 @@ for testing common Python packages. Partial code snippets for testing were gener
 
 Spark Connect Documentation
 
-* [Spark Connect Overview](https://spark.apache.org/docs/4.0.0-preview2/spark-connect-overview.html)
+* [Spark Connect Overview](https://spark.apache.org/docs/latest/spark-connect-overview.html)
  * [Spark Connect Architecture](https://spark.apache.org/spark-connect/)
 
 Spark Connect Technical Talks
