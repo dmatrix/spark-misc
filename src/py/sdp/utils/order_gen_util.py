@@ -4,9 +4,12 @@ import random
 from datetime import datetime, timedelta
 import uuid
 
-def create_random_order_items() -> 'pyspark.sql.DataFrame':
+def create_random_order_items(num_items: int = 100) -> 'pyspark.sql.DataFrame':
     """
     Generates a DataFrame with random order items.
+    
+    Args:
+        num_items (int): Number of random order items to generate. Defaults to 100.
     
     Returns:
         pyspark.sql.DataFrame: DataFrame containing random order items.
@@ -35,9 +38,9 @@ def create_random_order_items() -> 'pyspark.sql.DataFrame':
     # Possible statuses
     statuses = ["approved", "fulfilled", "pending"]
 
-    # Generate 100 random rows
+    # Generate random rows based on num_items parameter
     data = []
-    for _ in range(100):
+    for _ in range(num_items):
         order_id = str(uuid.uuid4())
         order_item = random.choice(items)
         price = round(random.uniform(10.0, 1000.0), 2)  # price between $10 and $1000
@@ -51,11 +54,17 @@ def create_random_order_items() -> 'pyspark.sql.DataFrame':
     return orders_df
 
 def main():
-    # Create random order items DataFrame
-    orders_df = create_random_order_items()
+    # Test creating 10 random order items
+    print("Testing with 10 items:")
+    orders_df_10 = create_random_order_items(num_items=10)
+    orders_df_10.show()
     
-    # Show the DataFrame
-    orders_df.show()
+    print(f"Number of rows generated: {orders_df_10.count()}")
+    
+    # Also test with default (100 items) - just show count
+    print("\nTesting with default 100 items:")
+    orders_df_default = create_random_order_items()
+    print(f"Number of rows with default: {orders_df_default.count()}")
 
 if __name__ == "__main__":
     main()
