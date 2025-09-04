@@ -1,50 +1,27 @@
 from pyspark import pipelines as sdp
-from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import col, pow
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType, DateType
-import random
-from datetime import datetime, timedelta
-import uuid
+from pyspark.sql import DataFrame
+import importlib.util
+import sys
+from pathlib import Path
 
 
-spark = SparkSession.active()
+# Get the path to the utility module
+util_path = Path(__file__).parent.parent.parent / "utils" / "order_gen_util.py"
+
+# Load the module using importlib.util
+spec = importlib.util.spec_from_file_location("order_gen_util", util_path)
+order_gen_util = importlib.util.module_from_spec(spec)
+sys.modules["order_gen_util"] = order_gen_util
+spec.loader.exec_module(order_gen_util)
+
 
 @sdp.materialized_view
 def orders_mv() -> DataFrame:
-
-    # Define schema
-    schema = StructType([
-        StructField("order_id", StringType(), False),
-        StructField("order_item", StringType(), False),
-        StructField("price", FloatType(), False),
-        StructField("items_ordered", IntegerType(), False),
-        StructField("status", StringType(), False),
-        StructField("date_ordered", DateType(), False)
-    ])
-
-    # Possible order items (toys, sports, electronics, etc.)
-    items = [
-        "Toy Car", "Basketball", "Laptop", "Action Figure", "Tennis Racket",
-        "Smartphone", "Board Game", "Football", "Headphones", "Drone",
-        "Puzzle", "Tablet", "Skateboard", "Camera", "Video Game",
-        "Scooter", "Smartwatch", "Baseball Bat", "VR Headset", "Electric Guitar"
-    ]
-
-    # Possible statuses
-    statuses = ["approved", "fulfilled", "pending"]
-
-    # Generate 100 random rows
-    data = []
-    for _ in range(100):
-        order_id = str(uuid.uuid4())
-        order_item = random.choice(items)
-        price = round(random.uniform(10.0, 1000.0), 2)  # price between $10 and $1000
-        items_ordered = random.randint(1, 10)
-        status = random.choice(statuses)
-        date_ordered = (datetime.now() - timedelta(days=random.randint(0, 30))).date()
-        data.append((order_id, order_item, price, items_ordered, status, date_ordered))
-
-    # Create DataFrame
-    orders_df = spark.createDataFrame(data, schema)
-    return orders_df
+    """
+    Materialized view that generates random order items using the utility function.
+    
+    Returns:
+        DataFrame: DataFrame containing random order items.
+    """
+    return order_gen_util.create_random_order_items()
 

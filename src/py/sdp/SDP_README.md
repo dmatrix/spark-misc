@@ -52,15 +52,6 @@ Each project showcases different aspects of the SDP framework, from synthetic da
    spark-pipelines --help
    ```
 
-### Project Dependencies
-
-The project includes the following key dependencies (managed in `pyproject.toml`):
-
-- **PySpark 4.1.0.dev1**: Latest development version of Apache Spark
-- **PySpark Connect 4.1.0.dev1**: Spark Connect client for remote cluster connectivity
-- **Faker 37.6.0+**: For generating realistic synthetic data
-- **Plotly 6.3.0+**: For interactive data visualizations
-
 ## Project Structure
 
 ```
@@ -73,7 +64,8 @@ sdp/
 ├── .venv/                          # UV virtual environment (auto-generated)
 ├── utils/                          # Shared utilities
 │   ├── __init__.py                 # Package initialization
-│   └── order_gen_util.py           # Order data generation utilities
+│   ├── order_gen_util.py           # Order data generation utilities
+│   └── oil_gen_util.py             # Oil rig sensor data generation utilities
 ├── brickfood/                      # E-commerce order processing pipeline
 │   ├── __init__.py                 # Package initialization
 │   ├── pipeline.yml                # SDP pipeline configuration
@@ -103,6 +95,85 @@ sdp/
     └── metastore_db/              # Derby database files (auto-generated)
 ```
 
+## Utility Functions
+
+The project includes shared utility functions for data generation that can be used independently or as part of the pipelines:
+
+### Order Generation Utilities (`utils/order_gen_util.py`)
+
+**Purpose**: Generate realistic e-commerce order data for testing and development.
+
+**Key Functions**:
+- `create_random_order_items(num_items=100)`: Generate random order DataFrame
+- Configurable number of items (default: 100)
+- 20+ product categories including toys, electronics, sports equipment
+- Realistic price ranges ($10-$1000) and order quantities (1-10 items)
+- Order statuses: approved, fulfilled, pending
+- Date ranges: last 30 days
+
+**Usage**:
+```bash
+# Test the order generation utility
+uv run sdp-test-orders
+
+# Or run directly
+uv run python utils/order_gen_util.py
+```
+
+### Oil Rig Sensor Utilities (`utils/oil_gen_util.py`)
+
+**Purpose**: Generate realistic industrial IoT sensor data for oil rig monitoring systems.
+
+**Key Functions**:
+- `generate_sensor_data(rig_name, start_date, num_events=100)`: Generate raw sensor data
+- `create_oil_rig_events_dataframe(rig_name, start_date=None, num_events=100)`: Generate complete DataFrame
+- `get_available_rigs()`: List configured oil rigs
+- `get_rig_info(rig_name)`: Get rig location and specifications
+
+**Supported Rigs**:
+- **Permian Rig**: Midland, Texas (31.9973°N, -102.0779°W)
+- **Eagle Ford Rig**: Karnes City, Texas (28.8851°N, -97.9006°W)
+
+**Sensor Types**:
+- **Temperature**: 150-350°F operational range
+- **Pressure**: 2000-5000 PSI operational range
+- **Water Level**: 100-500 feet depth range
+- **Frequency**: 15-minute intervals
+
+**Usage**:
+```bash
+# Test the oil sensor generation utility
+uv run sdp-test-oil-sensors
+
+# Or run directly
+uv run python utils/oil_gen_util.py
+```
+
+## Entry Points and CLI Commands
+
+The project provides several CLI entry points for easy access to utilities and pipelines:
+
+### Pipeline Execution
+```bash
+# Run complete pipelines
+uv run python main.py brickfood      # E-commerce pipeline
+uv run python main.py oil-rigs       # Oil rigs pipeline
+```
+
+### Utility Testing
+```bash
+# Test data generation utilities
+uv run sdp-test-orders              # Test order generation (100 items)
+uv run sdp-test-oil-sensors         # Test oil sensor generation (multiple rigs)
+```
+
+### Direct Pipeline Access
+```bash
+# Direct access to pipeline components
+uv run sdp-brickfood               # Query BrickFood tables
+uv run sdp-oil-rigs                # Query oil rig tables
+```
+
 ## BrickFood E-commerce Pipeline
 
 ### Purpose
@@ -113,14 +184,14 @@ The pipeline creates the following materialized views:
 
 - **`orders_mv`** - Main orders table with complete order information
   - Schema: `order_id`, `order_item`, `price`, `items_ordered`, `status`, `date_ordered`
-  - Generates 100 random orders with various products and statuses
+  - Uses `utils.order_gen_util.create_random_order_items()` for data generation
   
 - **`approved_orders_mv`** - Filtered view containing only approved orders
 - **`fulfilled_orders_mv`** - Filtered view containing only fulfilled orders  
 - **`pending_orders_mv`** - Filtered view containing only pending orders
 
 ### Key Features
-- **Synthetic Data Generation**: Creates realistic order data with 20+ product types
+- **Synthetic Data Generation**: Uses centralized utility for realistic order data
 - **Order Status Management**: Tracks orders through approval, fulfillment, and pending states
 - **Financial Analytics**: Calculates total prices, 15% sales tax, and order summaries
 - **Product Analytics**: Provides breakdown by product category and sales performance
@@ -177,8 +248,8 @@ Simulates a comprehensive industrial IoT sensor monitoring system for oil drilli
 The pipeline creates the following materialized views:
 
 **Base Data Sources:**
-- **`permian_rig_mv`** - Sensor data from Permian Basin (Midland, Texas: 31.9973°N, -102.0779°W)
-- **`eagle_ford_rig_mv`** - Sensor data from Eagle Ford Shale (Karnes City, Texas: 28.8851°N, -97.9006°W)
+- **`permian_rig_mv`** - Uses `utils.oil_gen_util` for Permian Basin sensor data
+- **`eagle_ford_rig_mv`** - Uses `utils.oil_gen_util` for Eagle Ford Shale sensor data
 
 **Sensor-Specific Views:**
 - **`temperature_events_mv`** - Temperature readings in Fahrenheit (150-350°F range)
@@ -193,6 +264,7 @@ The pipeline creates the following materialized views:
 - **Data Visualization**: Interactive Plotly charts for temperature analysis
 - **Statistical Reporting**: Min/max/average calculations by rig location
 - **Real-time Simulation**: Generates sensor data for the past 2 days
+- **Centralized Data Generation**: Uses shared utility for consistent sensor data
 
 ### Sensor Specifications
 - **Temperature**: 150-350°F operational range
@@ -264,14 +336,19 @@ cd ..
    - Automatically manages dependencies between materialized views
    - Stores data in local Spark warehouse directories
 
+4. **Shared Utilities**
+   - **Centralized Data Generation**: Common utilities for realistic test data
+   - **Reusable Components**: Shared across multiple pipelines and projects
+   - **Parameterized Functions**: Configurable data generation with sensible defaults
+
 ### Materialized View Types
 
 **Python Materialized Views** (`@sdp.materialized_view`)
 ```python
 @sdp.materialized_view
 def my_data_view() -> DataFrame:
-    # Complex data transformation logic
-    return spark.createDataFrame(data, schema)
+    # Uses shared utilities for data generation
+    return utility_module.create_data_dataframe(num_items=1000)
 ```
 
 **SQL Materialized Views** (`.sql` files)
@@ -290,13 +367,16 @@ WHERE condition = 'value';
 
 ### 1. Data Generation
 Both pipelines demonstrate synthetic data generation for testing and development:
-- **BrickFood**: Generates random e-commerce orders with realistic product catalogs
-- **Oil Rigs**: Simulates sensor readings with realistic operational ranges
+- **BrickFood**: Uses `utils.order_gen_util` for realistic e-commerce orders
+- **Oil Rigs**: Uses `utils.oil_gen_util` for realistic sensor readings
+- **Centralized Logic**: All data generation logic is in shared utilities
+- **Parameterized**: Configurable number of records and date ranges
 
 ### 2. Data Transformation
 Showcases the hybrid approach of Python + SQL transformations:
 - **Python**: Complex business logic, data generation, schema definition
 - **SQL**: Filtering, aggregation, and view creation
+- **Utilities**: Shared data generation functions across pipelines
 
 ### 3. Analytics and Reporting
 Demonstrates various analytical capabilities:
@@ -325,6 +405,12 @@ dependencies = [
     "pyspark==4.1.0.dev1",
     "pyspark-connect==4.1.0.dev1",
 ]
+
+[project.scripts]
+sdp-brickfood = "brickfood.query_tables:main"
+sdp-oil-rigs = "oil_rigs.query_oil_rigs_tables:main"
+sdp-test-orders = "utils.order_gen_util:main"
+sdp-test-oil-sensors = "utils.oil_gen_util:main"
 ```
 
 ### Key Features
@@ -333,6 +419,7 @@ dependencies = [
 - **Development Dependencies**: Optional dev dependencies for testing and linting
 - **Virtual Environment**: Automatic isolation with `.venv/` directory
 - **Lock File**: `uv.lock` ensures reproducible builds across environments
+- **Entry Points**: CLI commands for utilities and pipeline components
 
 ### UV Commands
 ```bash
@@ -347,6 +434,10 @@ uv remove package-name
 
 # Run commands in the virtual environment
 uv run python script.py
+
+# Run entry point commands
+uv run sdp-test-orders
+uv run sdp-test-oil-sensors
 
 # Show project info
 uv show
@@ -376,42 +467,48 @@ uv lock --upgrade
 ## Development Workflow
 
 1. **Define Transformations**: Create materialized views in `transformations/` directory
-2. **Configure Pipeline**: Update `pipeline.yml` to include new transformations
-3. **Execute Pipeline**: Run `./run_pipeline.sh` to build materialized views
-4. **Query Data**: Use provided query scripts or create custom analytics
-5. **Visualize Results**: Generate charts and reports using the analysis scripts
+2. **Use Shared Utilities**: Import and use `utils.order_gen_util` or `utils.oil_gen_util` for data generation
+3. **Configure Pipeline**: Update `pipeline.yml` to include new transformations
+4. **Execute Pipeline**: Run `./run_pipeline.sh` to build materialized views
+5. **Query Data**: Use provided query scripts or create custom analytics
+6. **Visualize Results**: Generate charts and reports using the analysis scripts
 
 ## Best Practices
 
 ### Code Organization
-- Separate data generation from business logic
-- Use SQL for simple filtering and aggregation
-- Use Python for complex transformations and data generation
-- Keep utility functions in shared modules
+- **Centralize Data Generation**: Use shared utilities for consistent test data
+- **Separate Concerns**: Keep data generation separate from business logic
+- **Use SQL for Simple Operations**: Filtering and aggregation in SQL
+- **Use Python for Complex Logic**: Data generation and complex transformations
+- **Parameterize Utilities**: Make data generation configurable
 
 ### Performance Considerations
 - SDP automatically manages materialized view dependencies
 - Parquet storage provides efficient analytical query performance
 - Local file system suitable for development; consider distributed storage for production
+- Shared utilities reduce code duplication and improve maintainability
 
 ### Data Quality
 - Both pipelines include data validation and error handling
 - Schema enforcement through Spark StructType definitions
 - Realistic data ranges and constraints for synthetic data
+- Centralized data generation ensures consistency across pipelines
 
 ## Getting Started
 
 ### Quick Start
 1. **Install UV** and **setup the project** (see Prerequisites section above)
 2. **Verify SDP CLI** is installed: `spark-pipelines --help`
-3. **Run a pipeline**: `uv run python main.py brickfood` or `uv run python main.py oil-rigs`
+3. **Test utilities**: `uv run sdp-test-orders` and `uv run sdp-test-oil-sensors`
+4. **Run a pipeline**: `uv run python main.py brickfood` or `uv run python main.py oil-rigs`
 
 ### Step-by-Step
 1. **Choose a Pipeline**: Start with either BrickFood or Oil Rigs
-2. **Review Configuration**: Examine the `pipeline.yml` and transformation files
-3. **Execute Pipeline**: Use the CLI interface or manual execution
-4. **Explore Data**: Generated materialized views are stored in `spark-warehouse/`
-5. **Analyze Results**: Review the analytics output and visualizations
+2. **Test Utilities**: Run the utility tests to understand data generation
+3. **Review Configuration**: Examine the `pipeline.yml` and transformation files
+4. **Execute Pipeline**: Use the CLI interface or manual execution
+5. **Explore Data**: Generated materialized views are stored in `spark-warehouse/`
+6. **Analyze Results**: Review the analytics output and visualizations
 
 ### Troubleshooting
 
@@ -446,6 +543,26 @@ chmod +x oil_rigs/run_pipeline.sh
 
 ## Example Output
 
+### Utility Testing
+```bash
+# Order generation utility test
+$ uv run sdp-test-orders
+Testing with 10 items:
++--------------------+-------------+------+-------------+--------+------------+
+|            order_id|   order_item| price|items_ordered|  status|date_ordered|
++--------------------+-------------+------+-------------+--------+------------+
+|uuid-example        |      Laptop |123.45|            3|approved|  2024-01-15|
++--------------------+-------------+------+-------------+--------+------------+
+Number of rows generated: 10
+
+# Oil sensor utility test
+$ uv run sdp-test-oil-sensors
+Testing oil rig sensor data generation:
+1. Testing Permian Rig with 50 events:
+Generated 150 rows for Permian Rig
+Available rigs: ['permian_rig', 'eagle_ford_rig']
+```
+
 ### BrickFood Analytics
 ```
 Approved Orders with Total Prices and Sales Tax (15%):
@@ -471,12 +588,14 @@ Temperature Readings from All Rigs:
 - **Warehouse Data**: The `spark-warehouse/` directories contain the actual data files in Parquet format.
 - **Virtual Environment**: The `.venv/` directory is automatically created by UV and should not be committed to version control.
 - **Lock File**: The `uv.lock` file should be committed to ensure reproducible builds.
+- **Shared Utilities**: The `utils/` directory contains reusable data generation functions used across pipelines.
 
 ### Development Focus
 - **Local Development**: These examples are designed for local development and learning
 - **UV Integration**: Modern Python package management with automatic dependency resolution
 - **Production Ready**: The UV project structure is suitable for production deployment
 - **Spark Connect**: Supports both local and remote Spark cluster execution
+- **Code Reuse**: Shared utilities promote DRY principles and maintainability
 
 ### CLI Interface
 The project includes a comprehensive CLI interface (`main.py`) that:
@@ -484,5 +603,6 @@ The project includes a comprehensive CLI interface (`main.py`) that:
 - Handles errors gracefully with clear messages
 - Supports both pipelines with consistent interface
 - Exits with proper error codes for scripting integration
+- Includes utility testing commands for development
 
-This SDP implementation provides a solid foundation for understanding declarative data pipeline development with Apache Spark, combining the power of Python's flexibility with SQL's simplicity, all managed through modern UV tooling for comprehensive data processing workflows.
+This SDP implementation provides a solid foundation for understanding declarative data pipeline development with Apache Spark, combining the power of Python's flexibility with SQL's simplicity, all managed through modern UV tooling for comprehensive data processing workflows. The shared utilities demonstrate best practices for code organization and reusability in data pipeline development.
