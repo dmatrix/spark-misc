@@ -37,9 +37,9 @@ def run_brickfood_pipeline():
         try:
             subprocess.run(["./run_pipeline.sh"], check=True)
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
-            print("❌ ERROR: SDP pipeline command not available!")
-            print("   This requires the Spark Declarative Pipelines CLI to be installed.")
-            print("   Please install the SDP CLI before running this pipeline.")
+            print("❌ ERROR: SDP pipeline command failed!")
+            print("   Spark Declarative Pipelines CLI is missing files.")
+            print("   Please check the SDP CLI before running this pipeline.")
             return 1
         
         print("\n2. Querying order data...")
@@ -76,9 +76,9 @@ def run_oil_rigs_pipeline():
         try:
             subprocess.run(["./run_pipeline.sh"], check=True)
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
-            print("❌ ERROR: SDP pipeline command not available!")
-            print("   This requires the Spark Declarative Pipelines CLI to be installed.")
-            print("   Please install the SDP CLI before running this pipeline.")
+            print("❌ ERROR: SDP pipeline command failed!")
+            print("   Spark Declarative Pipelines CLI is missing files.")
+            print("   Please check the SDP CLI before running this pipeline.")
             return 1
         
         print("\n2. Querying sensor data...")
