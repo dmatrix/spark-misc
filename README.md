@@ -3,6 +3,8 @@
 This directory contains example implementations of **Spark Declarative Pipelines (SDP)**, a framework for building and managing data pipelines using Apache Spark. The SDP framework enables declarative data transformations through Python decorators and SQL, providing a clean and maintainable approach to data pipeline development.
 
 ## Overview
+* [Spark Connect Overview](https://spark.apache.org/docs/latest/spark-connect-overview.html)
+ * [Spark Connect Architecture](https://spark.apache.org/spark-connect/)
 
 The SDP directory demonstrates two complete data processing pipelines:
 
