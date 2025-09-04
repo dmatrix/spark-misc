@@ -1,0 +1,56 @@
+[project]
+name = "spark-declarative-pipelines-examples"
+version = "0.1.0"
+description = "Example implementations of Spark Declarative Pipelines (SDP) with PySpark 4.1.0.dev1 and Spark Connect, featuring BrickFood e-commerce and Oil Rigs sensor monitoring use cases"
+readme = "SDP_README.md"
+requires-python = ">=3.11"
+authors = [
+    {name = "Jules S. Damji", email = "jules.damji@databricks.com"}
+]
+keywords = ["spark", "pyspark", "spark-connect", "data-pipelines", "etl", "analytics", "iot", "ecommerce"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "faker>=37.6.0",
+    "plotly>=6.3.0",
+    "pyspark==4.1.0.dev1",
+    "pyspark-connect==4.1.0.dev1",
+]
+
+[project.urls]
+Homepage = "https://github.com/dmatrix/spark-misc"
+Repository = "https://github.com/dmatrix/spark-misc"
+Documentation = "https://github.com/dmatrix/spark-misc/tree/main/src/py/sdp"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+]
+
+[project.scripts]
+sdp-brickfood = "brickfood.query_tables:main"
+sdp-oil-rigs = "oil_rigs.query_oil_rigs_tables:main"
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["brickfood", "oil_rigs", "utils"]
+
+[tool.setuptools.package-data]
+brickfood = ["*.yml", "*.sql", "*.sh"]
+oil_rigs = ["*.yml", "*.sql", "*.sh"]
+
+[tool.uv]
+dev-dependencies = []

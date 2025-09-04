@@ -2,6 +2,8 @@
 
 This directory contains example implementations of **Spark Declarative Pipelines (SDP)**, a framework for building and managing data pipelines using Apache Spark. The SDP framework enables declarative data transformations through Python decorators and SQL, providing a clean and maintainable approach to data pipeline development.
 
+This project is structured as a **uv-managed Python package** with PySpark 4.1.0.dev1 and Spark Connect support, providing a modern development environment with dependency management and virtual environment isolation.
+
 ## Overview
 
 The SDP directory demonstrates two complete data processing pipelines:
@@ -11,14 +13,69 @@ The SDP directory demonstrates two complete data processing pipelines:
 
 Each project showcases different aspects of the SDP framework, from synthetic data generation and materialized view creation to business analytics and sensor data visualization.
 
+## Prerequisites and Setup
+
+### Requirements
+
+1. **Python 3.11+**: Required for the project
+2. **UV Package Manager**: For dependency management and virtual environments
+3. **Spark Declarative Pipelines CLI**: Required for running the pipelines (`spark-pipelines` command)
+
+### Installation
+
+1. **Install UV** (if not already installed):
+   ```bash
+   # macOS/Linux
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   
+   # Windows
+   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
+
+2. **Clone and setup the project**:
+   ```bash
+   cd /path/to/spark-misc/src/py/sdp
+   
+   # Install dependencies and create virtual environment
+   uv sync
+   
+   # Activate the virtual environment (optional)
+   source .venv/bin/activate
+   ```
+
+3. **Verify installation**:
+   ```bash
+   # Check that PySpark is available
+   uv run python -c "import pyspark; print('PySpark version:', pyspark.__version__)"
+   
+   # Check SDP CLI availability (required for pipelines)
+   spark-pipelines --help
+   ```
+
+### Project Dependencies
+
+The project includes the following key dependencies (managed in `pyproject.toml`):
+
+- **PySpark 4.1.0.dev1**: Latest development version of Apache Spark
+- **PySpark Connect 4.1.0.dev1**: Spark Connect client for remote cluster connectivity
+- **Faker 37.6.0+**: For generating realistic synthetic data
+- **Plotly 6.3.0+**: For interactive data visualizations
+
 ## Project Structure
 
 ```
 sdp/
-├── SDP_README.md                  
-├── utils/                           # Shared utilities
+├── pyproject.toml                   # UV project configuration and dependencies
+├── uv.lock                         # UV lock file for reproducible builds
+├── main.py                         # CLI interface for running pipelines
+├── SDP_README.md                   # This file
+├── __init__.py                     # Python package initialization
+├── .venv/                          # UV virtual environment (auto-generated)
+├── utils/                          # Shared utilities
+│   ├── __init__.py                 # Package initialization
 │   └── order_gen_util.py           # Order data generation utilities
-├── brickfood/                       # E-commerce order processing pipeline
+├── brickfood/                      # E-commerce order processing pipeline
+│   ├── __init__.py                 # Package initialization
 │   ├── pipeline.yml                # SDP pipeline configuration
 │   ├── run_pipeline.sh             # Pipeline execution script
 │   ├── transformations/            # Data transformation definitions
@@ -32,6 +89,7 @@ sdp/
 │   ├── metastore_db/              # Derby database files (auto-generated)
 │   └── artifacts/                  # Build artifacts
 └── oil_rigs/                       # Industrial sensor monitoring pipeline
+    ├── __init__.py                 # Package initialization
     ├── pipeline.yml                # SDP pipeline configuration
     ├── run_pipeline.sh             # Pipeline execution script
     ├── transformations/            # Data transformation definitions
@@ -72,6 +130,17 @@ The pipeline creates the following materialized views:
 Toys, sports equipment, electronics including: Toy Car, Basketball, Laptop, Action Figure, Tennis Racket, Smartphone, Board Game, Football, Headphones, Drone, Puzzle, Tablet, Skateboard, Camera, Video Game, Scooter, Smartwatch, Baseball Bat, VR Headset, Electric Guitar.
 
 ### Running the BrickFood Pipeline
+
+#### Using the CLI Interface (Recommended)
+```bash
+# Run the complete BrickFood pipeline
+uv run python main.py brickfood
+
+# Get help
+uv run python main.py --help
+```
+
+#### Manual Execution (Advanced)
 ```bash
 cd brickfood/
 
@@ -79,10 +148,24 @@ cd brickfood/
 ./run_pipeline.sh
 
 # 2. Query and display order data
-python query_tables.py
+uv run python query_tables.py
 
 # 3. Calculate sales tax and generate business analytics
-python calculate_sales_tax.py
+uv run python calculate_sales_tax.py
+
+cd ..
+```
+
+#### Expected Output
+```
+🚀 Spark Declarative Pipelines (SDP) Examples
+==================================================
+🏪 Running BrickFood E-commerce Pipeline...
+==================================================
+1. Executing SDP pipeline...
+2. Querying order data...
+3. Calculating sales tax and analytics...
+✅ BrickFood pipeline completed successfully!
 ```
 
 ## Oil Rigs Industrial Monitoring Pipeline
@@ -119,6 +202,17 @@ The pipeline creates the following materialized views:
 - **Geographic Coverage**: Permian Basin and Eagle Ford Shale regions
 
 ### Running the Oil Rigs Pipeline
+
+#### Using the CLI Interface (Recommended)
+```bash
+# Run the complete Oil Rigs pipeline
+uv run python main.py oil-rigs
+
+# Get help
+uv run python main.py --help
+```
+
+#### Manual Execution (Advanced)
 ```bash
 cd oil_rigs/
 
@@ -126,10 +220,24 @@ cd oil_rigs/
 ./run_pipeline.sh
 
 # 2. Query and display sensor data from all materialized views
-python query_oil_rigs_tables.py
+uv run python query_oil_rigs_tables.py
 
 # 3. Generate interactive temperature visualization
-python plot_temperatures.py
+uv run python plot_temperatures.py
+
+cd ..
+```
+
+#### Expected Output
+```
+🚀 Spark Declarative Pipelines (SDP) Examples
+==================================================
+🛢️  Running Oil Rigs Industrial Monitoring Pipeline...
+==================================================
+1. Executing SDP pipeline...
+2. Querying sensor data...
+3. Generating temperature visualizations...
+✅ Oil Rigs pipeline completed successfully!
 ```
 
 ## SDP Framework Architecture
@@ -199,17 +307,66 @@ Demonstrates various analytical capabilities:
 - **Plotly Integration**: Interactive charts with Spark DataFrame direct integration
 - **Statistical Reporting**: Automated summary statistics and data quality checks
 
+## UV Project Configuration
+
+### Dependencies Management
+The project uses UV for modern Python dependency management. All dependencies are specified in `pyproject.toml`:
+
+```toml
+[project]
+name = "spark-declarative-pipelines-examples"
+version = "0.1.0"
+description = "Example implementations of Spark Declarative Pipelines (SDP) with PySpark 4.1.0.dev1 and Spark Connect"
+requires-python = ">=3.11"
+
+dependencies = [
+    "faker>=37.6.0",
+    "plotly>=6.3.0", 
+    "pyspark==4.1.0.dev1",
+    "pyspark-connect==4.1.0.dev1",
+]
+```
+
+### Key Features
+- **Pinned PySpark Version**: Uses exact version `4.1.0.dev1` for consistency
+- **Spark Connect Support**: Includes `pyspark-connect` for remote cluster connectivity
+- **Development Dependencies**: Optional dev dependencies for testing and linting
+- **Virtual Environment**: Automatic isolation with `.venv/` directory
+- **Lock File**: `uv.lock` ensures reproducible builds across environments
+
+### UV Commands
+```bash
+# Install dependencies and sync environment
+uv sync
+
+# Add a new dependency
+uv add package-name
+
+# Remove a dependency
+uv remove package-name
+
+# Run commands in the virtual environment
+uv run python script.py
+
+# Show project info
+uv show
+
+# Update dependencies
+uv lock --upgrade
+```
+
 ## Dependencies
 
-### Required Python Packages
-```
-pyspark
-faker
-plotly
-uuid (standard library)
-datetime (standard library)
-random (standard library)
-```
+### Core Dependencies
+- **PySpark 4.1.0.dev1**: Latest development version of Apache Spark
+- **PySpark Connect 4.1.0.dev1**: Spark Connect client for remote clusters
+- **Faker 37.6.0+**: Realistic synthetic data generation
+- **Plotly 6.3.0+**: Interactive data visualizations
+
+### System Requirements
+- **Python 3.11+**: Required minimum Python version
+- **Spark Declarative Pipelines CLI**: External tool for pipeline execution
+- **Java 11+**: Required by PySpark (automatically handled by Spark)
 
 ### Spark Configuration
 - **Catalog**: Hive metastore support required
@@ -244,11 +401,48 @@ random (standard library)
 
 ## Getting Started
 
-1. **Choose a Pipeline**: Start with either `brickfood/` or `oil_rigs/`
+### Quick Start
+1. **Install UV** and **setup the project** (see Prerequisites section above)
+2. **Verify SDP CLI** is installed: `spark-pipelines --help`
+3. **Run a pipeline**: `uv run python main.py brickfood` or `uv run python main.py oil-rigs`
+
+### Step-by-Step
+1. **Choose a Pipeline**: Start with either BrickFood or Oil Rigs
 2. **Review Configuration**: Examine the `pipeline.yml` and transformation files
-3. **Execute Pipeline**: Run the `run_pipeline.sh` script
-4. **Explore Data**: Use the query scripts to examine the generated materialized views
-5. **Analyze Results**: Run the analytics scripts to see data insights
+3. **Execute Pipeline**: Use the CLI interface or manual execution
+4. **Explore Data**: Generated materialized views are stored in `spark-warehouse/`
+5. **Analyze Results**: Review the analytics output and visualizations
+
+### Troubleshooting
+
+#### SDP CLI Not Available
+If you see this error:
+```
+❌ ERROR: SDP pipeline command not available!
+   This requires the Spark Declarative Pipelines CLI to be installed.
+   Please install the SDP CLI before running this pipeline.
+```
+
+**Solution**: Install the Spark Declarative Pipelines CLI tool. The `spark-pipelines` command must be available in your PATH.
+
+#### Environment Issues
+```bash
+# Recreate the virtual environment
+uv sync --reinstall
+
+# Check Python version
+uv run python --version
+
+# Verify PySpark installation
+uv run python -c "import pyspark; print(pyspark.__version__)"
+```
+
+#### Permission Issues
+```bash
+# Make sure shell scripts are executable
+chmod +x brickfood/run_pipeline.sh
+chmod +x oil_rigs/run_pipeline.sh
+```
 
 ## Example Output
 
@@ -272,8 +466,23 @@ Temperature Readings from All Rigs:
 
 ## Notes
 
+### File Structure
 - **Derby Database**: The `metastore_db/` directories contain auto-generated Derby database files for Spark's Hive metastore. These should not be modified manually.
 - **Warehouse Data**: The `spark-warehouse/` directories contain the actual data files in Parquet format.
-- **Development Focus**: These examples are designed for local development and learning. Production deployments would typically use distributed storage systems.
+- **Virtual Environment**: The `.venv/` directory is automatically created by UV and should not be committed to version control.
+- **Lock File**: The `uv.lock` file should be committed to ensure reproducible builds.
 
-This SDP implementation provides a solid foundation for understanding declarative data pipeline development with Apache Spark, combining the power of Python's flexibility with SQL's simplicity for comprehensive data processing workflows.
+### Development Focus
+- **Local Development**: These examples are designed for local development and learning
+- **UV Integration**: Modern Python package management with automatic dependency resolution
+- **Production Ready**: The UV project structure is suitable for production deployment
+- **Spark Connect**: Supports both local and remote Spark cluster execution
+
+### CLI Interface
+The project includes a comprehensive CLI interface (`main.py`) that:
+- Provides user-friendly pipeline execution
+- Handles errors gracefully with clear messages
+- Supports both pipelines with consistent interface
+- Exits with proper error codes for scripting integration
+
+This SDP implementation provides a solid foundation for understanding declarative data pipeline development with Apache Spark, combining the power of Python's flexibility with SQL's simplicity, all managed through modern UV tooling for comprehensive data processing workflows.
