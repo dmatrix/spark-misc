@@ -1,0 +1,32 @@
+{
+  "version": "v1",
+  "host": "https://e2-dogfood.staging.cloud.databricks.com",
+  "remote_path": "/Workspace/Users/jules@databricks.com/holiday-request-manager",
+  "last_modified_times": {
+    "chatbotcuj_app/app.py": "2025-06-30T15:07:22.807357651-07:00",
+    "chatbotcuj_app/app.yaml": "2025-06-30T14:01:22.849449031-07:00",
+    "chatbotcuj_app/model_serving_utils.py": "2025-09-05T11:14:36.331993575-07:00",
+    "chatbotcuj_app/requirements.txt": "2025-06-30T14:01:23.325170297-07:00",
+    "holiday_request_app/app.py": "2025-09-05T11:31:11.522564636-07:00",
+    "holiday_request_app/app.yaml": "2025-09-05T11:20:11.692866277-07:00",
+    "holiday_request_app/requirements.txt": "2025-09-05T11:17:25.994696355-07:00"
+  },
+  "local_to_remote_names": {
+    "chatbotcuj_app/app.py": "chatbotcuj_app/app.py",
+    "chatbotcuj_app/app.yaml": "chatbotcuj_app/app.yaml",
+    "chatbotcuj_app/model_serving_utils.py": "chatbotcuj_app/model_serving_utils.py",
+    "chatbotcuj_app/requirements.txt": "chatbotcuj_app/requirements.txt",
+    "holiday_request_app/app.py": "holiday_request_app/app.py",
+    "holiday_request_app/app.yaml": "holiday_request_app/app.yaml",
+    "holiday_request_app/requirements.txt": "holiday_request_app/requirements.txt"
+  },
+  "remote_to_local_names": {
+    "chatbotcuj_app/app.py": "chatbotcuj_app/app.py",
+    "chatbotcuj_app/app.yaml": "chatbotcuj_app/app.yaml",
+    "chatbotcuj_app/model_serving_utils.py": "chatbotcuj_app/model_serving_utils.py",
+    "chatbotcuj_app/requirements.txt": "chatbotcuj_app/requirements.txt",
+    "holiday_request_app/app.py": "holiday_request_app/app.py",
+    "holiday_request_app/app.yaml": "holiday_request_app/app.yaml",
+    "holiday_request_app/requirements.txt": "holiday_request_app/requirements.txt"
+  }
+}
