@@ -1,0 +1,9 @@
+name: simple-lakebase-app
+description: A simple Streamlit app for Lakebase data exploration
+command: [
+  "streamlit",
+  "run",
+  "app.py",
+  "--server.port=8000",
+  "--server.address=0.0.0.0"
+]

@@ -1,0 +1,9 @@
+name: database-table-browser
+description: A Streamlit app for browsing and exploring database tables with schema inspection and data visualization
+command: [
+  "streamlit",
+  "run",
+  "app.py",
+  "--server.port=8000",
+  "--server.address=0.0.0.0"
+]
