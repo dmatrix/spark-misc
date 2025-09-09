@@ -11,14 +11,17 @@ workspace_client = WorkspaceClient()
 postgres_username = app_config.client_id
 postgres_host = os.getenv("PGHOST")
 postgres_port = 5432
-postgres_database = "jsd-lakebase-demo"
+#postgres_database = "jsd-lakebase-demo"
+postgres_database = "databricks_postgres"
 
-postgres_pool = create_engine(f"postgresql+psycopg2://{postgres_username}:@{postgres_host}:{postgres_port}/{postgres_database}")
+postgres_pool = create_engine(f"postgresql+psycopg://{postgres_username}:@{postgres_host}:{postgres_port}/{postgres_database}",
+     pool_pre_ping=True)
+
 
 @event.listens_for(postgres_pool, "do_connect")
 def provide_token(dialect, conn_rec, cargs, cparams):
     """Provide the App's OAuth token. Caching is managed by WorkspaceClient"""
-    cparams["password"] = workspace_client.config.token
+    cparams["password"] = workspace_client.config.oauth_token().access_token
 
 def get_engine():
     """Return the postgres engine."""
@@ -115,7 +118,7 @@ def main():
         st.subheader("Holiday Requests")
         
         # Create columns for the table display
-        col_headers = ["", "Request ID", "Employee", "Start Date", "End Date", "Status", "Manager Comment"]
+        col_headers = ["Select ID", "Request ID", "Employee", "Start Date", "End Date", "Status", "Manager Comment"]
         
         # Create header row
         header_cols = st.columns([0.5, 1, 1.5, 1.5, 1.5, 1, 2])
@@ -123,16 +126,24 @@ def main():
             with header_cols[i]:
                 st.markdown(f"**{header}**")
         
-        # Display each request as a row with radio button selection
+        # Display each request as a row with individual radio buttons
         for idx, row in df.iterrows():
             cols = st.columns([0.5, 1, 1.5, 1.5, 1.5, 1, 2])
             
             with cols[0]:
-                # Radio button for selection
-                if st.radio("", [row['request_id']], key=f"radio_{row['request_id']}", 
-                           index=0 if st.session_state.selected_request_id == row['request_id'] else None,
-                           label_visibility="collapsed"):
-                    st.session_state.selected_request_id = row['request_id']
+                # Individual radio button for each row
+                is_selected = st.session_state.selected_request_id == row['request_id']
+                if st.button("⚪" if not is_selected else "🔘", 
+                           key=f"radio_btn_{row['request_id']}", 
+                           help="Select this request"):
+                    # When clicked, update selection
+                    if st.session_state.selected_request_id == row['request_id']:
+                        # If already selected, deselect
+                        st.session_state.selected_request_id = None
+                    else:
+                        # Select this request
+                        st.session_state.selected_request_id = row['request_id']
+                    st.rerun()
             
             with cols[1]:
                 st.write(row['request_id'])

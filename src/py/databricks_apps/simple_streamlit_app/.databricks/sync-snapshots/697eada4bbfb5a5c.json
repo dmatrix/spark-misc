@@ -1,0 +1,26 @@
+{
+  "version": "v1",
+  "host": "https://e2-dogfood.staging.cloud.databricks.com",
+  "remote_path": "/Workspace/Users/jules@databricks.com/simple-streamllit-app",
+  "last_modified_times": {
+    ".python-version": "2025-09-05T17:09:00.849682323-07:00",
+    "app.py": "2025-09-07T15:23:23.83763878-07:00",
+    "app.yaml": "2025-09-08T06:59:46.292437048-07:00",
+    "pyproject.toml": "2025-09-05T17:08:25.113996798-07:00",
+    "uv.lock": "2025-09-05T17:07:59.7470329-07:00"
+  },
+  "local_to_remote_names": {
+    ".python-version": ".python-version",
+    "app.py": "app.py",
+    "app.yaml": "app.yaml",
+    "pyproject.toml": "pyproject.toml",
+    "uv.lock": "uv.lock"
+  },
+  "remote_to_local_names": {
+    ".python-version": ".python-version",
+    "app.py": "app.py",
+    "app.yaml": "app.yaml",
+    "pyproject.toml": "pyproject.toml",
+    "uv.lock": "uv.lock"
+  }
+}
