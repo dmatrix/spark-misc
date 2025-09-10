@@ -94,8 +94,8 @@ def get_table_info(schema_name, table_name):
 # Streamlit App
 def main():
     st.set_page_config(
-        page_title="Florida BrickCon 2025 and Offsite-holiday ShinDig Holiday Request Manager",
-        page_icon="🏖️",
+        page_title="Florida BrickCon 2025 and Offsite-holiday Shindig Request Manager",
+        page_icon="🏖️🏖️🏖️",
         layout="wide"
     )
     
@@ -115,7 +115,7 @@ def main():
             return
             
         # Display the holiday requests table
-        st.subheader("Holiday Requests")
+        st.subheader("DevRel Team Holiday Requests")
         
         # Create columns for the table display
         col_headers = ["Select ID", "Request ID", "Employee", "Start Date", "End Date", "Status", "Manager Comment"]
