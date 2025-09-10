@@ -170,6 +170,7 @@ This project is licensed under the "Use It, Love It, Share It" license. Basicall
 - The Databricks team for building an amazing platform
 - Our test team members for "volunteering" their names
 - Coffee, for making all of this possible
+- Inspired by the [Databricks Blog](https://www.databricks.com/blog/how-use-lakebase-transactional-data-layer-databricks-apps) (and modified here)
 - You, for reading this far (seriously, thanks!)
 
 ---
