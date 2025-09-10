@@ -99,8 +99,8 @@ def main():
         layout="wide"
     )
     
-    st.title("Holiday Request Manager for Orlando, Florida BrickCon 2025and Offsite-holiday ShinDig")
-    st.markdown("Olfaf, Please Review, approve, or decline holiday requests from your team.")
+    st.title("Holiday Request Manager for Orlando, Florida BrickCon 2025 and Offsite-holiday Shindig")
+    st.markdown("Olaf, Please review, approve, or decline holiday requests from your team.")
     
     # Initialize session state for selected request
     if "selected_request_id" not in st.session_state:
