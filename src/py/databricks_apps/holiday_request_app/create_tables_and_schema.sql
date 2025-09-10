@@ -25,6 +25,7 @@ INSERT INTO holidays.holiday_requests (employee_name, start_date, end_date, stat
     ('Jenni Jones', '2025-12-01', '2025-12-12', 'Pending', ''),
     ('Jules Damji', '2025-12-01', '2025-12-12', 'Pending', ''),
     ('Lizzie Santor', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Lisa Cao', '2025-12-01', '2025-12-12', 'Pending', ''),
     ('Nick Karpov', '2025-12-01', '2025-12-12', 'Pending', ''),
     ('Oleksandra Bovkun', '2025-12-01', '2025-12-12', 'Pending', ''),
     ('Robert Pack', '2025-12-01', '2025-12-12', 'Pending', ''),
