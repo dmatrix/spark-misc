@@ -94,13 +94,13 @@ def get_table_info(schema_name, table_name):
 # Streamlit App
 def main():
     st.set_page_config(
-        page_title="Holiday Request Manager",
+        page_title="Florida BrickCon 2025 and Offsite-holiday ShinDig Holiday Request Manager",
         page_icon="🏖️",
         layout="wide"
     )
     
-    st.title("Holiday Request Manager")
-    st.markdown("Review, approve, or decline holiday requests from your team.")
+    st.title("Holiday Request Manager for Orlando, Florida BrickCon 2025and Offsite-holiday ShinDig")
+    st.markdown("Olfaf, Please Review, approve, or decline holiday requests from your team.")
     
     # Initialize session state for selected request
     if "selected_request_id" not in st.session_state:

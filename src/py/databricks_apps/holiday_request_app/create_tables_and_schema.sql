@@ -13,12 +13,22 @@ CREATE TABLE IF NOT EXISTS holidays.holiday_requests (
   manager_note TEXT
 );
 
--- 3. Insert some values
+-- 3. Insert sample holiday requests for all team members
 INSERT INTO holidays.holiday_requests (employee_name, start_date, end_date, status, manager_note)
   VALUES
-    ('Joe', '2025-08-01', '2025-08-20', 'Pending', ''),
-    ('Suzy', '2025-07-22', '2025-07-25', 'Pending', ''),
-    ('Charlie', '2025-08-01', '2025-08-05', 'Pending', '');
+    ('Andre Landgraf', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Carly Akerly', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Daniel Liden', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Denny Lee', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Elise Hollowed', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Holly Smith', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Jenni Jones', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Jules Damji', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Lizzie Santor', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Nick Karpov', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Oleksandra Bovkun', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Robert Pack', '2025-12-01', '2025-12-12', 'Pending', ''),
+    ('Torey Bublitz', '2025-12-01', '2025-12-12', 'Pending', '');
 
 
 -- 4. The Lakebase resource in the App already allows connecting to Lakebase database instance and the database.
