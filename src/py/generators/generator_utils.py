@@ -62,44 +62,38 @@ class OrderGenerator(DataGenerator):
     
     def create_spark_dataframe(self, num_events: int = 100) -> 'pyspark.sql.DataFrame':
         """
-        Generates a Spark DataFrame with random order events.
+        Creates a Spark DataFrame with order events using generate_item() to avoid code duplication.
+        Uses explicit schema to ensure proper data types matching generate_item structure.
         
         Args:
-            num_events (int): Number of random order events to generate. Defaults to 100.
+            num_events (int): Number of events to generate. Defaults to 100.
         
         Returns:
-            pyspark.sql.DataFrame: DataFrame containing random order events.
+            pyspark.sql.DataFrame: DataFrame containing order events
         """
         from pyspark.sql import SparkSession
-        from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType, DateType
+        from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType
         
         # Initialize Spark session
         spark = SparkSession.active()
-
-        # Define schema
+        
+        # Define explicit schema matching generate_item structure
         schema = StructType([
             StructField("order_id", StringType(), False),
             StructField("order_item", StringType(), False),
             StructField("price", FloatType(), False),
             StructField("items_ordered", IntegerType(), False),
             StructField("status", StringType(), False),
-            StructField("date_ordered", DateType(), False)
+            StructField("date_ordered", StringType(), False),      # JSON dates are strings
+            StructField("customer_id", StringType(), False),
+            StructField("order_timestamp", StringType(), False)   # JSON timestamps are strings
         ])
-
-        # Generate random rows based on num_events parameter
-        data = []
-        for _ in range(num_events):
-            order_id = str(uuid.uuid4())
-            order_item = random.choice(self.items)
-            price = round(random.uniform(10.0, 1000.0), 2)
-            items_ordered = random.randint(1, 10)
-            status = random.choice(self.statuses)
-            date_ordered = (datetime.now() - timedelta(days=random.randint(0, 30))).date()
-            data.append((order_id, order_item, price, items_ordered, status, date_ordered))
-
-        # Create DataFrame
-        orders_df = spark.createDataFrame(data, schema)
-        return orders_df
+        
+        # Generate JSON data using existing generate_batch method (which uses generate_item)
+        json_data = self.generate_batch(num_events)
+        
+        # Create DataFrame with explicit schema to ensure proper types
+        return spark.createDataFrame(json_data, schema)
 
 
 class OilRigGenerator(DataGenerator):
@@ -133,21 +127,6 @@ class OilRigGenerator(DataGenerator):
         }
         self.sensor_ranges = SENSOR_RANGES
         
-        # Predefined rigs for sensor data
-        self.oil_rigs = {
-            'permian_rig': {
-                'location': 'Midland, Texas',
-                'region': 'Permian Basin',
-                'lat': 31.9973,
-                'lon': -102.0779
-            },
-            'eagle_ford_rig': {
-                'location': 'Karnes City, Texas',
-                'region': 'Eagle Ford Shale',
-                'lat': 28.8851,
-                'lon': -97.9006
-            }
-        }
     
     def generate_item(self) -> Dict[str, Any]:
         """Generate a single random oil rig entity event (for JSON output)."""
@@ -179,93 +158,52 @@ class OilRigGenerator(DataGenerator):
             "timestamp": datetime.now().isoformat() + "Z"
         }
     
-    def create_spark_dataframe(self, rig_name: str = 'permian_rig', start_date: datetime = None, num_events: int = 100) -> 'pyspark.sql.DataFrame':
+    def create_spark_dataframe(self, num_events: int = 100) -> 'pyspark.sql.DataFrame':
         """
-        Creates a Spark DataFrame with oil rig sensor events.
+        Creates a Spark DataFrame with oil rig events using generate_item() to avoid code duplication.
+        Uses explicit schema to ensure proper data types and nested struct for coordinates.
         
         Args:
-            rig_name (str): Name of the oil rig (must be a key in oil_rigs)
-            start_date (datetime): Starting timestamp for the sensor data. Defaults to 2 days ago.
             num_events (int): Number of events to generate. Defaults to 100.
         
         Returns:
-            pyspark.sql.DataFrame: DataFrame containing oil rig sensor events
+            pyspark.sql.DataFrame: DataFrame containing oil rig events
         """
         from pyspark.sql import SparkSession
-        from pyspark.sql.types import StructType, StructField, StringType, FloatType, TimestampType
+        from pyspark.sql.types import StructType, StructField, StringType, FloatType, IntegerType
         
         # Initialize Spark session
         spark = SparkSession.active()
         
-        # Define schema
-        schema = StructType([
-            StructField("event_id", StringType(), False),
-            StructField("rig_name", StringType(), False),
-            StructField("location", StringType(), False),
-            StructField("region", StringType(), False),
-            StructField("sensor_type", StringType(), False),
-            StructField("sensor_value", FloatType(), False),
-            StructField("timestamp", TimestampType(), False),
+        # Define explicit schema matching generate_item structure
+        coordinates_schema = StructType([
             StructField("latitude", FloatType(), False),
             StructField("longitude", FloatType(), False)
         ])
         
-        # Default start date if not provided
-        if start_date is None:
-            start_date = datetime.now() - timedelta(days=2)
+        schema = StructType([
+            StructField("rig_id", StringType(), False),
+            StructField("rig_name", StringType(), False),
+            StructField("rig_type", StringType(), False),
+            StructField("location", StringType(), False),
+            StructField("operator", StringType(), False),
+            StructField("depth_meters", IntegerType(), False),
+            StructField("daily_production_barrels", IntegerType(), False),
+            StructField("crew_size", IntegerType(), False),
+            StructField("status", StringType(), False),
+            StructField("commissioning_date", StringType(), False),  # JSON dates are strings
+            StructField("last_inspection", StringType(), False),     # JSON dates are strings
+            StructField("coordinates", coordinates_schema, False),
+            StructField("sensor_type", StringType(), False),
+            StructField("sensor_value", FloatType(), False),
+            StructField("timestamp", StringType(), False)           # JSON timestamps are strings
+        ])
         
-        # Generate sensor events using the helper method
-        data = self._generate_sensor_events(rig_name, start_date, num_events)
+        # Generate JSON data using existing generate_batch method (which uses generate_item)
+        json_data = self.generate_batch(num_events)
         
-        # Create and return DataFrame
-        return spark.createDataFrame(data, schema)
-    
-    def get_available_rigs(self) -> List[str]:
-        """Returns a list of available oil rig names for sensor data."""
-        return list(self.oil_rigs.keys())
-    
-    def get_rig_info(self, rig_name: str) -> Dict[str, Any]:
-        """Returns information about a specific oil rig."""
-        return self.oil_rigs.get(rig_name, {})
-    
-    def _generate_sensor_events(self, rig_name: str, start_date: datetime, num_events: int = 100) -> List[Dict[str, Any]]:
-        """
-        Generate raw sensor event data as a list of dictionaries.
-        
-        Args:
-            rig_name (str): Name of the oil rig
-            start_date (datetime): Starting timestamp for the sensor data
-            num_events (int): Number of events to generate
-        
-        Returns:
-            List[Dict[str, Any]]: List of sensor event dictionaries
-        """
-        data = []
-        current_time = start_date
-        
-        for _ in range(num_events):
-            for sensor_type, (min_val, max_val) in self.sensor_ranges.items():
-                # Add some random variation but maintain a general trend
-                base_value = random.uniform(min_val, max_val)
-                # Add some noise
-                value = base_value + random.uniform(-base_value * 0.05, base_value * 0.05)
-                
-                data.append({
-                    'event_id': str(uuid.uuid4()),
-                    'rig_name': rig_name,
-                    'location': self.oil_rigs[rig_name]['location'],
-                    'region': self.oil_rigs[rig_name]['region'],
-                    'sensor_type': sensor_type,
-                    'sensor_value': round(value, 2),
-                    'timestamp': current_time,
-                    'latitude': self.oil_rigs[rig_name]['lat'],
-                    'longitude': self.oil_rigs[rig_name]['lon']
-                })
-            
-            # Increment time by 15 minutes
-            current_time += timedelta(minutes=15)
-        
-        return data
+        # Create DataFrame with explicit schema to ensure proper types and struct for coordinates
+        return spark.createDataFrame(json_data, schema)
 
 
 class BatchManager:
